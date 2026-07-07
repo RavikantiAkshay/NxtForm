@@ -5,7 +5,6 @@ export default function TopNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem('nxtform_token');
-  const isDark = location.pathname === '/' || location.pathname === '/auth';
 
   const handleLogout = () => {
     localStorage.removeItem('nxtform_token');
@@ -22,10 +21,8 @@ export default function TopNavbar() {
     }
   };
 
-  // The styling adjusts based on whether it's on the dark Landing Page or light Dashboard
-  const navClass = isDark 
-    ? "w-full top-0 sticky z-50 bg-[#131313]/80 backdrop-blur-md border-b border-outline-variant text-[#e5e2e1]"
-    : "w-full top-0 sticky z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 text-gray-900 shadow-sm";
+  // The styling is consistent across the dark-themed platform
+  const navClass = "w-full top-0 sticky z-50 bg-[#131313]/80 backdrop-blur-md border-b border-outline-variant text-[#e5e2e1]";
 
   return (
     <header className={navClass}>
@@ -34,21 +31,27 @@ export default function TopNavbar() {
           <div className="w-8 h-8 rounded-lg bg-[#8b5cf6] flex items-center justify-center">
             <span className="material-symbols-outlined text-white text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>dataset</span>
           </div>
-          <span className={`font-headline-md text-headline-md font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>NxtForm AI</span>
+          <span className="font-headline-md text-headline-md font-bold text-white">NxtForm AI</span>
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
           {token ? (
             <>
               <button 
+                onClick={() => navigate('/')} 
+                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname === '/' ? 'text-[#8b5cf6]' : 'text-gray-400 hover:text-white'}`}
+              >
+                Home
+              </button>
+              <button 
                 onClick={() => navigate('/workspace')} 
-                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname === '/workspace' ? 'text-[#8b5cf6]' : (isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900')}`}
+                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname === '/workspace' ? 'text-[#8b5cf6]' : 'text-gray-400 hover:text-white'}`}
               >
                 My Forms
               </button>
               <button 
                 onClick={() => navigate('/dashboard/customer-feedback')} 
-                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname.includes('/dashboard') ? 'text-[#8b5cf6]' : (isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900')}`}
+                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname.includes('/dashboard') ? 'text-[#8b5cf6]' : 'text-gray-400 hover:text-white'}`}
               >
                 Responses
               </button>
@@ -56,13 +59,13 @@ export default function TopNavbar() {
           ) : (
             <>
               <button
-                className={`font-label-md text-label-md font-bold transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                className="font-label-md text-label-md font-bold transition-colors text-gray-400 hover:text-white"
                 onClick={() => handleScroll('precision-engineering-section')}
               >
                 Features
               </button>
               <button
-                className={`font-label-md text-label-md font-bold transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                className="font-label-md text-label-md font-bold transition-colors text-gray-400 hover:text-white"
                 onClick={() => handleScroll('how-it-works')}
               >
                 How it Works
@@ -76,7 +79,7 @@ export default function TopNavbar() {
             <>
               <button
                 onClick={handleLogout}
-                className={`font-label-md text-label-md font-bold transition-colors ${isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'}`}
+                className="font-label-md text-label-md font-bold transition-colors text-gray-400 hover:text-red-400"
               >
                 Logout
               </button>
@@ -91,7 +94,7 @@ export default function TopNavbar() {
             <>
               <button
                 onClick={() => navigate('/auth')}
-                className={`font-label-md text-label-md font-bold transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                className="font-label-md text-label-md font-bold transition-colors text-gray-400 hover:text-white"
               >
                 Sign In
               </button>

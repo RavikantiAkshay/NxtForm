@@ -8,6 +8,7 @@ export default function WorkspaceBuilder() {
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
   const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
+  const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [blocks, setBlocks] = useState([
@@ -592,7 +593,22 @@ export default function WorkspaceBuilder() {
                           </div>
                           
                           {/* Actions */}
-                          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={() => updateBlockValue(block.id, 'required', !block.required)}
+                              className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${
+                                block.required 
+                                  ? 'bg-primary/10 text-primary border border-primary/20' 
+                                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                              }`}
+                              title="Toggle Required"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">
+                                {block.required ? 'star' : 'star_border'}
+                              </span>
+                              Required
+                            </button>
+                            <div className="w-px h-4 bg-gray-200"></div>
                             <button 
                               onClick={() => duplicateBlock(block)}
                               className="text-gray-400 hover:text-gray-800" 
@@ -734,25 +750,37 @@ export default function WorkspaceBuilder() {
           </div>
 
           {/* Right Side: Immersive Device Live Preview */}
-          <aside className="w-[380px] bg-[#0a0a0a] border-l border-[#1a1a1a] flex flex-col items-center py-6 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0">
+          <aside className={`bg-[#0a0a0a] border-l border-[#1a1a1a] flex flex-col items-center py-6 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0 transition-all duration-300 ${previewDevice === 'mobile' ? 'w-[380px]' : 'w-[65%]'}`}>
             <div className="flex items-center justify-between w-full px-6 mb-6">
               <h3 className="font-label-md text-label-md text-on-surface">Live Preview</h3>
               <div className="flex bg-surface-container-high rounded-lg p-1">
-                <button className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded font-label-sm text-label-sm flex items-center justify-center">
+                <button 
+                  onClick={() => setPreviewDevice('mobile')}
+                  className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'mobile' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
+                >
                   <span className="material-symbols-outlined text-[16px]">smartphone</span>
                 </button>
-                <button className="px-3 py-1 text-on-surface-variant hover:text-on-surface rounded font-label-sm text-label-sm flex items-center justify-center">
+                <button 
+                  onClick={() => setPreviewDevice('desktop')}
+                  className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'desktop' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
+                >
                   <span className="material-symbols-outlined text-[16px]">desktop_windows</span>
                 </button>
               </div>
             </div>
 
-            {/* Phone Frame Mockup (Notch) */}
-            <div className="relative w-[290px] h-[550px] bg-black rounded-[36px] border-[6px] border-[#262626] overflow-hidden shadow-2xl flex flex-col">
+            {/* Preview Mockup Container */}
+            <div className={`relative bg-black transition-all duration-300 overflow-hidden shadow-2xl flex flex-col ${
+              previewDevice === 'mobile' 
+                ? 'w-[290px] h-[550px] rounded-[36px] border-[6px] border-[#262626]' 
+                : 'w-[90%] h-[90%] rounded-xl border border-[#262626]'
+            }`}>
               {/* Notch */}
-              <div className="absolute top-0 inset-x-0 h-5 flex justify-center z-50">
-                <div className="w-28 h-5 bg-[#262626] rounded-b-xl"></div>
-              </div>
+              {previewDevice === 'mobile' && (
+                <div className="absolute top-0 inset-x-0 h-5 flex justify-center z-50">
+                  <div className="w-28 h-5 bg-[#262626] rounded-b-xl"></div>
+                </div>
+              )}
 
               {/* Screen Content */}
               <div className="flex-1 bg-white pt-10 pb-6 px-5 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left">
@@ -1167,16 +1195,40 @@ export default function WorkspaceBuilder() {
                 {/* Navigation inside phone mockup */}
                 <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100 bg-white sticky bottom-0 z-10">
                   {formMode === 'conversational' ? (
-                    <>
-                      <button className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-500 rounded-sm">
-                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
-                      </button>
-                      <button className="w-8 h-8 bg-gray-900 text-white flex items-center justify-center rounded-sm">
-                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
-                      </button>
-                    </>
+                    (() => {
+                      const currentIndex = blocks.findIndex(b => b.id === activeBlockId);
+                      const isFirst = currentIndex === 0;
+                      const isLast = currentIndex === blocks.length - 1;
+
+                      return (
+                        <>
+                          <div className="flex gap-2">
+                            <button 
+                              disabled={isFirst}
+                              onClick={() => !isFirst && setActiveBlockId(blocks[currentIndex - 1].id)}
+                              className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isFirst ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                            >
+                              <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
+                            </button>
+                            <button 
+                              disabled={isLast}
+                              onClick={() => !isLast && setActiveBlockId(blocks[currentIndex + 1].id)}
+                              className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isLast ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                            >
+                              <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+                            </button>
+                          </div>
+                          
+                          {isLast && (
+                            <button className="px-6 h-8 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black">
+                              Submit
+                            </button>
+                          )}
+                        </>
+                      );
+                    })()
                   ) : (
-                    <button className="w-full h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm">
+                    <button className="w-full h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-black transition-colors">
                       {currentPage < totalPages ? 'Next Page' : 'Submit'}
                     </button>
                   )}

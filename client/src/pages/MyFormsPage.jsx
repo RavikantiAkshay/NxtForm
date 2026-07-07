@@ -69,13 +69,6 @@ export default function MyFormsPage() {
               <h1 className="text-2xl font-bold text-white mb-1">My Forms</h1>
               <p className="text-[13px] text-[#6b6577]">Welcome back, {user.name}. You have {forms.length} forms.</p>
             </div>
-            <button
-              onClick={() => navigate('/workspace/edit')}
-              className="bg-[#8b5cf6] text-white px-5 py-2.5 rounded-lg font-semibold text-[14px] hover:bg-[#7c3aed] hover:shadow-[0_0_20px_rgba(139,92,246,0.25)] transition-all flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[18px]">add</span>
-              Create New Form
-            </button>
           </div>
 
           {/* Search */}
