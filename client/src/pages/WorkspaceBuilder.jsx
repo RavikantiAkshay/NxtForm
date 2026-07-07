@@ -158,14 +158,6 @@ export default function WorkspaceBuilder() {
         <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0 z-40">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => setIsLibraryVisible(!isLibraryVisible)} 
-              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${isLibraryVisible ? 'bg-primary/20 text-primary' : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high'}`}
-              title="Toggle Elements Library"
-            >
-              <span className="material-symbols-outlined text-[18px]">left_panel_open</span>
-            </button>
-            <div className="h-4 w-px bg-outline-variant mx-1"></div>
-            <button 
               onClick={() => navigate('/workspace')} 
               className="text-[#555] hover:text-white transition-colors flex items-center"
             >
@@ -236,18 +228,27 @@ export default function WorkspaceBuilder() {
         </header>
 
         {/* Builder Workspace Area */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
           
           {/* Left Side: Component Elements Library */}
-          <aside className={`${isLibraryVisible ? 'w-64 border-r border-[#1a1a1a] opacity-100' : 'w-0 opacity-0 overflow-hidden'} bg-[#0a0a0a] flex flex-col shrink-0 transition-all duration-300 ease-in-out`}>
-            <div className="p-4 border-b border-outline-variant whitespace-nowrap">
-              <h2 className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider text-xs">Library Elements</h2>
-              {formMode === 'classic' && (
-                <p className="text-[10px] text-primary mt-1 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[10px]">info</span>
-                  Classic mode — all fields visible at once
-                </p>
-              )}
+          <aside className={`${isLibraryVisible ? 'w-64 border-r border-[#1a1a1a] opacity-100' : 'w-0 opacity-0'} bg-[#0a0a0a] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}>
+            <div className="p-4 border-b border-outline-variant whitespace-nowrap flex justify-between items-center">
+              <div>
+                <h2 className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider text-xs">Library Elements</h2>
+                {formMode === 'classic' && (
+                  <p className="text-[10px] text-primary mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[10px]">info</span>
+                    Classic mode — all fields visible
+                  </p>
+                )}
+              </div>
+              <button 
+                onClick={() => setIsLibraryVisible(false)}
+                className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
+                title="Hide Library"
+              >
+                <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-custom">
               
@@ -487,6 +488,17 @@ export default function WorkspaceBuilder() {
 
             </div>
           </aside>
+
+          {/* Floating Expand Tab when Library is Hidden */}
+          {!isLibraryVisible && (
+            <button 
+              onClick={() => setIsLibraryVisible(true)}
+              className="absolute left-0 top-4 bg-[#131313] border border-[#1a1a1a] border-l-0 rounded-r-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800 z-50 shadow-lg transition-colors group flex items-center"
+              title="Show Library Elements"
+            >
+              <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
+            </button>
+          )}
 
           {/* Center Canvas (Light background workspace style as requested) */}
           <div className="flex-1 light-workspace bg-[#f8f9fa] relative overflow-hidden flex flex-col">
@@ -827,9 +839,18 @@ export default function WorkspaceBuilder() {
                       <span className="material-symbols-outlined text-primary text-[48px] mb-4">waving_hand</span>
                       <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-3">{activeBlock.title}</h2>
                       <p className="text-xs text-gray-500 leading-relaxed mb-8">{activeBlock.description}</p>
-                      <button className="px-6 py-2 bg-gray-900 text-white font-label-md text-label-md w-full rounded-sm">
-                        {activeBlock.buttonText || 'Start'}
-                      </button>
+                      {formMode === 'conversational' && (
+                        <button 
+                          onClick={() => {
+                            if (blocks.length > 1) {
+                              setActiveBlockId(blocks[1].id);
+                            }
+                          }}
+                          className="px-6 py-2 bg-gray-900 text-white font-label-md text-label-md w-full rounded-sm"
+                        >
+                          {activeBlock.buttonText || 'Start'}
+                        </button>
+                      )}
                     </div>
                   )}
 
@@ -1240,15 +1261,18 @@ export default function WorkspaceBuilder() {
                   {formMode === 'conversational' ? (
                     (() => {
                       const currentIndex = blocks.findIndex(b => b.id === activeBlockId);
-                      const isFirst = currentIndex === 0;
+                      const isFirstBlock = currentIndex === 0;
+                      // Prevent returning to welcome screen if they already passed it
+                      const isFirstQuestionAfterWelcome = currentIndex === 1 && blocks[0].type === 'welcome';
+                      const disableUp = isFirstBlock || isFirstQuestionAfterWelcome;
                       const isLast = currentIndex === blocks.length - 1;
 
                       return (
                         <div className="flex gap-2 w-full">
                           <button 
-                            disabled={isFirst}
-                            onClick={() => !isFirst && setActiveBlockId(blocks[currentIndex - 1].id)}
-                            className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isFirst ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                            disabled={disableUp}
+                            onClick={() => !disableUp && setActiveBlockId(blocks[currentIndex - 1].id)}
+                            className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${disableUp ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
                           >
                             <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
                           </button>
