@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
+import countries from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+import ISO6391 from 'iso-639-1';
 import {
   DndContext,
   closestCenter,
@@ -16,6 +20,8 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
+countries.registerLocale(enLocale);
 
 const SortableBlock = ({ id, children }) => {
   const {
@@ -986,6 +992,9 @@ export default function WorkspaceBuilder() {
                       <input 
                         type={activeBlock.type === 'text' ? 'text' : (activeBlock.type === 'company' ? 'text' : activeBlock.type)} 
                         value={previewData[activeBlock.id] || ''}
+                        autoComplete={activeBlock.type === 'password' ? 'new-password' : 'off'}
+                        data-lpignore="true"
+                        data-1p-ignore="true"
                         onChange={(e) => {
                           let val = e.target.value;
                           if (activeBlock.type === 'phone') {
@@ -1034,10 +1043,37 @@ export default function WorkspaceBuilder() {
                   {(activeBlock.type === 'country' || activeBlock.type === 'language') && (
                     <div>
                       <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                        <span>Select {activeBlock.type}...</span>
-                        <span className="material-symbols-outlined">expand_more</span>
-                      </div>
+                      <Select
+                        value={
+                          activeBlock.type === 'country'
+                            ? previewData[activeBlock.id] 
+                                ? { value: previewData[activeBlock.id], label: countries.getName(previewData[activeBlock.id], 'en') } 
+                                : null
+                            : previewData[activeBlock.id] 
+                                ? { value: previewData[activeBlock.id], label: previewData[activeBlock.id] } 
+                                : null
+                        }
+                        onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
+                        options={
+                          activeBlock.type === 'country'
+                            ? Object.entries(countries.getNames('en')).map(([code, name]) => ({ value: code, label: name }))
+                            : ISO6391.getAllNames().map((name) => ({ value: name, label: name }))
+                        }
+                        placeholder={`Select ${activeBlock.type}...`}
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            backgroundColor: '#f9fafb',
+                            borderColor: state.isFocused ? '#111827' : '#e5e7eb',
+                            boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
+                            padding: '2px',
+                            borderRadius: '0.375rem',
+                            '&:hover': {
+                              borderColor: '#111827'
+                            }
+                          })
+                        }}
+                      />
                     </div>
                   )}
 
@@ -1234,15 +1270,190 @@ export default function WorkspaceBuilder() {
                     </div>
                   )}
 
-                  {activeBlock.type === 'date' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                        <span>mm/dd/yyyy</span>
-                        <span className="material-symbols-outlined">calendar_today</span>
+                  {activeBlock.type === 'date' && (() => {
+                    const dateVal = previewData[activeBlock.id]; // { day, month, year, text, pickerOpen, pickerView }
+                    const d = dateVal || {};
+                    const pickerOpen = d.pickerOpen || false;
+                    const pickerView = d.pickerView || 'day'; // 'year' | 'month' | 'day'
+                    const selYear = d.year || new Date().getFullYear();
+                    const selMonth = d.month !== undefined ? d.month : new Date().getMonth();
+                    const selDay = d.day || null;
+                    const setD = (patch) => updatePreviewData(activeBlock.id, { ...d, ...patch });
+
+                    const daysInMonth = new Date(selYear, selMonth + 1, 0).getDate();
+                    const firstDayOfWeek = new Date(selYear, selMonth, 1).getDay();
+                    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                    const dayLabels = ['S','M','T','W','T','F','S'];
+                    const yearStart = Math.floor(selYear / 16) * 16;
+
+                    const formattedDate = selDay ? `${String(selDay).padStart(2,'0')}/${String(selMonth+1).padStart(2,'0')}/${selYear}` : '';
+
+                    return (
+                      <div>
+                        <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                        {/* Text input + calendar icon */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={d.text !== undefined ? d.text : formattedDate}
+                            onChange={(e) => {
+                              let raw = e.target.value.replace(/[^\d]/g, '');
+                              if (raw.length > 8) raw = raw.slice(0, 8);
+                              
+                              let dd = raw.slice(0, 2);
+                              let mm = raw.slice(2, 4);
+                              let yy = raw.slice(4, 8);
+                              
+                              if (dd.length === 2) {
+                                if (parseInt(dd, 10) > 31) dd = '31';
+                                if (parseInt(dd, 10) === 0) dd = '01';
+                              }
+                              if (mm.length === 2) {
+                                if (parseInt(mm, 10) > 12) mm = '12';
+                                if (parseInt(mm, 10) === 0) mm = '01';
+                              }
+                              
+                              let formatted = dd;
+                              if (mm.length > 0) formatted += '/' + mm;
+                              if (yy.length > 0) formatted += '/' + yy;
+                              
+                              raw = dd + mm + yy;
+
+                              // Auto-parse DD/MM/YYYY
+                              if (raw.length === 8) {
+                                const d_val = parseInt(dd, 10);
+                                const m_val = parseInt(mm, 10);
+                                const y_val = parseInt(yy, 10);
+                                
+                                // check true days in month
+                                const daysInThisMonth = new Date(y_val, m_val, 0).getDate();
+                                let finalDay = d_val;
+                                if (d_val > daysInThisMonth) {
+                                  finalDay = daysInThisMonth;
+                                  formatted = String(finalDay).padStart(2, '0') + '/' + mm + '/' + yy;
+                                }
+                                
+                                setD({ text: formatted, day: finalDay, month: m_val - 1, year: y_val });
+                              } else {
+                                setD({ text: formatted, day: null });
+                              }
+                            }}
+                            placeholder="DD/MM/YYYY"
+                            className="w-full p-3 pr-10 border border-gray-200 rounded text-sm text-gray-900 bg-gray-50 outline-none focus:border-gray-900 transition-colors"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setD({ pickerOpen: !pickerOpen, pickerView: 'day' })}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+                          </button>
+                        </div>
+
+                        {/* Calendar popup */}
+                        {pickerOpen && (
+                          <div className="mt-2 rounded-lg overflow-hidden shadow-xl" style={{ backgroundColor: '#282828', color: '#e0e0e0', width: '100%' }}>
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-4 py-3">
+                              <button
+                                type="button"
+                                onClick={() => setD({ pickerView: pickerView === 'day' ? 'year' : (pickerView === 'month' ? 'year' : 'day') })}
+                                className="text-white text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                              >
+                                {pickerView === 'year' ? `${yearStart} – ${yearStart + 15}` : pickerView === 'month' ? selYear : `${monthNames[selMonth]} ${selYear}`}
+                                <span className="material-symbols-outlined text-[16px]">{pickerView === 'day' ? 'arrow_drop_down' : 'arrow_drop_up'}</span>
+                              </button>
+                              {pickerView === 'day' && (
+                                <div className="flex gap-1">
+                                  <button type="button" onClick={() => setD({ month: selMonth === 0 ? 11 : selMonth - 1, year: selMonth === 0 ? selYear - 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                  </button>
+                                  <button type="button" onClick={() => setD({ month: selMonth === 11 ? 0 : selMonth + 1, year: selMonth === 11 ? selYear + 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                  </button>
+                                </div>
+                              )}
+                              {pickerView === 'year' && (
+                                <div className="flex gap-1">
+                                  <button type="button" onClick={() => setD({ year: selYear - 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                  </button>
+                                  <button type="button" onClick={() => setD({ year: selYear + 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Year Grid */}
+                            {pickerView === 'year' && (
+                              <div className="grid grid-cols-4 gap-1 px-3 pb-4">
+                                {Array.from({ length: 16 }, (_, i) => yearStart + i).map(yr => (
+                                  <button
+                                    key={yr}
+                                    type="button"
+                                    onClick={() => setD({ year: yr, pickerView: 'month' })}
+                                    className={`py-2 rounded-full text-sm transition-colors ${yr === selYear ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                  >
+                                    {yr}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Month Grid */}
+                            {pickerView === 'month' && (
+                              <div className="grid grid-cols-3 gap-1 px-3 pb-4">
+                                {monthNames.map((m, i) => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => setD({ month: i, pickerView: 'day' })}
+                                    className={`py-3 rounded-full text-sm transition-colors ${i === selMonth ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                  >
+                                    {m.slice(0, 3)}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Day Grid */}
+                            {pickerView === 'day' && (
+                              <div className="px-3 pb-4">
+                                <div className="grid grid-cols-7 mb-1">
+                                  {dayLabels.map((label, i) => (
+                                    <div key={i} className="text-center text-[11px] font-medium py-1" style={{ color: '#9aa0a6' }}>{label}</div>
+                                  ))}
+                                </div>
+                                <div className="grid grid-cols-7">
+                                  {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e-${i}`} />)}
+                                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                                    const isToday = day === new Date().getDate() && selMonth === new Date().getMonth() && selYear === new Date().getFullYear();
+                                    const isSelected = day === selDay;
+                                    return (
+                                      <button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => {
+                                          const txt = `${String(day).padStart(2,'0')}/${String(selMonth+1).padStart(2,'0')}/${selYear}`;
+                                          setD({ day, text: txt, pickerOpen: false });
+                                        }}
+                                        className={`w-full aspect-square flex items-center justify-center text-sm rounded-full transition-colors
+                                          ${isSelected ? 'bg-white/20 text-white font-bold' : isToday ? 'ring-1 ring-white/60 text-white' : 'text-gray-300 hover:bg-white/10'}
+                                        `}
+                                      >
+                                        {day}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {activeBlock.type === 'rating_stars' && (
                     <div>
