@@ -53,6 +53,8 @@ export default function WorkspaceBuilder() {
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [previewData, setPreviewData] = useState({});
+  const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
   const [blocks, setBlocks] = useState([
     {
       id: 'welcome',
@@ -907,8 +909,8 @@ export default function WorkspaceBuilder() {
                   <div 
                     className="h-full bg-gray-900 transition-all duration-300" 
                     style={{ 
-                      width: formMode === 'conversational' && blocks.length > 0
-                        ? `${((blocks.findIndex(b => b.id === activeBlockId) + 1) / blocks.length) * 100}%` 
+                      width: formMode === 'conversational' && blocks.filter(b => b.type !== 'welcome').length > 0
+                        ? (activeBlock?.type === 'welcome' ? '0%' : `${((blocks.filter(b => b.type !== 'welcome').findIndex(b => b.id === activeBlockId) + 1) / blocks.filter(b => b.type !== 'welcome').length) * 100}%`)
                         : '100%' 
                     }}
                   ></div>
@@ -918,7 +920,9 @@ export default function WorkspaceBuilder() {
                 <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[10px]">{formMode === 'conversational' ? 'swipe_up' : 'view_agenda'}</span>
                   {formMode === 'conversational' && blocks.length > 0
-                    ? `Question ${blocks.findIndex(b => b.id === activeBlockId) + 1} of ${blocks.length}` 
+                    ? (activeBlock?.type === 'welcome' 
+                        ? 'Welcome Screen' 
+                        : `Question ${blocks.filter(b => b.type !== 'welcome').findIndex(b => b.id === activeBlockId) + 1} of ${blocks.filter(b => b.type !== 'welcome').length}`)
                     : `All fields · Page ${currentPage}`}
                 </div>
 
@@ -963,8 +967,9 @@ export default function WorkspaceBuilder() {
                         {activeBlock.options?.map((opt, i) => (
                           <div 
                             key={i} 
+                            onClick={() => updatePreviewData(activeBlock.id, opt.value)}
                             className={`w-full py-3 border flex items-center justify-center gap-2 cursor-pointer transition-colors ${
-                              i === 4 ? 'border-2 border-gray-900 bg-gray-50 font-bold' : 'border-gray-200 hover:border-gray-900'
+                              previewData[activeBlock.id] === opt.value ? 'border-2 border-gray-900 bg-gray-50 font-bold' : 'border-gray-200 hover:border-gray-900'
                             }`}
                           >
                             <span className="font-bold">{opt.value}</span>
@@ -980,9 +985,10 @@ export default function WorkspaceBuilder() {
                       <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
                       <input 
                         type={activeBlock.type === 'text' ? 'text' : (activeBlock.type === 'company' ? 'text' : activeBlock.type)} 
-                        disabled 
+                        value={previewData[activeBlock.id] || ''}
+                        onChange={(e) => updatePreviewData(activeBlock.id, e.target.value)}
                         placeholder={activeBlock.placeholder || `Enter ${activeBlock.type}...`}
-                        className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-700" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
                       />
                     </div>
                   )}
@@ -991,12 +997,27 @@ export default function WorkspaceBuilder() {
                     <div>
                       <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
                       <div className="space-y-2">
-                        {activeBlock.options?.map((opt, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                            <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0"></span>
-                            <span className="text-sm text-gray-700">{opt.label}</span>
-                          </div>
-                        ))}
+                        {activeBlock.options?.map((opt, i) => {
+                          const isChecked = previewData[activeBlock.id]?.includes(opt.value);
+                          return (
+                            <div 
+                              key={i} 
+                              onClick={() => {
+                                const current = previewData[activeBlock.id] || [];
+                                const next = current.includes(opt.value) 
+                                  ? current.filter(v => v !== opt.value)
+                                  : [...current, opt.value];
+                                updatePreviewData(activeBlock.id, next);
+                              }}
+                              className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isChecked ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                            >
+                              <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${isChecked ? 'bg-gray-900 border-gray-900' : 'border-gray-300'}`}>
+                                {isChecked && <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>}
+                              </span>
+                              <span className={`text-sm ${isChecked ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
