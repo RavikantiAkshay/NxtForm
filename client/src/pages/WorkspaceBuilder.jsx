@@ -9,6 +9,7 @@ export default function WorkspaceBuilder() {
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
   const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
   const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
+  const [isLibraryVisible, setIsLibraryVisible] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [blocks, setBlocks] = useState([
@@ -138,6 +139,14 @@ export default function WorkspaceBuilder() {
     setActiveBlockId(newId);
   };
 
+  React.useEffect(() => {
+    if (previewDevice === 'desktop') {
+      setIsLibraryVisible(false);
+    } else {
+      setIsLibraryVisible(true);
+    }
+  }, [previewDevice]);
+
   const activeBlock = blocks.find(b => b.id === activeBlockId) || blocks[0];
 
   return (
@@ -148,6 +157,14 @@ export default function WorkspaceBuilder() {
         {/* Builder Header */}
         <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0 z-40">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsLibraryVisible(!isLibraryVisible)} 
+              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${isLibraryVisible ? 'bg-primary/20 text-primary' : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high'}`}
+              title="Toggle Elements Library"
+            >
+              <span className="material-symbols-outlined text-[18px]">left_panel_open</span>
+            </button>
+            <div className="h-4 w-px bg-outline-variant mx-1"></div>
             <button 
               onClick={() => navigate('/workspace')} 
               className="text-[#555] hover:text-white transition-colors flex items-center"
@@ -222,8 +239,8 @@ export default function WorkspaceBuilder() {
         <div className="flex-1 flex overflow-hidden">
           
           {/* Left Side: Component Elements Library */}
-          <aside className="w-64 border-r border-[#1a1a1a] bg-[#0a0a0a] flex flex-col shrink-0">
-            <div className="p-4 border-b border-outline-variant">
+          <aside className={`${isLibraryVisible ? 'w-64 border-r border-[#1a1a1a] opacity-100' : 'w-0 opacity-0 overflow-hidden'} bg-[#0a0a0a] flex flex-col shrink-0 transition-all duration-300 ease-in-out`}>
+            <div className="p-4 border-b border-outline-variant whitespace-nowrap">
               <h2 className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider text-xs">Library Elements</h2>
               {formMode === 'classic' && (
                 <p className="text-[10px] text-primary mt-1 flex items-center gap-1">
@@ -594,21 +611,25 @@ export default function WorkspaceBuilder() {
                           
                           {/* Actions */}
                           <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
-                            <button
-                              onClick={() => updateBlockValue(block.id, 'required', !block.required)}
-                              className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${
-                                block.required 
-                                  ? 'bg-primary/10 text-primary border border-primary/20' 
-                                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                              }`}
-                              title="Toggle Required"
-                            >
-                              <span className="material-symbols-outlined text-[14px]">
-                                {block.required ? 'star' : 'star_border'}
-                              </span>
-                              Required
-                            </button>
-                            <div className="w-px h-4 bg-gray-200"></div>
+                            {block.type !== 'welcome' && (
+                              <>
+                                <button
+                                  onClick={() => updateBlockValue(block.id, 'required', !block.required)}
+                                  className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${
+                                    block.required 
+                                      ? 'bg-primary/10 text-primary border border-primary/20' 
+                                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                                  }`}
+                                  title="Toggle Required"
+                                >
+                                  <span className="material-symbols-outlined text-[14px]">
+                                    {block.required ? 'star' : 'star_border'}
+                                  </span>
+                                  Required
+                                </button>
+                                <div className="w-px h-4 bg-gray-200"></div>
+                              </>
+                            )}
                             <button 
                               onClick={() => duplicateBlock(block)}
                               className="text-gray-400 hover:text-gray-800" 
@@ -814,7 +835,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'rating' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-6 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-6 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="space-y-2">
                         {activeBlock.options?.map((opt, i) => (
                           <div 
@@ -1058,7 +1081,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'linear_scale' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200 rounded">
                         {[1,2,3,4,5].map(num => (
                           <div key={num} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold text-gray-500 bg-white">
@@ -1071,7 +1096,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'nps' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="flex justify-between items-center bg-gray-50 p-2 border border-gray-200 rounded">
                         {[0,1,2,3,4,5,6,7,8,9,10].map(num => (
                           <div key={num} className="w-6 h-8 rounded border border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-500 bg-white">
@@ -1088,7 +1115,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'yes_no' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="flex gap-4">
                         <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">Yes</div>
                         <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">No</div>
@@ -1098,7 +1127,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'terms' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="flex items-start gap-3 p-4 border border-gray-200 rounded bg-gray-50">
                         <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0 mt-0.5 bg-white"></span>
                         <span className="text-xs text-gray-600 leading-relaxed">{activeBlock.options?.[0]?.label || 'I agree to the terms'}</span>
@@ -1120,7 +1151,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'signature' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="border-2 border-gray-200 rounded p-6 h-32 flex items-center justify-center text-gray-400 bg-gray-50">
                         <span className="text-xs">Draw signature here</span>
                       </div>
@@ -1129,7 +1162,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'longtext' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <textarea 
                         disabled 
                         placeholder={activeBlock.placeholder || 'Enter details...'}
@@ -1140,7 +1175,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'choice' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="space-y-2">
                         {activeBlock.options?.map((opt, i) => (
                           <div key={i} className="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
@@ -1154,7 +1191,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'dropdown' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
                         <span>Select an option...</span>
                         <span className="material-symbols-outlined">arrow_drop_down</span>
@@ -1164,7 +1203,9 @@ export default function WorkspaceBuilder() {
 
                   {activeBlock.type === 'sentiment' && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <textarea 
                         disabled
                         placeholder="Write something..."
@@ -1179,7 +1220,9 @@ export default function WorkspaceBuilder() {
 
                   {(activeBlock.type === 'upload' || activeBlock.type === 'fileupload') && (
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                      </h2>
                       <div className="border-2 border-dashed border-gray-200 rounded p-6 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
                         <span className="material-symbols-outlined text-[32px] text-gray-300 mb-1">cloud_upload</span>
                         <span className="text-[10px]">Tap to upload files</span>
@@ -1193,7 +1236,7 @@ export default function WorkspaceBuilder() {
                 </div>
 
                 {/* Navigation inside phone mockup */}
-                <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100 bg-white sticky bottom-0 z-10">
+                <div className="mt-8 pt-4 flex justify-between items-center border-t border-gray-100">
                   {formMode === 'conversational' ? (
                     (() => {
                       const currentIndex = blocks.findIndex(b => b.id === activeBlockId);
@@ -1201,30 +1244,27 @@ export default function WorkspaceBuilder() {
                       const isLast = currentIndex === blocks.length - 1;
 
                       return (
-                        <>
-                          <div className="flex gap-2">
-                            <button 
-                              disabled={isFirst}
-                              onClick={() => !isFirst && setActiveBlockId(blocks[currentIndex - 1].id)}
-                              className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isFirst ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
-                            >
-                              <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
-                            </button>
-                            <button 
-                              disabled={isLast}
-                              onClick={() => !isLast && setActiveBlockId(blocks[currentIndex + 1].id)}
-                              className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isLast ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
-                            >
-                              <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
-                            </button>
-                          </div>
-                          
+                        <div className="flex gap-2 w-full">
+                          <button 
+                            disabled={isFirst}
+                            onClick={() => !isFirst && setActiveBlockId(blocks[currentIndex - 1].id)}
+                            className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isFirst ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                          >
+                            <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
+                          </button>
+                          <button 
+                            disabled={isLast}
+                            onClick={() => !isLast && setActiveBlockId(blocks[currentIndex + 1].id)}
+                            className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isLast ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                          >
+                            <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+                          </button>
                           {isLast && (
-                            <button className="px-6 h-8 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black">
+                            <button className="flex-1 ml-4 h-8 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black">
                               Submit
                             </button>
                           )}
-                        </>
+                        </div>
                       );
                     })()
                   ) : (
