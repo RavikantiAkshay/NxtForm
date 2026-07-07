@@ -1367,55 +1367,89 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {activeBlock.type === 'matrix' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="border border-gray-200 rounded bg-white overflow-hidden text-xs">
-                              <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
-                                <div className="w-1/3"></div>
-                                <div className="flex-1 text-center">Poor</div>
-                                <div className="flex-1 text-center">Avg</div>
-                                <div className="flex-1 text-center">Good</div>
-                              </div>
-                              {['Quality', 'Speed'].map((row, i) => (
-                                <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
-                                  <div className="w-1/3 font-semibold text-gray-700">{row}</div>
-                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        {activeBlock.type === 'matrix' && (() => {
+                          const val = previewData[activeBlock.id] || {};
+                          const setVal = (row, col) => updatePreviewData(activeBlock.id, { ...val, [row]: col });
+                          const renderRows = activeBlock.rows || ['Quality', 'Speed'];
+                          const renderCols = activeBlock.columns || ['Poor', 'Avg', 'Good'];
 
-                        {activeBlock.type === 'counter' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="flex items-center justify-between p-2 border border-gray-200 rounded bg-white w-32">
-                              <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">-</button>
-                              <span className="font-bold">0</span>
-                              <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">+</button>
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="border border-gray-200 rounded bg-white overflow-hidden text-xs">
+                                <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
+                                  <div className="w-1/3"></div>
+                                  {renderCols.map(col => (
+                                    <div key={col} className="flex-1 text-center">{col}</div>
+                                  ))}
+                                </div>
+                                {renderRows.map((row, i) => (
+                                  <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
+                                    <div className="w-1/3 font-semibold text-gray-700">{row}</div>
+                                    {renderCols.map(col => {
+                                      const isSelected = val[row] === col;
+                                      return (
+                                        <div key={col} className="flex-1 flex justify-center">
+                                          <button 
+                                            type="button"
+                                            onClick={() => setVal(row, col)}
+                                            className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${isSelected ? 'border-gray-900 bg-gray-900' : 'border-gray-300 bg-white hover:border-gray-400'}`}
+                                          >
+                                            {isSelected && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
-                        {activeBlock.type === 'slider' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="py-4 relative">
-                              <div className="w-full h-1 bg-gray-200 rounded-full">
-                                <div className="w-1/2 h-full bg-gray-900 rounded-full relative">
-                                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-900 rounded-full"></div>
+                        {activeBlock.type === 'counter' && (() => {
+                          const val = previewData[activeBlock.id] || 0;
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex items-center justify-between p-2 border border-gray-200 rounded bg-white w-32">
+                                <button type="button" onClick={() => updatePreviewData(activeBlock.id, val > 0 ? val - 1 : 0)} className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500 hover:bg-gray-200 transition-colors">-</button>
+                                <span className="font-bold">{val}</span>
+                                <button type="button" onClick={() => updatePreviewData(activeBlock.id, val + 1)} className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500 hover:bg-gray-200 transition-colors">+</button>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {activeBlock.type === 'slider' && (() => {
+                          const min = activeBlock.min || 0;
+                          const max = activeBlock.max || 100;
+                          const val = previewData[activeBlock.id] !== undefined ? previewData[activeBlock.id] : ((max + min) / 2);
+                          const percentage = ((val - min) / (max - min)) * 100;
+                          
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="py-4 relative">
+                                <input 
+                                  type="range" 
+                                  min={min} 
+                                  max={max} 
+                                  value={val}
+                                  onChange={(e) => updatePreviewData(activeBlock.id, parseInt(e.target.value, 10))}
+                                  className="w-full h-1 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gray-900 [&::-webkit-slider-thumb]:rounded-full [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-gray-900 [&::-moz-range-thumb]:rounded-full"
+                                  style={{
+                                    background: `linear-gradient(to right, #111827 0%, #111827 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`
+                                  }}
+                                />
+                                <div className="flex justify-between mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                                  <span>{activeBlock.minLabel || 'Min'}</span>
+                                  <span>{activeBlock.maxLabel || 'Max'}</span>
                                 </div>
                               </div>
-                              <div className="flex justify-between mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                                <span>Min</span>
-                                <span>Max</span>
-                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                         {activeBlock.type === 'spacer' && (
                           <div className="py-6">
