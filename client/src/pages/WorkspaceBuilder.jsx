@@ -49,7 +49,7 @@ const SortableBlock = ({ id, children }) => {
 
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
-  
+
   // State for form blocks
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
@@ -218,29 +218,29 @@ export default function WorkspaceBuilder() {
     <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen overflow-hidden flex font-sans">
       {/* Main Workspace Frame */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
-        
+
         {/* Builder Header */}
         <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0 z-40">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/workspace')} 
+            <button
+              onClick={() => navigate('/workspace')}
               className="text-[#555] hover:text-white transition-colors flex items-center"
             >
               <span className="material-symbols-outlined mr-2">arrow_back</span>
               <span className="font-label-md text-label-md">Exit</span>
             </button>
             <div className="h-4 w-px bg-outline-variant mx-2"></div>
-            
+
             <div className="flex items-center gap-2">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
                 className="bg-transparent border-none focus:ring-0 text-white font-headline-md text-headline-md font-semibold p-0 w-64 focus:border-b focus:border-primary focus:outline-none"
               />
               <span className="material-symbols-outlined text-[18px] text-on-surface-variant">edit</span>
             </div>
-            
+
             <div className="ml-4 px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-primary font-label-sm text-label-sm flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
               Draft
@@ -252,18 +252,16 @@ export default function WorkspaceBuilder() {
             <div className="flex bg-surface-container-high rounded-lg p-0.5 border border-outline-variant">
               <button
                 onClick={() => setFormMode('conversational')}
-                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${
-                  formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
-                }`}
+                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
               >
                 <span className="material-symbols-outlined text-[14px]">swipe_up</span>
                 Conversational
               </button>
               <button
                 onClick={() => setFormMode('classic')}
-                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${
-                  formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
-                }`}
+                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
               >
                 <span className="material-symbols-outlined text-[14px]">view_agenda</span>
                 Classic
@@ -274,14 +272,14 @@ export default function WorkspaceBuilder() {
               <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">redo</span></button>
             </div>
             <div className="flex gap-4">
-              <button 
+              <button
                 onClick={() => navigate(`/dashboard/customer-feedback`)}
                 className="px-4 py-2 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-md text-label-md flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-[18px]">visibility</span>
                 View Dashboard
               </button>
-              <button 
+              <button
                 onClick={() => alert('Form published! Responses will now compile.')}
                 className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md font-bold hover:bg-primary-container hover:electric-violet-glow transition-all flex items-center gap-2"
               >
@@ -294,7 +292,7 @@ export default function WorkspaceBuilder() {
 
         {/* Builder Workspace Area */}
         <div className="flex-1 flex overflow-hidden relative">
-          
+
           {/* Left Side: Component Elements Library */}
           <aside className={`${isLibraryVisible ? 'w-64 border-r border-[#1a1a1a] opacity-100' : 'w-0 opacity-0'} bg-[#0a0a0a] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}>
             <div className="p-4 border-b border-outline-variant whitespace-nowrap flex justify-between items-center">
@@ -307,7 +305,7 @@ export default function WorkspaceBuilder() {
                   </p>
                 )}
               </div>
-              <button 
+              <button
                 onClick={() => setIsLibraryVisible(false)}
                 className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
                 title="Hide Library"
@@ -316,40 +314,40 @@ export default function WorkspaceBuilder() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-custom">
-              
+
               {/* Basic Fields (Grid) */}
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Basic Inputs</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <button 
+                  <button
                     onClick={() => addBlock('text', 'Short Text', 'short_text')}
                     className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm text-left"
                   >
                     <span className="material-symbols-outlined text-[20px]">short_text</span>
                     <span className="text-[9px] uppercase font-bold tracking-wider">Short Text</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => addBlock('longtext', 'Long Text', 'notes')}
                     className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
                   >
                     <span className="material-symbols-outlined text-[20px]">notes</span>
                     <span className="text-[9px] uppercase font-bold tracking-wider">Long Text</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => addBlock('choice', 'Choice Option', 'radio_button_checked')}
                     className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
                   >
                     <span className="material-symbols-outlined text-[20px]">radio_button_checked</span>
                     <span className="text-[9px] uppercase font-bold tracking-wider">Choice</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => addBlock('checkbox', 'Checkboxes', 'check_box')}
                     className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
                   >
                     <span className="material-symbols-outlined text-[20px]">check_box</span>
                     <span className="text-[9px] uppercase font-bold tracking-wider">Checkboxes</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => addBlock('dropdown', 'Dropdown', 'arrow_drop_down_circle')}
                     className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm col-span-2"
                   >
@@ -525,7 +523,7 @@ export default function WorkspaceBuilder() {
                   Smart AI Fields
                 </h3>
                 <div className="space-y-2">
-                  <button 
+                  <button
                     onClick={() => addBlock('sentiment', 'AI Sentiment', 'psychology')}
                     className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
                   >
@@ -537,7 +535,7 @@ export default function WorkspaceBuilder() {
                     </div>
                   </button>
 
-                  <button 
+                  <button
                     onClick={() => addBlock('upload', 'Smart Upload', 'document_scanner')}
                     className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
                   >
@@ -556,7 +554,7 @@ export default function WorkspaceBuilder() {
 
           {/* Floating Expand Tab when Library is Hidden */}
           {!isLibraryVisible && (
-            <button 
+            <button
               onClick={() => setIsLibraryVisible(true)}
               className="absolute left-0 top-4 bg-[#131313] border border-[#1a1a1a] border-l-0 rounded-r-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800 z-50 shadow-lg transition-colors group flex items-center"
               title="Show Library Elements"
@@ -567,23 +565,23 @@ export default function WorkspaceBuilder() {
 
           {/* Center Canvas (Light background workspace style as requested) */}
           <div className="flex-1 light-workspace bg-[#f8f9fa] relative overflow-hidden flex flex-col">
-            
+
             {/* Canvas Controls */}
             <div className="absolute top-4 left-4 z-10 flex gap-2">
-              <button 
+              <button
                 onClick={() => setZoom(Math.min(zoom + 10, 200))}
                 className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">add</span>
               </button>
-              <button 
+              <button
                 onClick={() => setZoom(Math.max(zoom - 10, 50))}
                 className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">remove</span>
               </button>
               <div className="w-px h-8 bg-gray-200 mx-1"></div>
-              <button 
+              <button
                 onClick={() => setZoom(100)}
                 className="px-3 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm font-label-sm text-label-sm rounded-sm"
               >
@@ -593,66 +591,65 @@ export default function WorkspaceBuilder() {
 
             {/* Blocks flow list */}
             <div className="flex-1 overflow-y-auto builder-scroll p-12 flex flex-col items-center">
-              <div 
+              <div
                 className="w-full max-w-xl pb-32 pt-8 transition-transform duration-200 origin-top"
                 style={{ transform: `scale(${zoom / 100})` }}
               >
 
-              {/* Canvas Header */}
-              <div className="w-full mb-8">
-                <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">{formTitle}</h1>
-                  <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
-                    {blocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => setFormMode(formMode === 'conversational' ? 'classic' : 'conversational')}
-                  className="text-[10px] text-gray-400 uppercase tracking-wider bg-white border border-gray-200 px-3 py-1 rounded-full hover:border-primary hover:text-primary transition-colors"
-                >
-                  {formMode === 'conversational' ? 'Flow View' : 'Page View'}
-                </button>
-              </div>
+                {/* Canvas Header */}
+                <div className="w-full mb-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h1 className="text-xl font-bold text-gray-900">{formTitle}</h1>
+                      <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
+                        {blocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setFormMode(formMode === 'conversational' ? 'classic' : 'conversational')}
+                      className="text-[10px] text-gray-400 uppercase tracking-wider bg-white border border-gray-200 px-3 py-1 rounded-full hover:border-primary hover:text-primary transition-colors"
+                    >
+                      {formMode === 'conversational' ? 'Flow View' : 'Page View'}
+                    </button>
+                  </div>
 
-              {/* Classic Mode: Page Tabs */}
-              {formMode === 'classic' && (
-                <div className="flex items-center gap-2 mt-4">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
-                        currentPage === page
-                          ? 'bg-gray-900 text-white shadow-sm'
-                          : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
-                      }`}
-                    >
-                      Page {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => { setTotalPages(totalPages + 1); setCurrentPage(totalPages + 1); }}
-                    className="w-7 h-7 flex items-center justify-center bg-white border border-dashed border-gray-300 text-gray-400 hover:border-gray-500 hover:text-gray-600 transition-colors"
-                    title="Add Page"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">add</span>
-                  </button>
-                  {totalPages > 1 && (
-                    <button
-                      onClick={() => { if (totalPages > 1) { setTotalPages(totalPages - 1); if (currentPage > totalPages - 1) setCurrentPage(totalPages - 1); } }}
-                      className="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors ml-1"
-                      title="Remove Last Page"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">remove</span>
-                    </button>
+                  {/* Classic Mode: Page Tabs */}
+                  {formMode === 'classic' && (
+                    <div className="flex items-center gap-2 mt-4">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${currentPage === page
+                              ? 'bg-gray-900 text-white shadow-sm'
+                              : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
+                            }`}
+                        >
+                          Page {page}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => { setTotalPages(totalPages + 1); setCurrentPage(totalPages + 1); }}
+                        className="w-7 h-7 flex items-center justify-center bg-white border border-dashed border-gray-300 text-gray-400 hover:border-gray-500 hover:text-gray-600 transition-colors"
+                        title="Add Page"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span>
+                      </button>
+                      {totalPages > 1 && (
+                        <button
+                          onClick={() => { if (totalPages > 1) { setTotalPages(totalPages - 1); if (currentPage > totalPages - 1) setCurrentPage(totalPages - 1); } }}
+                          className="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors ml-1"
+                          title="Remove Last Page"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">remove</span>
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
 
-            {/* Start Node */}
-            <div className="flex justify-center mb-6">
+                {/* Start Node */}
+                <div className="flex justify-center mb-6">
                   <div className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-600 font-label-sm text-label-sm uppercase tracking-widest rounded-full flex items-center gap-2">
                     <span className="material-symbols-outlined text-[16px]">play_arrow</span>
                     Start Node
@@ -663,7 +660,7 @@ export default function WorkspaceBuilder() {
                 <div className="w-px h-8 bg-gray-300 mx-auto mb-2 relative"></div>
 
                 {/* Dynamic Block Rendering */}
-                <DndContext 
+                <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
@@ -676,17 +673,16 @@ export default function WorkspaceBuilder() {
                           {({ listeners, attributes }) => (
                             <div className="w-full">
                               {/* Form Block Item */}
-                              <div 
+                              <div
                                 onClick={() => setActiveBlockId(block.id)}
-                                className={`bg-white border text-gray-900 sharp-corners shadow-sm relative group transition-all duration-200 cursor-pointer ${
-                                  isActive 
-                                    ? 'border-primary ring-2 ring-primary/20 shadow-[0_0_20px_rgba(208,188,255,0.15)]' 
+                                className={`bg-white border text-gray-900 sharp-corners shadow-sm relative group transition-all duration-200 cursor-pointer ${isActive
+                                    ? 'border-primary ring-2 ring-primary/20 shadow-[0_0_20px_rgba(208,188,255,0.15)]'
                                     : 'border-gray-200 hover:border-primary'
-                                }`}
+                                  }`}
                               >
                                 {/* Drag Handle on active */}
                                 {isActive && (
-                                  <div 
+                                  <div
                                     {...listeners}
                                     {...attributes}
                                     className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing bg-[#fbf9ff] border-r border-[#d0bcff]/30 text-primary z-10"
@@ -695,171 +691,170 @@ export default function WorkspaceBuilder() {
                                   </div>
                                 )}
 
-                        {/* AI Indicator badge */}
-                        {(block.type === 'sentiment' || block.type === 'upload' || block.aiLogic) && (
-                          <div className="absolute -top-3 right-4 bg-[#131313] text-[#d0bcff] px-2 py-0.5 flex items-center gap-1 border border-[#d0bcff]/30 text-[9px] uppercase font-bold tracking-wider sharp-corners">
-                            <span className="material-symbols-outlined text-[11px] animate-pulse">auto_awesome</span>
-                            AI Logic
-                          </div>
-                        )}
-
-                        {/* Block Header */}
-                        <div className={`px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 ${isActive ? 'ml-8' : ''}`}>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-gray-400 text-[18px]">{block.icon || 'description'}</span>
-                            <span className="font-label-sm text-label-sm text-gray-700 font-bold">{block.typeName}</span>
-                          </div>
-                          
-                          {/* Actions */}
-                          <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
-                            {block.type !== 'welcome' && (
-                              <>
-                                <button
-                                  onClick={() => updateBlockValue(block.id, 'required', !block.required)}
-                                  className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${
-                                    block.required 
-                                      ? 'bg-primary/10 text-primary border border-primary/20' 
-                                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                                  }`}
-                                  title="Toggle Required"
-                                >
-                                  <span className="material-symbols-outlined text-[14px]">
-                                    {block.required ? 'star' : 'star_border'}
-                                  </span>
-                                  Required
-                                </button>
-                                <div className="w-px h-4 bg-gray-200"></div>
-                              </>
-                            )}
-                            <button 
-                              onClick={() => duplicateBlock(block)}
-                              className="text-gray-400 hover:text-gray-800 transition-colors" 
-                              title="Duplicate"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                            </button>
-                            <button 
-                              onClick={() => deleteBlock(block.id)}
-                              className="text-gray-400 hover:text-red-500" 
-                              title="Delete"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">delete</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Block Content Inputs */}
-                        <div className={`p-6 ${isActive ? 'ml-8' : ''}`}>
-                          {/* Question/Title Input */}
-                          <input 
-                            type="text"
-                            value={block.title}
-                            onChange={(e) => updateBlockValue(block.id, 'title', e.target.value)}
-                            placeholder="Enter question wording..."
-                            className="w-full font-body-lg text-body-lg font-medium text-gray-900 border-none bg-transparent focus:ring-0 p-0 mb-4 focus:border-b focus:border-primary focus:outline-none"
-                          />
-
-                          {/* Welcome Screen Subtitle */}
-                          {block.type === 'welcome' && (
-                            <textarea 
-                              value={block.description}
-                              onChange={(e) => updateBlockValue(block.id, 'description', e.target.value)}
-                              placeholder="Subtitle description..."
-                              className="w-full font-body-md text-body-md text-gray-500 border-none bg-transparent focus:ring-0 p-0 resize-none h-12 focus:border-b focus:border-primary focus:outline-none"
-                            />
-                          )}
-
-                          {/* Block Option details */}
-                          {block.type === 'rating' && (
-                            <div className="flex justify-between items-center gap-2 mt-4">
-                              {block.options?.map((opt, i) => (
-                                <div key={i} className="flex flex-col items-center gap-1">
-                                  <div className="w-10 h-10 border border-gray-200 bg-gray-50 flex items-center justify-center font-bold text-gray-500 text-sm">
-                                    {opt.value}
+                                {/* AI Indicator badge */}
+                                {(block.type === 'sentiment' || block.type === 'upload' || block.aiLogic) && (
+                                  <div className="absolute -top-3 right-4 bg-[#131313] text-[#d0bcff] px-2 py-0.5 flex items-center gap-1 border border-[#d0bcff]/30 text-[9px] uppercase font-bold tracking-wider sharp-corners">
+                                    <span className="material-symbols-outlined text-[11px] animate-pulse">auto_awesome</span>
+                                    AI Logic
                                   </div>
-                                  <span className="text-[9px] text-gray-400">{opt.label}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                                )}
 
-                          {/* Choice/Dropdown Options List */}
-                          {(block.type === 'choice' || block.type === 'dropdown') && (
-                            <div className="space-y-2 mt-2">
-                              {block.options?.map((opt, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                  <span className="material-symbols-outlined text-gray-300 text-sm">radio_button_unchecked</span>
-                                  <input 
-                                    type="text" 
-                                    value={opt.label}
-                                    onChange={(e) => {
-                                      const newOpts = [...block.options];
-                                      newOpts[i].label = e.target.value;
-                                      updateBlockValue(block.id, 'options', newOpts);
-                                    }}
-                                    className="bg-transparent border-none text-gray-700 text-sm p-0 focus:ring-0 focus:border-b focus:border-primary focus:outline-none"
+                                {/* Block Header */}
+                                <div className={`px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 ${isActive ? 'ml-8' : ''}`}>
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-gray-400 text-[18px]">{block.icon || 'description'}</span>
+                                    <span className="font-label-sm text-label-sm text-gray-700 font-bold">{block.typeName}</span>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
+                                    {block.type !== 'welcome' && (
+                                      <>
+                                        <button
+                                          onClick={() => updateBlockValue(block.id, 'required', !block.required)}
+                                          className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${block.required
+                                              ? 'bg-primary/10 text-primary border border-primary/20'
+                                              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                          title="Toggle Required"
+                                        >
+                                          <span className="material-symbols-outlined text-[14px]">
+                                            {block.required ? 'star' : 'star_border'}
+                                          </span>
+                                          Required
+                                        </button>
+                                        <div className="w-px h-4 bg-gray-200"></div>
+                                      </>
+                                    )}
+                                    <button
+                                      onClick={() => duplicateBlock(block)}
+                                      className="text-gray-400 hover:text-gray-800 transition-colors"
+                                      title="Duplicate"
+                                    >
+                                      <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                                    </button>
+                                    <button
+                                      onClick={() => deleteBlock(block.id)}
+                                      className="text-gray-400 hover:text-red-500"
+                                      title="Delete"
+                                    >
+                                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Block Content Inputs */}
+                                <div className={`p-6 ${isActive ? 'ml-8' : ''}`}>
+                                  {/* Question/Title Input */}
+                                  <input
+                                    type="text"
+                                    value={block.title}
+                                    onChange={(e) => updateBlockValue(block.id, 'title', e.target.value)}
+                                    placeholder="Enter question wording..."
+                                    className="w-full font-body-lg text-body-lg font-medium text-gray-900 border-none bg-transparent focus:ring-0 p-0 mb-4 focus:border-b focus:border-primary focus:outline-none"
                                   />
+
+                                  {/* Welcome Screen Subtitle */}
+                                  {block.type === 'welcome' && (
+                                    <textarea
+                                      value={block.description}
+                                      onChange={(e) => updateBlockValue(block.id, 'description', e.target.value)}
+                                      placeholder="Subtitle description..."
+                                      className="w-full font-body-md text-body-md text-gray-500 border-none bg-transparent focus:ring-0 p-0 resize-none h-12 focus:border-b focus:border-primary focus:outline-none"
+                                    />
+                                  )}
+
+                                  {/* Block Option details */}
+                                  {block.type === 'rating' && (
+                                    <div className="flex justify-between items-center gap-2 mt-4">
+                                      {block.options?.map((opt, i) => (
+                                        <div key={i} className="flex flex-col items-center gap-1">
+                                          <div className="w-10 h-10 border border-gray-200 bg-gray-50 flex items-center justify-center font-bold text-gray-500 text-sm">
+                                            {opt.value}
+                                          </div>
+                                          <span className="text-[9px] text-gray-400">{opt.label}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Choice/Dropdown Options List */}
+                                  {(block.type === 'choice' || block.type === 'dropdown') && (
+                                    <div className="space-y-2 mt-2">
+                                      {block.options?.map((opt, i) => (
+                                        <div key={i} className="flex items-center gap-2">
+                                          <span className="material-symbols-outlined text-gray-300 text-sm">radio_button_unchecked</span>
+                                          <input
+                                            type="text"
+                                            value={opt.label}
+                                            onChange={(e) => {
+                                              const newOpts = [...block.options];
+                                              newOpts[i].label = e.target.value;
+                                              updateBlockValue(block.id, 'options', newOpts);
+                                            }}
+                                            className="bg-transparent border-none text-gray-700 text-sm p-0 focus:ring-0 focus:border-b focus:border-primary focus:outline-none"
+                                          />
+                                        </div>
+                                      ))}
+                                      <button
+                                        onClick={() => {
+                                          const newOpts = [...block.options, { value: `${block.options.length + 1}`, label: `Option ${block.options.length + 1}` }];
+                                          updateBlockValue(block.id, 'options', newOpts);
+                                        }}
+                                        className="text-primary text-xs font-semibold hover:underline mt-2 flex items-center gap-1"
+                                      >
+                                        <span className="material-symbols-outlined text-xs">add</span> Add Option
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {/* AI Logic Display */}
+                                  {block.aiLogic && (
+                                    <div className="mt-6 p-3 bg-gray-50 border border-gray-100 flex items-start gap-3">
+                                      <span className="material-symbols-outlined text-[16px] text-primary mt-0.5">account_tree</span>
+                                      <div>
+                                        <span className="block text-xs font-bold text-gray-700 mb-1">Logic Branching Active</span>
+                                        <span className="block text-xs text-gray-500">{block.aiLogic}</span>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* AI Sentiment Feedback Display */}
+                                  {block.type === 'sentiment' && (
+                                    <div className="mt-4 p-3 bg-[#fbf9ff] border border-primary/20 flex items-center gap-2 text-primary">
+                                      <span className="material-symbols-outlined text-[18px]">psychology</span>
+                                      <span className="text-xs font-medium">Automatic sentiment analyzer evaluates response polarity.</span>
+                                    </div>
+                                  )}
+
+                                  {/* Smart Upload Display */}
+                                  {block.type === 'upload' && (
+                                    <div className="mt-4 border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400">
+                                      <span className="material-symbols-outlined text-[32px] mb-2 text-gray-300">cloud_upload</span>
+                                      <span className="text-xs">Drag and drop file here, or click to upload</span>
+                                    </div>
+                                  )}
                                 </div>
-                              ))}
-                              <button 
-                                onClick={() => {
-                                  const newOpts = [...block.options, { value: `${block.options.length + 1}`, label: `Option ${block.options.length + 1}` }];
-                                  updateBlockValue(block.id, 'options', newOpts);
-                                }}
-                                className="text-primary text-xs font-semibold hover:underline mt-2 flex items-center gap-1"
-                              >
-                                <span className="material-symbols-outlined text-xs">add</span> Add Option
-                              </button>
-                            </div>
-                          )}
-
-                          {/* AI Logic Display */}
-                          {block.aiLogic && (
-                            <div className="mt-6 p-3 bg-gray-50 border border-gray-100 flex items-start gap-3">
-                              <span className="material-symbols-outlined text-[16px] text-primary mt-0.5">account_tree</span>
-                              <div>
-                                <span className="block text-xs font-bold text-gray-700 mb-1">Logic Branching Active</span>
-                                <span className="block text-xs text-gray-500">{block.aiLogic}</span>
                               </div>
+
+                              {/* Connector Line below item */}
+                              {index < blocks.length - 1 && (
+                                <div className="relative w-full h-12 flex items-center justify-center">
+                                  <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
+                                  <button className="relative z-10 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition-all shadow-sm">
+                                    <span className="material-symbols-outlined text-[16px]">add</span>
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           )}
+                        </SortableBlock>
+                      );
+                    })}
+                  </SortableContext>
+                </DndContext>
 
-                          {/* AI Sentiment Feedback Display */}
-                          {block.type === 'sentiment' && (
-                            <div className="mt-4 p-3 bg-[#fbf9ff] border border-primary/20 flex items-center gap-2 text-primary">
-                              <span className="material-symbols-outlined text-[18px]">psychology</span>
-                              <span className="text-xs font-medium">Automatic sentiment analyzer evaluates response polarity.</span>
-                            </div>
-                          )}
-
-                          {/* Smart Upload Display */}
-                          {block.type === 'upload' && (
-                            <div className="mt-4 border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400">
-                              <span className="material-symbols-outlined text-[32px] mb-2 text-gray-300">cloud_upload</span>
-                              <span className="text-xs">Drag and drop file here, or click to upload</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Connector Line below item */}
-                      {index < blocks.length - 1 && (
-                        <div className="relative w-full h-12 flex items-center justify-center">
-                          <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
-                          <button className="relative z-10 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition-all shadow-sm">
-                            <span className="material-symbols-outlined text-[16px]">add</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </SortableBlock>
-              );
-            })}
-          </SortableContext>
-        </DndContext>
-
-        {/* End node */}
+                {/* End node */}
                 <div className="relative w-full h-12 flex items-center justify-center my-2">
                   <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
                 </div>
@@ -876,17 +871,17 @@ export default function WorkspaceBuilder() {
           </div>
 
           {/* Right Side: Immersive Device Live Preview */}
-          <aside className={`bg-[#0a0a0a] border-l border-[#1a1a1a] flex flex-col items-center py-6 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0 transition-all duration-300 ${previewDevice === 'mobile' ? 'w-[380px]' : 'w-[65%]'}`}>
+          <aside className={`bg-[#0a0a0a] border-l border-[#1a1a1a] flex flex-col items-center py-6 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0 transition-all duration-300 ${previewDevice === 'mobile' ? 'w-[420px]' : 'w-[65%]'}`}>
             <div className="flex items-center justify-between w-full px-6 mb-6">
               <h3 className="font-label-md text-label-md text-on-surface">Live Preview</h3>
               <div className="flex bg-surface-container-high rounded-lg p-1">
-                <button 
+                <button
                   onClick={() => setPreviewDevice('mobile')}
                   className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'mobile' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
                 >
                   <span className="material-symbols-outlined text-[16px]">smartphone</span>
                 </button>
-                <button 
+                <button
                   onClick={() => setPreviewDevice('desktop')}
                   className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'desktop' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
                 >
@@ -896,11 +891,10 @@ export default function WorkspaceBuilder() {
             </div>
 
             {/* Preview Mockup Container */}
-            <div className={`relative bg-black transition-all duration-300 overflow-hidden shadow-2xl flex flex-col ${
-              previewDevice === 'mobile' 
-                ? 'w-[290px] h-[550px] rounded-[36px] border-[6px] border-[#262626]' 
+            <div className={`relative bg-black transition-all duration-300 overflow-hidden shadow-2xl flex flex-col ${previewDevice === 'mobile'
+                ? 'w-[340px] h-[650px] rounded-[36px] border-[6px] border-[#262626]'
                 : 'w-[90%] h-[90%] rounded-xl border border-[#262626]'
-            }`}>
+              }`}>
               {/* Notch */}
               {previewDevice === 'mobile' && (
                 <div className="absolute top-0 inset-x-0 h-5 flex justify-center z-50">
@@ -912,12 +906,12 @@ export default function WorkspaceBuilder() {
               <div className="flex-1 bg-white pt-10 pb-6 px-5 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left">
                 {/* Progress bar */}
                 <div className="w-full h-1 bg-gray-100 mb-6 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gray-900 transition-all duration-300" 
-                    style={{ 
+                  <div
+                    className="h-full bg-gray-900 transition-all duration-300"
+                    style={{
                       width: formMode === 'conversational' && blocks.filter(b => b.type !== 'welcome').length > 0
                         ? (activeBlock?.type === 'welcome' ? '0%' : `${((blocks.filter(b => b.type !== 'welcome').findIndex(b => b.id === activeBlockId) + 1) / blocks.filter(b => b.type !== 'welcome').length) * 100}%`)
-                        : '100%' 
+                        : '100%'
                     }}
                   ></div>
                 </div>
@@ -926,9 +920,9 @@ export default function WorkspaceBuilder() {
                 <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[10px]">{formMode === 'conversational' ? 'swipe_up' : 'view_agenda'}</span>
                   {formMode === 'conversational' && blocks.length > 0
-                    ? (activeBlock?.type === 'welcome' 
-                        ? 'Welcome Screen' 
-                        : `Question ${blocks.filter(b => b.type !== 'welcome').findIndex(b => b.id === activeBlockId) + 1} of ${blocks.filter(b => b.type !== 'welcome').length}`)
+                    ? (activeBlock?.type === 'welcome'
+                      ? 'Welcome Screen'
+                      : `Question ${blocks.filter(b => b.type !== 'welcome').findIndex(b => b.id === activeBlockId) + 1} of ${blocks.filter(b => b.type !== 'welcome').length}`)
                     : `All fields · Page ${currentPage}`}
                 </div>
 
@@ -944,689 +938,912 @@ export default function WorkspaceBuilder() {
                     if (!activeBlock) return null;
                     return (
                       <div key={activeBlock.id} className={formMode === 'classic' ? 'mb-10 last:mb-0' : 'flex-1 flex flex-col justify-start'}>
-                  {activeBlock.type === 'welcome' && (
-                    <div className="text-center pt-8">
-                      <span className="material-symbols-outlined text-primary text-[48px] mb-4">waving_hand</span>
-                      <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-3">{activeBlock.title}</h2>
-                      <p className="text-xs text-gray-500 leading-relaxed mb-8">{activeBlock.description}</p>
-                      {formMode === 'conversational' && (
-                        <button 
-                          onClick={() => {
-                            if (blocks.length > 1) {
-                              setActiveBlockId(blocks[1].id);
-                            }
-                          }}
-                          className="px-6 py-2 bg-gray-900 text-white font-label-md text-label-md w-full rounded-sm"
-                        >
-                          {activeBlock.buttonText || 'Start'}
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'rating' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-6 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="space-y-2">
-                        {activeBlock.options?.map((opt, i) => (
-                          <div 
-                            key={i} 
-                            onClick={() => updatePreviewData(activeBlock.id, opt.value)}
-                            className={`w-full py-3 border flex items-center justify-center gap-2 cursor-pointer transition-colors ${
-                              previewData[activeBlock.id] === opt.value ? 'border-2 border-gray-900 bg-gray-50 font-bold' : 'border-gray-200 hover:border-gray-900'
-                            }`}
-                          >
-                            <span className="font-bold">{opt.value}</span>
-                            {opt.label && <span className="text-[10px] text-gray-500 uppercase font-semibold">{opt.label}</span>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {['text', 'email', 'number', 'phone', 'url', 'password', 'company'].includes(activeBlock.type) && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <input 
-                        type={activeBlock.type === 'text' ? 'text' : (activeBlock.type === 'company' ? 'text' : activeBlock.type)} 
-                        value={previewData[activeBlock.id] || ''}
-                        autoComplete={activeBlock.type === 'password' ? 'new-password' : 'off'}
-                        data-lpignore="true"
-                        data-1p-ignore="true"
-                        onChange={(e) => {
-                          let val = e.target.value;
-                          if (activeBlock.type === 'phone') {
-                            val = val.replace(/\D/g, ''); // Numeric only for phone
-                          }
-                          updatePreviewData(activeBlock.id, val);
-                        }}
-                        placeholder={activeBlock.placeholder || `Enter ${activeBlock.type}...`}
-                        className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                      />
-                      {activeBlock.type === 'email' && previewData[activeBlock.id] && !previewData[activeBlock.id].includes('@') && (
-                        <p className="text-red-500 text-[10px] font-bold mt-2">Please include an '@' in the email address.</p>
-                      )}
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'checkbox' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="space-y-2">
-                        {activeBlock.options?.map((opt, i) => {
-                          const isChecked = previewData[activeBlock.id]?.includes(opt.value);
-                          return (
-                            <div 
-                              key={i} 
-                              onClick={() => {
-                                const current = previewData[activeBlock.id] || [];
-                                const next = current.includes(opt.value) 
-                                  ? current.filter(v => v !== opt.value)
-                                  : [...current, opt.value];
-                                updatePreviewData(activeBlock.id, next);
-                              }}
-                              className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isChecked ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
-                            >
-                              <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${isChecked ? 'bg-gray-900 border-gray-900' : 'border-gray-300'}`}>
-                                {isChecked && <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>}
-                              </span>
-                              <span className={`text-sm ${isChecked ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {(activeBlock.type === 'country' || activeBlock.type === 'language') && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <Select
-                        value={
-                          activeBlock.type === 'country'
-                            ? previewData[activeBlock.id] 
-                                ? { value: previewData[activeBlock.id], label: countries.getName(previewData[activeBlock.id], 'en') } 
-                                : null
-                            : previewData[activeBlock.id] 
-                                ? { value: previewData[activeBlock.id], label: previewData[activeBlock.id] } 
-                                : null
-                        }
-                        onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
-                        options={
-                          activeBlock.type === 'country'
-                            ? Object.entries(countries.getNames('en')).map(([code, name]) => ({ value: code, label: name }))
-                            : ISO6391.getAllNames().map((name) => ({ value: name, label: name }))
-                        }
-                        placeholder={`Select ${activeBlock.type}...`}
-                        styles={{
-                          control: (baseStyles, state) => ({
-                            ...baseStyles,
-                            backgroundColor: '#f9fafb',
-                            borderColor: state.isFocused ? '#111827' : '#e5e7eb',
-                            boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
-                            padding: '2px',
-                            borderRadius: '0.375rem',
-                            '&:hover': {
-                              borderColor: '#111827'
-                            }
-                          })
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'time' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                        <span>--:-- AM/PM</span>
-                        <span className="material-symbols-outlined">schedule</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'date_range' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex gap-2 items-center">
-                        <div className="flex-1 p-2 border border-gray-200 rounded text-xs text-gray-400 bg-gray-50 flex justify-between">
-                          Start Date <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                        </div>
-                        <span className="text-gray-300 material-symbols-outlined text-[14px]">arrow_forward</span>
-                        <div className="flex-1 p-2 border border-gray-200 rounded text-xs text-gray-400 bg-gray-50 flex justify-between">
-                          End Date <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'otp' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex gap-2 justify-center">
-                        {[1,2,3,4,5,6].map(box => (
-                          <div key={box} className="w-10 h-12 border-2 border-gray-200 rounded flex items-center justify-center text-gray-400 bg-white">
-                            -
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'color_picker' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex items-center gap-3 p-2 border border-gray-200 rounded bg-white">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500"></div>
-                        <span className="text-sm text-gray-400">#HEXCODE</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'tags' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="p-2 border border-gray-200 rounded bg-white flex gap-2 flex-wrap">
-                        <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">Design <span className="material-symbols-outlined text-[12px]">close</span></span>
-                        <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">UI/UX <span className="material-symbols-outlined text-[12px]">close</span></span>
-                        <input type="text" disabled placeholder="Add tag..." className="bg-transparent outline-none text-sm w-20" />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'credit_card' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="border border-gray-200 rounded overflow-hidden">
-                        <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center">
-                          <span className="text-gray-400 text-sm">Card Number</span>
-                          <span className="material-symbols-outlined text-gray-300">credit_card</span>
-                        </div>
-                        <div className="flex bg-white">
-                          <div className="p-3 border-r border-gray-200 flex-1 text-gray-400 text-sm">MM/YY</div>
-                          <div className="p-3 flex-1 text-gray-400 text-sm">CVC</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'matrix' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="border border-gray-200 rounded bg-white overflow-hidden text-xs">
-                        <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
-                          <div className="w-1/3"></div>
-                          <div className="flex-1 text-center">Poor</div>
-                          <div className="flex-1 text-center">Avg</div>
-                          <div className="flex-1 text-center">Good</div>
-                        </div>
-                        {['Quality', 'Speed'].map((row, i) => (
-                          <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
-                            <div className="w-1/3 font-semibold text-gray-700">{row}</div>
-                            <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                            <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                            <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'counter' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex items-center justify-between p-2 border border-gray-200 rounded bg-white w-32">
-                        <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">-</button>
-                        <span className="font-bold">0</span>
-                        <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">+</button>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'slider' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="py-4 relative">
-                        <div className="w-full h-1 bg-gray-200 rounded-full">
-                          <div className="w-1/2 h-full bg-gray-900 rounded-full relative">
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-900 rounded-full"></div>
-                          </div>
-                        </div>
-                        <div className="flex justify-between mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                          <span>Min</span>
-                          <span>Max</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'spacer' && (
-                    <div className="py-6">
-                      <div className="w-full h-8 bg-gray-50 border border-gray-100 border-dashed flex items-center justify-center text-gray-300 text-[10px] uppercase font-bold tracking-widest rounded">
-                        Spacer
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'fullname' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          placeholder="First Name" 
-                          value={previewData[activeBlock.id]?.first || ''}
-                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], first: e.target.value })}
-                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                        />
-                        <input 
-                          type="text" 
-                          placeholder="Last Name" 
-                          value={previewData[activeBlock.id]?.last || ''}
-                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], last: e.target.value })}
-                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'address' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="space-y-2">
-                        <input 
-                          type="text" 
-                          placeholder="Street Address" 
-                          value={previewData[activeBlock.id]?.street || ''}
-                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], street: e.target.value })}
-                          className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                        />
-                        <div className="flex gap-2">
-                          <input 
-                            type="text" 
-                            placeholder="City" 
-                            value={previewData[activeBlock.id]?.city || ''}
-                            onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], city: e.target.value })}
-                            className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                          />
-                          <input 
-                            type="text" 
-                            placeholder="State" 
-                            value={previewData[activeBlock.id]?.state || ''}
-                            onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], state: e.target.value })}
-                            className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                          />
-                        </div>
-                        <input 
-                          type="text" 
-                          placeholder="ZIP / Postal Code" 
-                          value={previewData[activeBlock.id]?.zip || ''}
-                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], zip: e.target.value.replace(/\D/g, '') })}
-                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'date' && (() => {
-                    const dateVal = previewData[activeBlock.id]; // { day, month, year, text, pickerOpen, pickerView }
-                    const d = dateVal || {};
-                    const pickerOpen = d.pickerOpen || false;
-                    const pickerView = d.pickerView || 'day'; // 'year' | 'month' | 'day'
-                    const selYear = d.year || new Date().getFullYear();
-                    const selMonth = d.month !== undefined ? d.month : new Date().getMonth();
-                    const selDay = d.day || null;
-                    const setD = (patch) => updatePreviewData(activeBlock.id, { ...d, ...patch });
-
-                    const daysInMonth = new Date(selYear, selMonth + 1, 0).getDate();
-                    const firstDayOfWeek = new Date(selYear, selMonth, 1).getDay();
-                    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-                    const dayLabels = ['S','M','T','W','T','F','S'];
-                    const yearStart = Math.floor(selYear / 16) * 16;
-
-                    const formattedDate = selDay ? `${String(selDay).padStart(2,'0')}/${String(selMonth+1).padStart(2,'0')}/${selYear}` : '';
-
-                    return (
-                      <div>
-                        <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                        {/* Text input + calendar icon */}
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={d.text !== undefined ? d.text : formattedDate}
-                            onChange={(e) => {
-                              let raw = e.target.value.replace(/[^\d]/g, '');
-                              if (raw.length > 8) raw = raw.slice(0, 8);
-                              
-                              let dd = raw.slice(0, 2);
-                              let mm = raw.slice(2, 4);
-                              let yy = raw.slice(4, 8);
-                              
-                              if (dd.length === 2) {
-                                if (parseInt(dd, 10) > 31) dd = '31';
-                                if (parseInt(dd, 10) === 0) dd = '01';
-                              }
-                              if (mm.length === 2) {
-                                if (parseInt(mm, 10) > 12) mm = '12';
-                                if (parseInt(mm, 10) === 0) mm = '01';
-                              }
-                              
-                              let formatted = dd;
-                              if (mm.length > 0) formatted += '/' + mm;
-                              if (yy.length > 0) formatted += '/' + yy;
-                              
-                              raw = dd + mm + yy;
-
-                              // Auto-parse DD/MM/YYYY
-                              if (raw.length === 8) {
-                                const d_val = parseInt(dd, 10);
-                                const m_val = parseInt(mm, 10);
-                                const y_val = parseInt(yy, 10);
-                                
-                                // check true days in month
-                                const daysInThisMonth = new Date(y_val, m_val, 0).getDate();
-                                let finalDay = d_val;
-                                if (d_val > daysInThisMonth) {
-                                  finalDay = daysInThisMonth;
-                                  formatted = String(finalDay).padStart(2, '0') + '/' + mm + '/' + yy;
-                                }
-                                
-                                setD({ text: formatted, day: finalDay, month: m_val - 1, year: y_val });
-                              } else {
-                                setD({ text: formatted, day: null });
-                              }
-                            }}
-                            placeholder="DD/MM/YYYY"
-                            className="w-full p-3 pr-10 border border-gray-200 rounded text-sm text-gray-900 bg-gray-50 outline-none focus:border-gray-900 transition-colors"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setD({ pickerOpen: !pickerOpen, pickerView: 'day' })}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                          </button>
-                        </div>
-
-                        {/* Calendar popup */}
-                        {pickerOpen && (
-                          <div className="mt-2 rounded-lg overflow-hidden shadow-xl" style={{ backgroundColor: '#282828', color: '#e0e0e0', width: '100%' }}>
-                            {/* Header */}
-                            <div className="flex items-center justify-between px-4 py-3">
+                        {activeBlock.type === 'welcome' && (
+                          <div className="text-center pt-8">
+                            <span className="material-symbols-outlined text-primary text-[48px] mb-4">waving_hand</span>
+                            <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-3">{activeBlock.title}</h2>
+                            <p className="text-xs text-gray-500 leading-relaxed mb-8">{activeBlock.description}</p>
+                            {formMode === 'conversational' && (
                               <button
-                                type="button"
-                                onClick={() => setD({ pickerView: pickerView === 'day' ? 'year' : (pickerView === 'month' ? 'year' : 'day') })}
-                                className="text-white text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                onClick={() => {
+                                  if (blocks.length > 1) {
+                                    setActiveBlockId(blocks[1].id);
+                                  }
+                                }}
+                                className="px-6 py-2 bg-gray-900 text-white font-label-md text-label-md w-full rounded-sm"
                               >
-                                {pickerView === 'year' ? `${yearStart} – ${yearStart + 15}` : pickerView === 'month' ? selYear : `${monthNames[selMonth]} ${selYear}`}
-                                <span className="material-symbols-outlined text-[16px]">{pickerView === 'day' ? 'arrow_drop_down' : 'arrow_drop_up'}</span>
+                                {activeBlock.buttonText || 'Start'}
                               </button>
-                              {pickerView === 'day' && (
-                                <div className="flex gap-1">
-                                  <button type="button" onClick={() => setD({ month: selMonth === 0 ? 11 : selMonth - 1, year: selMonth === 0 ? selYear - 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
-                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                                  </button>
-                                  <button type="button" onClick={() => setD({ month: selMonth === 11 ? 0 : selMonth + 1, year: selMonth === 11 ? selYear + 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
-                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                                  </button>
-                                </div>
-                              )}
-                              {pickerView === 'year' && (
-                                <div className="flex gap-1">
-                                  <button type="button" onClick={() => setD({ year: selYear - 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
-                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                                  </button>
-                                  <button type="button" onClick={() => setD({ year: selYear + 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
-                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Year Grid */}
-                            {pickerView === 'year' && (
-                              <div className="grid grid-cols-4 gap-1 px-3 pb-4">
-                                {Array.from({ length: 16 }, (_, i) => yearStart + i).map(yr => (
-                                  <button
-                                    key={yr}
-                                    type="button"
-                                    onClick={() => setD({ year: yr, pickerView: 'month' })}
-                                    className={`py-2 rounded-full text-sm transition-colors ${yr === selYear ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
-                                  >
-                                    {yr}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Month Grid */}
-                            {pickerView === 'month' && (
-                              <div className="grid grid-cols-3 gap-1 px-3 pb-4">
-                                {monthNames.map((m, i) => (
-                                  <button
-                                    key={m}
-                                    type="button"
-                                    onClick={() => setD({ month: i, pickerView: 'day' })}
-                                    className={`py-3 rounded-full text-sm transition-colors ${i === selMonth ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
-                                  >
-                                    {m.slice(0, 3)}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Day Grid */}
-                            {pickerView === 'day' && (
-                              <div className="px-3 pb-4">
-                                <div className="grid grid-cols-7 mb-1">
-                                  {dayLabels.map((label, i) => (
-                                    <div key={i} className="text-center text-[11px] font-medium py-1" style={{ color: '#9aa0a6' }}>{label}</div>
-                                  ))}
-                                </div>
-                                <div className="grid grid-cols-7">
-                                  {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e-${i}`} />)}
-                                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-                                    const isToday = day === new Date().getDate() && selMonth === new Date().getMonth() && selYear === new Date().getFullYear();
-                                    const isSelected = day === selDay;
-                                    return (
-                                      <button
-                                        key={day}
-                                        type="button"
-                                        onClick={() => {
-                                          const txt = `${String(day).padStart(2,'0')}/${String(selMonth+1).padStart(2,'0')}/${selYear}`;
-                                          setD({ day, text: txt, pickerOpen: false });
-                                        }}
-                                        className={`w-full aspect-square flex items-center justify-center text-sm rounded-full transition-colors
-                                          ${isSelected ? 'bg-white/20 text-white font-bold' : isToday ? 'ring-1 ring-white/60 text-white' : 'text-gray-300 hover:bg-white/10'}
-                                        `}
-                                      >
-                                        {day}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
                             )}
                           </div>
                         )}
-                      </div>
-                    );
-                  })()}
 
-                  {activeBlock.type === 'rating_stars' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex gap-2">
-                        {[1,2,3,4,5].map(star => (
-                          <span key={star} className="material-symbols-outlined text-[32px] text-gray-300">star_rate</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'emoji_rating' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                      <div className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded p-4">
-                        <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😢</span>
-                        <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😐</span>
-                        <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😀</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'linear_scale' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200 rounded">
-                        {[1,2,3,4,5].map(num => (
-                          <div key={num} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold text-gray-500 bg-white">
-                            {num}
+                        {activeBlock.type === 'rating' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-6 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="space-y-2">
+                              {activeBlock.options?.map((opt, i) => (
+                                <div
+                                  key={i}
+                                  onClick={() => updatePreviewData(activeBlock.id, opt.value)}
+                                  className={`w-full py-3 border flex items-center justify-center gap-2 cursor-pointer transition-colors ${previewData[activeBlock.id] === opt.value ? 'border-2 border-gray-900 bg-gray-50 font-bold' : 'border-gray-200 hover:border-gray-900'
+                                    }`}
+                                >
+                                  <span className="font-bold">{opt.value}</span>
+                                  {opt.label && <span className="text-[10px] text-gray-500 uppercase font-semibold">{opt.label}</span>}
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        )}
 
-                  {activeBlock.type === 'nps' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="flex justify-between items-center bg-gray-50 p-2 border border-gray-200 rounded">
-                        {[0,1,2,3,4,5,6,7,8,9,10].map(num => (
-                          <div key={num} className="w-6 h-8 rounded border border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-500 bg-white">
-                            {num}
+                        {['text', 'email', 'number', 'phone', 'url', 'password', 'company'].includes(activeBlock.type) && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <input
+                              type={activeBlock.type === 'text' ? 'text' : (activeBlock.type === 'company' ? 'text' : activeBlock.type)}
+                              value={previewData[activeBlock.id] || ''}
+                              autoComplete={activeBlock.type === 'password' ? 'new-password' : 'off'}
+                              data-lpignore="true"
+                              data-1p-ignore="true"
+                              onChange={(e) => {
+                                let val = e.target.value;
+                                if (activeBlock.type === 'phone') {
+                                  val = val.replace(/\D/g, ''); // Numeric only for phone
+                                }
+                                updatePreviewData(activeBlock.id, val);
+                              }}
+                              placeholder={activeBlock.placeholder || `Enter ${activeBlock.type}...`}
+                              className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                            />
+                            {activeBlock.type === 'email' && previewData[activeBlock.id] && !previewData[activeBlock.id].includes('@') && (
+                              <p className="text-red-500 text-[10px] font-bold mt-2">Please include an '@' in the email address.</p>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                      <div className="flex justify-between mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
-                        <span>Not likely</span>
-                        <span>Very likely</span>
-                      </div>
-                    </div>
-                  )}
+                        )}
 
-                  {activeBlock.type === 'yes_no' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="flex gap-4">
-                        <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">Yes</div>
-                        <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">No</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'terms' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="flex items-start gap-3 p-4 border border-gray-200 rounded bg-gray-50">
-                        <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0 mt-0.5 bg-white"></span>
-                        <span className="text-xs text-gray-600 leading-relaxed">{activeBlock.options?.[0]?.label || 'I agree to the terms'}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'heading' && (
-                    <div className="pt-4 pb-2 border-b-2 border-gray-900">
-                      <h1 className="text-2xl font-bold text-gray-900">{activeBlock.title}</h1>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'divider' && (
-                    <div className="py-4">
-                      <div className="w-full border-t border-gray-300 border-dashed"></div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'signature' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="border-2 border-gray-200 rounded p-6 h-32 flex items-center justify-center text-gray-400 bg-gray-50">
-                        <span className="text-xs">Draw signature here</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'longtext' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <textarea 
-                        disabled 
-                        placeholder={activeBlock.placeholder || 'Enter details...'}
-                        className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 h-20 resize-none" 
-                      />
-                    </div>
-                  )}
-
-                  {activeBlock.type === 'choice' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="space-y-2">
-                        {activeBlock.options?.map((opt, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                            <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"></span>
-                            <span className="text-sm text-gray-700">{opt.label}</span>
+                        {activeBlock.type === 'checkbox' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="space-y-2">
+                              {activeBlock.options?.map((opt, i) => {
+                                const isChecked = previewData[activeBlock.id]?.includes(opt.value);
+                                return (
+                                  <div
+                                    key={i}
+                                    onClick={() => {
+                                      const current = previewData[activeBlock.id] || [];
+                                      const next = current.includes(opt.value)
+                                        ? current.filter(v => v !== opt.value)
+                                        : [...current, opt.value];
+                                      updatePreviewData(activeBlock.id, next);
+                                    }}
+                                    className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isChecked ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                                  >
+                                    <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${isChecked ? 'bg-gray-900 border-gray-900' : 'border-gray-300'}`}>
+                                      {isChecked && <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>}
+                                    </span>
+                                    <span className={`text-sm ${isChecked ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        )}
 
-                  {activeBlock.type === 'dropdown' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                        <span>Select an option...</span>
-                        <span className="material-symbols-outlined">arrow_drop_down</span>
-                      </div>
-                    </div>
-                  )}
+                        {(activeBlock.type === 'country' || activeBlock.type === 'language') && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <Select
+                              value={
+                                activeBlock.type === 'country'
+                                  ? previewData[activeBlock.id]
+                                    ? { value: previewData[activeBlock.id], label: countries.getName(previewData[activeBlock.id], 'en') }
+                                    : null
+                                  : previewData[activeBlock.id]
+                                    ? { value: previewData[activeBlock.id], label: previewData[activeBlock.id] }
+                                    : null
+                              }
+                              onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
+                              options={
+                                activeBlock.type === 'country'
+                                  ? Object.entries(countries.getNames('en')).map(([code, name]) => ({ value: code, label: name }))
+                                  : ISO6391.getAllNames().map((name) => ({ value: name, label: name }))
+                              }
+                              placeholder={`Select ${activeBlock.type}...`}
+                              styles={{
+                                control: (baseStyles, state) => ({
+                                  ...baseStyles,
+                                  backgroundColor: '#f9fafb',
+                                  borderColor: state.isFocused ? '#111827' : '#e5e7eb',
+                                  boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
+                                  padding: '2px',
+                                  borderRadius: '0.375rem',
+                                  '&:hover': {
+                                    borderColor: '#111827'
+                                  }
+                                })
+                              }}
+                            />
+                          </div>
+                        )}
 
-                  {activeBlock.type === 'sentiment' && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <textarea 
-                        disabled
-                        placeholder="Write something..."
-                        className="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700 h-20 resize-none mb-3" 
-                      />
-                      <div className="p-3 bg-gray-50 border border-gray-200 flex items-center justify-between text-xs text-gray-500">
-                        <span>AI Sentiment Evaluation</span>
-                        <span className="bg-primary/20 text-primary-container px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[9px]">Awaiting input</span>
-                      </div>
-                    </div>
-                  )}
+                        {activeBlock.type === 'time' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
+                              <span>--:-- AM/PM</span>
+                              <span className="material-symbols-outlined">schedule</span>
+                            </div>
+                          </div>
+                        )}
 
-                  {(activeBlock.type === 'upload' || activeBlock.type === 'fileupload') && (
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                        {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                      </h2>
-                      <div className="border-2 border-dashed border-gray-200 rounded p-6 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-                        <span className="material-symbols-outlined text-[32px] text-gray-300 mb-1">cloud_upload</span>
-                        <span className="text-[10px]">Tap to upload files</span>
-                      </div>
-                    </div>
-                  )}
+                        {activeBlock.type === 'date_range' && (() => {
+                          const dateVal = previewData[activeBlock.id];
+                          const d = dateVal || {};
+                          const activePicker = d.activePicker || null;
+                          const pickerView = d.pickerView || 'day';
+                          const viewYear = d.viewYear || new Date().getFullYear();
+                          const viewMonth = d.viewMonth !== undefined ? d.viewMonth : new Date().getMonth();
+                          const setD = (patch) => updatePreviewData(activeBlock.id, { ...d, ...patch });
+
+                          const renderCalendar = (target) => {
+                            const selData = d[target] || {};
+                            const selYear = viewYear;
+                            const selMonth = viewMonth;
+                            const selDay = selData.day || null;
+
+                            const daysInMonth = new Date(selYear, selMonth + 1, 0).getDate();
+                            const firstDayOfWeek = new Date(selYear, selMonth, 1).getDay();
+                            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                            const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                            const yearStart = Math.floor(selYear / 16) * 16;
+
+                            return (
+                              <div className="mt-2 rounded-lg overflow-hidden shadow-xl" style={{ backgroundColor: '#282828', color: '#e0e0e0', width: '100%' }}>
+                                <div className="flex items-center justify-between px-4 py-3">
+                                  <button
+                                    type="button"
+                                    onClick={() => setD({ pickerView: pickerView === 'day' ? 'year' : (pickerView === 'month' ? 'year' : 'day') })}
+                                    className="text-white text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                  >
+                                    {pickerView === 'year' ? `${yearStart} – ${yearStart + 15}` : pickerView === 'month' ? selYear : `${monthNames[selMonth]} ${selYear}`}
+                                    <span className="material-symbols-outlined text-[16px]">{pickerView === 'day' ? 'arrow_drop_down' : 'arrow_drop_up'}</span>
+                                  </button>
+                                  {pickerView === 'day' && (
+                                    <div className="flex gap-1">
+                                      <button type="button" onClick={() => setD({ viewMonth: selMonth === 0 ? 11 : selMonth - 1, viewYear: selMonth === 0 ? selYear - 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                        <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                      </button>
+                                      <button type="button" onClick={() => setD({ viewMonth: selMonth === 11 ? 0 : selMonth + 1, viewYear: selMonth === 11 ? selYear + 1 : selYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                        <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                      </button>
+                                    </div>
+                                  )}
+                                  {pickerView === 'year' && (
+                                    <div className="flex gap-1">
+                                      <button type="button" onClick={() => setD({ viewYear: selYear - 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                        <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                      </button>
+                                      <button type="button" onClick={() => setD({ viewYear: selYear + 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                        <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {pickerView === 'year' && (
+                                  <div className="grid grid-cols-4 gap-1 px-3 pb-4">
+                                    {Array.from({ length: 16 }, (_, i) => yearStart + i).map(yr => (
+                                      <button
+                                        key={yr}
+                                        type="button"
+                                        onClick={() => { setD({ viewYear: yr, pickerView: 'month' }); }}
+                                        className={`py-2 rounded-full text-sm transition-colors ${yr === selYear ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                      >
+                                        {yr}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {pickerView === 'month' && (
+                                  <div className="grid grid-cols-3 gap-1 px-3 pb-4">
+                                    {monthNames.map((m, i) => (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => { setD({ viewMonth: i, pickerView: 'day' }); }}
+                                        className={`py-3 rounded-full text-sm transition-colors ${i === selMonth ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                      >
+                                        {m.slice(0, 3)}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {pickerView === 'day' && (
+                                  <div className="px-3 pb-4">
+                                    <div className="grid grid-cols-7 mb-1">
+                                      {dayLabels.map((label, i) => (
+                                        <div key={i} className="text-center text-[11px] font-medium py-1" style={{ color: '#9aa0a6' }}>{label}</div>
+                                      ))}
+                                    </div>
+                                    <div className="grid grid-cols-7">
+                                      {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e-${i}`} />)}
+                                      {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                                        const isToday = day === new Date().getDate() && selMonth === new Date().getMonth() && selYear === new Date().getFullYear();
+                                        const isSelected = day === selData.day && selMonth === selData.month && selYear === selData.year;
+
+                                        const sd = d.start?.day ? new Date(d.start.year, d.start.month, d.start.day) : null;
+                                        const ed = d.end?.day ? new Date(d.end.year, d.end.month, d.end.day) : null;
+                                        const curr = new Date(selYear, selMonth, day);
+                                        let inRange = false;
+                                        if (sd && ed && curr >= sd && curr <= ed) inRange = true;
+
+                                        const isDisabled = (target === 'start' && ed && curr > ed) || (target === 'end' && sd && curr < sd);
+
+                                        return (
+                                          <button
+                                            key={day}
+                                            type="button"
+                                            disabled={isDisabled}
+                                            onClick={() => {
+                                              const txt = `${String(day).padStart(2, '0')}/${String(selMonth + 1).padStart(2, '0')}/${selYear}`;
+                                              let updates = { [target]: { ...selData, day, month: selMonth, year: selYear, text: txt }, activePicker: null };
+                                              if (target === 'start' && ed && curr > ed) updates.end = {};
+                                              if (target === 'end' && sd && curr < sd) updates.start = {};
+                                              setD(updates);
+                                            }}
+                                            className={`w-full aspect-square flex items-center justify-center text-sm rounded-full transition-colors
+                                          ${isDisabled ? 'opacity-20 cursor-not-allowed text-gray-400' : isSelected ? 'bg-white/20 text-white font-bold' : inRange ? 'bg-white/10 text-white' : isToday ? 'ring-1 ring-white/60 text-white' : 'text-gray-300 hover:bg-white/10'}
+                                        `}
+                                          >
+                                            {day}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          const handleInput = (e, target) => {
+                            let raw = e.target.value.replace(/[^\d]/g, '');
+                            if (raw.length > 8) raw = raw.slice(0, 8);
+
+                            let dd = raw.slice(0, 2);
+                            let mm = raw.slice(2, 4);
+                            let yy = raw.slice(4, 8);
+
+                            if (dd.length === 2) {
+                              if (parseInt(dd, 10) > 31) dd = '31';
+                              if (parseInt(dd, 10) === 0) dd = '01';
+                            }
+                            if (mm.length === 2) {
+                              if (parseInt(mm, 10) > 12) mm = '12';
+                              if (parseInt(mm, 10) === 0) mm = '01';
+                            }
+
+                            let formatted = dd;
+                            if (mm.length > 0) formatted += '/' + mm;
+                            if (yy.length > 0) formatted += '/' + yy;
+
+                            raw = dd + mm + yy;
+
+                            let targetData = { text: formatted };
+                            let updates = {};
+
+                            if (raw.length === 8) {
+                              const d_val = parseInt(dd, 10);
+                              const m_val = parseInt(mm, 10);
+                              const y_val = parseInt(yy, 10);
+
+                              const daysInThisMonth = new Date(y_val, m_val, 0).getDate();
+                              let finalDay = d_val;
+                              if (d_val > daysInThisMonth) {
+                                finalDay = daysInThisMonth;
+                                formatted = String(finalDay).padStart(2, '0') + '/' + mm + '/' + yy;
+                              }
+
+                              targetData = { text: formatted, day: finalDay, month: m_val - 1, year: y_val };
+
+                              const tDate = new Date(y_val, m_val - 1, finalDay);
+                              if (target === 'start' && d.end?.day) {
+                                const edObj = new Date(d.end.year, d.end.month, d.end.day);
+                                if (tDate > edObj) updates.end = {};
+                              } else if (target === 'end' && d.start?.day) {
+                                const sdObj = new Date(d.start.year, d.start.month, d.start.day);
+                                if (tDate < sdObj) updates.start = {};
+                              }
+                            } else {
+                              targetData = { text: formatted, day: null };
+                            }
+                            updates[target] = { ...(d[target] || {}), ...targetData };
+                            setD(updates);
+                          };
+
+                          const s = d.start || {};
+                          const e = d.end || {};
+                          const sDate = s.day ? `${String(s.day).padStart(2, '0')}/${String(s.month + 1).padStart(2, '0')}/${s.year}` : '';
+                          const eDate = e.day ? `${String(e.day).padStart(2, '0')}/${String(e.month + 1).padStart(2, '0')}/${e.year}` : '';
+
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex gap-2 items-center relative">
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="text"
+                                    value={s.text !== undefined ? s.text : sDate}
+                                    onChange={(ev) => handleInput(ev, 'start')}
+                                    placeholder="DD/MM/YYYY"
+                                    className={`w-full p-3 pr-10 border rounded text-sm outline-none transition-colors ${activePicker === 'start' ? 'border-gray-900 ring-1 ring-gray-900 bg-white' : 'border-gray-200 bg-gray-50 hover:border-gray-400'}`}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setD({ activePicker: activePicker === 'start' ? null : 'start', pickerView: 'day', viewYear: new Date().getFullYear(), viewMonth: new Date().getMonth() })}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+                                  </button>
+                                </div>
+
+                                <span className="text-gray-300 material-symbols-outlined text-[14px]">arrow_forward</span>
+
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="text"
+                                    value={e.text !== undefined ? e.text : eDate}
+                                    onChange={(ev) => handleInput(ev, 'end')}
+                                    placeholder="DD/MM/YYYY"
+                                    className={`w-full p-3 pr-10 border rounded text-sm outline-none transition-colors ${activePicker === 'end' ? 'border-gray-900 ring-1 ring-gray-900 bg-white' : 'border-gray-200 bg-gray-50 hover:border-gray-400'}`}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setD({ activePicker: activePicker === 'end' ? null : 'end', pickerView: 'day', viewYear: new Date().getFullYear(), viewMonth: new Date().getMonth() })}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+                                  </button>
+                                </div>
+                              </div>
+                              {activePicker && renderCalendar(activePicker)}
+                            </div>
+                          );
+                        })()}
+
+                        {activeBlock.type === 'otp' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex gap-2 justify-center">
+                              {[1, 2, 3, 4, 5, 6].map(box => (
+                                <div key={box} className="w-10 h-12 border-2 border-gray-200 rounded flex items-center justify-center text-gray-400 bg-white">
+                                  -
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'color_picker' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex items-center gap-3 p-2 border border-gray-200 rounded bg-white">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500"></div>
+                              <span className="text-sm text-gray-400">#HEXCODE</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'tags' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="p-2 border border-gray-200 rounded bg-white flex gap-2 flex-wrap">
+                              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">Design <span className="material-symbols-outlined text-[12px]">close</span></span>
+                              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">UI/UX <span className="material-symbols-outlined text-[12px]">close</span></span>
+                              <input type="text" disabled placeholder="Add tag..." className="bg-transparent outline-none text-sm w-20" />
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'credit_card' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="border border-gray-200 rounded overflow-hidden">
+                              <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center">
+                                <span className="text-gray-400 text-sm">Card Number</span>
+                                <span className="material-symbols-outlined text-gray-300">credit_card</span>
+                              </div>
+                              <div className="flex bg-white">
+                                <div className="p-3 border-r border-gray-200 flex-1 text-gray-400 text-sm">MM/YY</div>
+                                <div className="p-3 flex-1 text-gray-400 text-sm">CVC</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'matrix' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="border border-gray-200 rounded bg-white overflow-hidden text-xs">
+                              <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
+                                <div className="w-1/3"></div>
+                                <div className="flex-1 text-center">Poor</div>
+                                <div className="flex-1 text-center">Avg</div>
+                                <div className="flex-1 text-center">Good</div>
+                              </div>
+                              {['Quality', 'Speed'].map((row, i) => (
+                                <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
+                                  <div className="w-1/3 font-semibold text-gray-700">{row}</div>
+                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
+                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
+                                  <div className="flex-1 text-center"><span className="w-3 h-3 rounded-full border border-gray-300 inline-block"></span></div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'counter' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex items-center justify-between p-2 border border-gray-200 rounded bg-white w-32">
+                              <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">-</button>
+                              <span className="font-bold">0</span>
+                              <button className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded text-gray-500">+</button>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'slider' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="py-4 relative">
+                              <div className="w-full h-1 bg-gray-200 rounded-full">
+                                <div className="w-1/2 h-full bg-gray-900 rounded-full relative">
+                                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-900 rounded-full"></div>
+                                </div>
+                              </div>
+                              <div className="flex justify-between mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                                <span>Min</span>
+                                <span>Max</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'spacer' && (
+                          <div className="py-6">
+                            <div className="w-full h-8 bg-gray-50 border border-gray-100 border-dashed flex items-center justify-center text-gray-300 text-[10px] uppercase font-bold tracking-widest rounded">
+                              Spacer
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'fullname' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                placeholder="First Name"
+                                value={previewData[activeBlock.id]?.first || ''}
+                                onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], first: e.target.value })}
+                                className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Last Name"
+                                value={previewData[activeBlock.id]?.last || ''}
+                                onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], last: e.target.value })}
+                                className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'address' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="space-y-2">
+                              <input
+                                type="text"
+                                placeholder="Street Address"
+                                value={previewData[activeBlock.id]?.street || ''}
+                                onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], street: e.target.value })}
+                                className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                              />
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="City"
+                                  value={previewData[activeBlock.id]?.city || ''}
+                                  onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], city: e.target.value })}
+                                  className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="State"
+                                  value={previewData[activeBlock.id]?.state || ''}
+                                  onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], state: e.target.value })}
+                                  className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                                />
+                              </div>
+                              <input
+                                type="text"
+                                placeholder="ZIP / Postal Code"
+                                value={previewData[activeBlock.id]?.zip || ''}
+                                onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], zip: e.target.value.replace(/\D/g, '') })}
+                                className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'date' && (() => {
+                          const dateVal = previewData[activeBlock.id];
+                          const d = dateVal || {};
+                          const pickerOpen = d.pickerOpen || false;
+                          const pickerView = d.pickerView || 'day';
+                          const viewYear = d.viewYear || new Date().getFullYear();
+                          const viewMonth = d.viewMonth !== undefined ? d.viewMonth : new Date().getMonth();
+                          const selDay = d.day || null;
+                          const selMonth = d.month;
+                          const selYear = d.year;
+                          const setD = (patch) => updatePreviewData(activeBlock.id, { ...d, ...patch });
+
+                          const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+                          const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
+                          const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                          const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                          const yearStart = Math.floor(viewYear / 16) * 16;
+
+                          const formattedDate = selDay ? `${String(selDay).padStart(2, '0')}/${String(selMonth + 1).padStart(2, '0')}/${selYear}` : '';
+
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              {/* Text input + calendar icon */}
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={d.text !== undefined ? d.text : formattedDate}
+                                  onChange={(e) => {
+                                    let raw = e.target.value.replace(/[^\d]/g, '');
+                                    if (raw.length > 8) raw = raw.slice(0, 8);
+
+                                    let dd = raw.slice(0, 2);
+                                    let mm = raw.slice(2, 4);
+                                    let yy = raw.slice(4, 8);
+
+                                    if (dd.length === 2) {
+                                      if (parseInt(dd, 10) > 31) dd = '31';
+                                      if (parseInt(dd, 10) === 0) dd = '01';
+                                    }
+                                    if (mm.length === 2) {
+                                      if (parseInt(mm, 10) > 12) mm = '12';
+                                      if (parseInt(mm, 10) === 0) mm = '01';
+                                    }
+
+                                    let formatted = dd;
+                                    if (mm.length > 0) formatted += '/' + mm;
+                                    if (yy.length > 0) formatted += '/' + yy;
+
+                                    raw = dd + mm + yy;
+
+                                    // Auto-parse DD/MM/YYYY
+                                    if (raw.length === 8) {
+                                      const d_val = parseInt(dd, 10);
+                                      const m_val = parseInt(mm, 10);
+                                      const y_val = parseInt(yy, 10);
+
+                                      // check true days in month
+                                      const daysInThisMonth = new Date(y_val, m_val, 0).getDate();
+                                      let finalDay = d_val;
+                                      if (d_val > daysInThisMonth) {
+                                        finalDay = daysInThisMonth;
+                                        formatted = String(finalDay).padStart(2, '0') + '/' + mm + '/' + yy;
+                                      }
+
+                                      setD({ text: formatted, day: finalDay, month: m_val - 1, year: y_val });
+                                    } else {
+                                      setD({ text: formatted, day: null });
+                                    }
+                                  }}
+                                  placeholder="DD/MM/YYYY"
+                                  className="w-full p-3 pr-10 border border-gray-200 rounded text-sm text-gray-900 bg-gray-50 outline-none focus:border-gray-900 transition-colors"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setD({ pickerOpen: !pickerOpen, pickerView: 'day', viewYear: new Date().getFullYear(), viewMonth: new Date().getMonth() })}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                                >
+                                  <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+                                </button>
+                              </div>
+
+                              {/* Calendar popup */}
+                              {pickerOpen && (
+                                <div className="mt-2 rounded-lg overflow-hidden shadow-xl" style={{ backgroundColor: '#282828', color: '#e0e0e0', width: '100%' }}>
+                                  {/* Header */}
+                                  <div className="flex items-center justify-between px-4 py-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => setD({ pickerView: pickerView === 'day' ? 'year' : (pickerView === 'month' ? 'year' : 'day') })}
+                                      className="text-white text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                    >
+                                      {pickerView === 'year' ? `${yearStart} – ${yearStart + 15}` : pickerView === 'month' ? viewYear : `${monthNames[viewMonth]} ${viewYear}`}
+                                      <span className="material-symbols-outlined text-[16px]">{pickerView === 'day' ? 'arrow_drop_down' : 'arrow_drop_up'}</span>
+                                    </button>
+                                    {pickerView === 'day' && (
+                                      <div className="flex gap-1">
+                                        <button type="button" onClick={() => setD({ viewMonth: viewMonth === 0 ? 11 : viewMonth - 1, viewYear: viewMonth === 0 ? viewYear - 1 : viewYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                          <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                        </button>
+                                        <button type="button" onClick={() => setD({ viewMonth: viewMonth === 11 ? 0 : viewMonth + 1, viewYear: viewMonth === 11 ? viewYear + 1 : viewYear })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                        </button>
+                                      </div>
+                                    )}
+                                    {pickerView === 'year' && (
+                                      <div className="flex gap-1">
+                                        <button type="button" onClick={() => setD({ viewYear: viewYear - 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                          <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                                        </button>
+                                        <button type="button" onClick={() => setD({ viewYear: viewYear + 16 })} className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:bg-white/10 transition-colors">
+                                          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Year Grid */}
+                                  {pickerView === 'year' && (
+                                    <div className="grid grid-cols-4 gap-1 px-3 pb-4">
+                                      {Array.from({ length: 16 }, (_, i) => yearStart + i).map(yr => (
+                                        <button
+                                          key={yr}
+                                          type="button"
+                                          onClick={() => setD({ viewYear: yr, pickerView: 'month' })}
+                                          className={`py-2 rounded-full text-sm transition-colors ${yr === viewYear ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                        >
+                                          {yr}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Month Grid */}
+                                  {pickerView === 'month' && (
+                                    <div className="grid grid-cols-3 gap-1 px-3 pb-4">
+                                      {monthNames.map((m, i) => (
+                                        <button
+                                          key={m}
+                                          type="button"
+                                          onClick={() => setD({ viewMonth: i, pickerView: 'day' })}
+                                          className={`py-3 rounded-full text-sm transition-colors ${i === viewMonth ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10'}`}
+                                        >
+                                          {m.slice(0, 3)}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Day Grid */}
+                                  {pickerView === 'day' && (
+                                    <div className="px-3 pb-4">
+                                      <div className="grid grid-cols-7 mb-1">
+                                        {dayLabels.map((label, i) => (
+                                          <div key={i} className="text-center text-[11px] font-medium py-1" style={{ color: '#9aa0a6' }}>{label}</div>
+                                        ))}
+                                      </div>
+                                      <div className="grid grid-cols-7">
+                                        {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e-${i}`} />)}
+                                        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                                          const isToday = day === new Date().getDate() && viewMonth === new Date().getMonth() && viewYear === new Date().getFullYear();
+                                          const isSelected = day === selDay && viewMonth === selMonth && viewYear === selYear;
+                                          return (
+                                            <button
+                                              key={day}
+                                              type="button"
+                                              onClick={() => {
+                                                const txt = `${String(day).padStart(2, '0')}/${String(viewMonth + 1).padStart(2, '0')}/${viewYear}`;
+                                                setD({ day, month: viewMonth, year: viewYear, text: txt, pickerOpen: false });
+                                              }}
+                                              className={`w-full aspect-square flex items-center justify-center text-sm rounded-full transition-colors
+                                          ${isSelected ? 'bg-white/20 text-white font-bold' : isToday ? 'ring-1 ring-white/60 text-white' : 'text-gray-300 hover:bg-white/10'}
+                                        `}
+                                            >
+                                              {day}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {activeBlock.type === 'rating_stars' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex gap-2">
+                              {[1, 2, 3, 4, 5].map(star => (
+                                <span key={star} className="material-symbols-outlined text-[32px] text-gray-300">star_rate</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'emoji_rating' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <div className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded p-4">
+                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😢</span>
+                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😐</span>
+                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😀</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'linear_scale' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200 rounded">
+                              {[1, 2, 3, 4, 5].map(num => (
+                                <div key={num} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold text-gray-500 bg-white">
+                                  {num}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'nps' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="flex justify-between items-center bg-gray-50 p-2 border border-gray-200 rounded">
+                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                                <div key={num} className="w-6 h-8 rounded border border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-500 bg-white">
+                                  {num}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex justify-between mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                              <span>Not likely</span>
+                              <span>Very likely</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'yes_no' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="flex gap-4">
+                              <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">Yes</div>
+                              <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">No</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'terms' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="flex items-start gap-3 p-4 border border-gray-200 rounded bg-gray-50">
+                              <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0 mt-0.5 bg-white"></span>
+                              <span className="text-xs text-gray-600 leading-relaxed">{activeBlock.options?.[0]?.label || 'I agree to the terms'}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'heading' && (
+                          <div className="pt-4 pb-2 border-b-2 border-gray-900">
+                            <h1 className="text-2xl font-bold text-gray-900">{activeBlock.title}</h1>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'divider' && (
+                          <div className="py-4">
+                            <div className="w-full border-t border-gray-300 border-dashed"></div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'signature' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="border-2 border-gray-200 rounded p-6 h-32 flex items-center justify-center text-gray-400 bg-gray-50">
+                              <span className="text-xs">Draw signature here</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'longtext' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <textarea
+                              disabled
+                              placeholder={activeBlock.placeholder || 'Enter details...'}
+                              className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 h-20 resize-none"
+                            />
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'choice' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="space-y-2">
+                              {activeBlock.options?.map((opt, i) => (
+                                <div key={i} className="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                  <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"></span>
+                                  <span className="text-sm text-gray-700">{opt.label}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'dropdown' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
+                              <span>Select an option...</span>
+                              <span className="material-symbols-outlined">arrow_drop_down</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'sentiment' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <textarea
+                              disabled
+                              placeholder="Write something..."
+                              className="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700 h-20 resize-none mb-3"
+                            />
+                            <div className="p-3 bg-gray-50 border border-gray-200 flex items-center justify-between text-xs text-gray-500">
+                              <span>AI Sentiment Evaluation</span>
+                              <span className="bg-primary/20 text-primary-container px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[9px]">Awaiting input</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {(activeBlock.type === 'upload' || activeBlock.type === 'fileupload') && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                            </h2>
+                            <div className="border-2 border-dashed border-gray-200 rounded p-6 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                              <span className="material-symbols-outlined text-[32px] text-gray-300 mb-1">cloud_upload</span>
+                              <span className="text-[10px]">Tap to upload files</span>
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     );
@@ -1646,14 +1863,14 @@ export default function WorkspaceBuilder() {
 
                       return (
                         <div className="flex gap-2 w-full">
-                          <button 
+                          <button
                             disabled={disableUp}
                             onClick={() => !disableUp && setActiveBlockId(blocks[currentIndex - 1].id)}
                             className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${disableUp ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
                           >
                             <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
                           </button>
-                          <button 
+                          <button
                             disabled={isLast}
                             onClick={() => !isLast && setActiveBlockId(blocks[currentIndex + 1].id)}
                             className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isLast ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
