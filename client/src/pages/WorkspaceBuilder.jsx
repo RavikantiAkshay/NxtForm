@@ -986,10 +986,19 @@ export default function WorkspaceBuilder() {
                       <input 
                         type={activeBlock.type === 'text' ? 'text' : (activeBlock.type === 'company' ? 'text' : activeBlock.type)} 
                         value={previewData[activeBlock.id] || ''}
-                        onChange={(e) => updatePreviewData(activeBlock.id, e.target.value)}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          if (activeBlock.type === 'phone') {
+                            val = val.replace(/\D/g, ''); // Numeric only for phone
+                          }
+                          updatePreviewData(activeBlock.id, val);
+                        }}
                         placeholder={activeBlock.placeholder || `Enter ${activeBlock.type}...`}
                         className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
                       />
+                      {activeBlock.type === 'email' && previewData[activeBlock.id] && !previewData[activeBlock.id].includes('@') && (
+                        <p className="text-red-500 text-[10px] font-bold mt-2">Please include an '@' in the email address.</p>
+                      )}
                     </div>
                   )}
 
@@ -1169,8 +1178,20 @@ export default function WorkspaceBuilder() {
                     <div>
                       <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
                       <div className="flex gap-2">
-                        <input type="text" disabled placeholder="First Name" className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
-                        <input type="text" disabled placeholder="Last Name" className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
+                        <input 
+                          type="text" 
+                          placeholder="First Name" 
+                          value={previewData[activeBlock.id]?.first || ''}
+                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], first: e.target.value })}
+                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Last Name" 
+                          value={previewData[activeBlock.id]?.last || ''}
+                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], last: e.target.value })}
+                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                        />
                       </div>
                     </div>
                   )}
@@ -1179,12 +1200,36 @@ export default function WorkspaceBuilder() {
                     <div>
                       <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
                       <div className="space-y-2">
-                        <input type="text" disabled placeholder="Street Address" className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
+                        <input 
+                          type="text" 
+                          placeholder="Street Address" 
+                          value={previewData[activeBlock.id]?.street || ''}
+                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], street: e.target.value })}
+                          className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                        />
                         <div className="flex gap-2">
-                          <input type="text" disabled placeholder="City" className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
-                          <input type="text" disabled placeholder="State" className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
+                          <input 
+                            type="text" 
+                            placeholder="City" 
+                            value={previewData[activeBlock.id]?.city || ''}
+                            onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], city: e.target.value })}
+                            className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                          />
+                          <input 
+                            type="text" 
+                            placeholder="State" 
+                            value={previewData[activeBlock.id]?.state || ''}
+                            onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], state: e.target.value })}
+                            className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                          />
                         </div>
-                        <input type="text" disabled placeholder="ZIP / Postal Code" className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm" />
+                        <input 
+                          type="text" 
+                          placeholder="ZIP / Postal Code" 
+                          value={previewData[activeBlock.id]?.zip || ''}
+                          onChange={(e) => updatePreviewData(activeBlock.id, { ...previewData[activeBlock.id], zip: e.target.value.replace(/\D/g, '') })}
+                          className="w-1/2 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors" 
+                        />
                       </div>
                     </div>
                   )}
