@@ -10,6 +10,7 @@ export default function WorkspaceBuilder() {
   const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
   const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
   const [isLibraryVisible, setIsLibraryVisible] = useState(true);
+  const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [blocks, setBlocks] = useState([
@@ -505,21 +506,33 @@ export default function WorkspaceBuilder() {
             
             {/* Canvas Controls */}
             <div className="absolute top-4 left-4 z-10 flex gap-2">
-              <button className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm">
+              <button 
+                onClick={() => setZoom(Math.min(zoom + 10, 200))}
+                className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
+              >
                 <span className="material-symbols-outlined text-[18px]">add</span>
               </button>
-              <button className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm">
+              <button 
+                onClick={() => setZoom(Math.max(zoom - 10, 50))}
+                className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
+              >
                 <span className="material-symbols-outlined text-[18px]">remove</span>
               </button>
               <div className="w-px h-8 bg-gray-200 mx-1"></div>
-              <button className="px-3 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm font-label-sm text-label-sm rounded-sm">
-                100%
+              <button 
+                onClick={() => setZoom(100)}
+                className="px-3 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm font-label-sm text-label-sm rounded-sm"
+              >
+                {zoom}%
               </button>
             </div>
 
             {/* Blocks flow list */}
             <div className="flex-1 overflow-y-auto builder-scroll p-12 flex flex-col items-center">
-              <div className="w-full max-w-xl pb-32 pt-8">
+              <div 
+                className="w-full max-w-xl pb-32 pt-8 transition-transform duration-200 origin-top"
+                style={{ transform: `scale(${zoom / 100})` }}
+              >
 
               {/* Canvas Header */}
               <div className="w-full mb-8">
@@ -642,9 +655,38 @@ export default function WorkspaceBuilder() {
                                 <div className="w-px h-4 bg-gray-200"></div>
                               </>
                             )}
+                            <button
+                              onClick={() => {
+                                if (index > 0) {
+                                  const newBlocks = [...blocks];
+                                  [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
+                                  setBlocks(newBlocks);
+                                }
+                              }}
+                              disabled={index === 0}
+                              className={`transition-colors ${index === 0 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-800'}`}
+                              title="Move Up"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (index < blocks.length - 1) {
+                                  const newBlocks = [...blocks];
+                                  [newBlocks[index + 1], newBlocks[index]] = [newBlocks[index], newBlocks[index + 1]];
+                                  setBlocks(newBlocks);
+                                }
+                              }}
+                              disabled={index === blocks.length - 1}
+                              className={`transition-colors ${index === blocks.length - 1 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-800'}`}
+                              title="Move Down"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+                            </button>
+                            <div className="w-px h-4 bg-gray-200"></div>
                             <button 
                               onClick={() => duplicateBlock(block)}
-                              className="text-gray-400 hover:text-gray-800" 
+                              className="text-gray-400 hover:text-gray-800 transition-colors" 
                               title="Duplicate"
                             >
                               <span className="material-symbols-outlined text-[16px]">content_copy</span>
@@ -819,19 +861,34 @@ export default function WorkspaceBuilder() {
               <div className="flex-1 bg-white pt-10 pb-6 px-5 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left">
                 {/* Progress bar */}
                 <div className="w-full h-1 bg-gray-100 mb-6 rounded-full overflow-hidden">
-                  <div className={`h-full bg-gray-900 transition-all`} style={{ width: formMode === 'conversational' ? '33%' : '100%' }}></div>
+                  <div 
+                    className="h-full bg-gray-900 transition-all duration-300" 
+                    style={{ 
+                      width: formMode === 'conversational' && blocks.length > 0
+                        ? `${((blocks.findIndex(b => b.id === activeBlockId) + 1) / blocks.length) * 100}%` 
+                        : '100%' 
+                    }}
+                  ></div>
                 </div>
 
                 {/* Mode indicator in preview */}
                 <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[10px]">{formMode === 'conversational' ? 'swipe_up' : 'view_agenda'}</span>
-                  {formMode === 'conversational' ? 'One at a time' : `All fields · Page ${currentPage}`}
+                  {formMode === 'conversational' && blocks.length > 0
+                    ? `Question ${blocks.findIndex(b => b.id === activeBlockId) + 1} of ${blocks.length}` 
+                    : `All fields · Page ${currentPage}`}
                 </div>
 
                 {/* Displaying active block content — Conversational: single block, Classic: all blocks */}
                 <div className="flex-1 flex flex-col justify-start pb-4">
-                  {(formMode === 'conversational' ? [activeBlock] : blocks).map((renderBlock, idx) => {
+                  {blocks.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                      <span className="material-symbols-outlined text-4xl mb-2">inbox</span>
+                      <p className="text-sm">Empty Form</p>
+                    </div>
+                  ) : (formMode === 'conversational' ? [activeBlock] : blocks).map((renderBlock, idx) => {
                     const activeBlock = renderBlock;
+                    if (!activeBlock) return null;
                     return (
                       <div key={activeBlock.id} className={formMode === 'classic' ? 'mb-10 last:mb-0' : 'flex-1 flex flex-col justify-start'}>
                   {activeBlock.type === 'welcome' && (
