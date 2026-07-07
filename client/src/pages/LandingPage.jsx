@@ -86,15 +86,15 @@ export default function LandingPage() {
             <div className="col-span-12 lg:col-span-5 text-left flex flex-col justify-center">
               <div className="inline-flex self-start items-center gap-2 bg-surface-container-high/50 border border-outline-variant px-4 py-1.5 rounded-full mb-6">
                 <div className="w-2 h-2 rounded-full bg-primary pulse-dot"></div>
-                <span className="font-label-sm text-label-sm text-primary uppercase tracking-widest">Next Generation Data Intake</span>
+                <span className="font-label-sm text-label-sm text-primary uppercase tracking-widest">Build Smarter Forms, Faster</span>
               </div>
 
               <h1 className="font-display-lg text-[40px] lg:text-[44px] mb-6 leading-tight text-white">
-                Data Intelligence, <br /><span className="violet-gradient-text">Refined.</span>
+                Forms That <br /><span className="violet-gradient-text">Build Themselves.</span>
               </h1>
 
               <p className="font-body-lg text-[16px] text-on-surface-variant mb-8 max-w-xl">
-                NxtForm AI leverages neural logic to create adaptive intake experiences that think with your users. Eliminate friction and capture insights, not just inputs.
+                Tired of building every form field from scratch? NxtForm lets you pick ready-made templates like Name, Email, or Rating — drop them in, customize the question, and publish. Done.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
@@ -102,64 +102,80 @@ export default function LandingPage() {
                   onClick={() => navigate('/auth')}
                   className="w-full sm:w-auto bg-primary text-on-primary px-8 py-3.5 rounded-xl font-label-md text-label-md font-bold text-[16px] hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all"
                 >
-                  Launch Experience
+                  Start Building Free
                 </button>
                 <button
                   onClick={handleScrollToFeatures}
                   className="w-full sm:w-auto border border-outline text-on-surface px-8 py-3.5 rounded-xl font-label-md text-label-md text-[16px] hover:bg-white/5 transition-all"
                 >
-                  View Showcases
+                  See Features
                 </button>
               </div>
             </div>
 
-            {/* Right Column: Floating Form Preview (Visual Anchor) */}
+            {/* Right Column: Mini Builder Mockup */}
             <div className="col-span-12 lg:col-span-7 w-full">
-              <div className="glass-card rounded-2xl p-6 border border-outline-variant/30 shadow-2xl relative overflow-hidden group">
-                <div className="flex items-center justify-between mb-6 border-b border-outline-variant pb-3">
+              <div className="glass-card rounded-2xl border border-outline-variant/30 shadow-2xl relative overflow-hidden group">
+                {/* Window chrome */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-outline-variant bg-[#111]/60">
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1.5">
                       <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
                       <div className="w-3 h-3 rounded-full bg-[#febc2e]"></div>
                       <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
                     </div>
-                    <span className="text-on-surface-variant font-label-sm">Intelligent Customer Onboarding</span>
+                    <span className="text-on-surface-variant font-label-sm">NxtForm Builder</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-sm">auto_awesome</span>
-                    <span className="text-primary font-label-sm">AI Engine Active</span>
+                  <div className="flex items-center gap-2 bg-primary/10 border border-primary/30 px-3 py-1 rounded-full">
+                    <span className="material-symbols-outlined text-primary text-[14px]">send</span>
+                    <span className="text-primary font-label-sm text-[11px]">Publish</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4 text-left">
-                    <div className="space-y-1.5">
-                      <label className="text-on-surface font-label-md">Dynamic Industry Context</label>
-                      <div className="p-3 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-center justify-between group-hover:border-primary/50 transition-colors">
-                        <span className="text-on-surface">Software Engineering</span>
-                        <span className="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span>
+                {/* Builder body: sidebar + canvas */}
+                <div className="flex" style={{ minHeight: '220px' }}>
+                  {/* Mini sidebar */}
+                  <div className="w-[140px] border-r border-outline-variant bg-[#0d0d0d] p-3 flex flex-col gap-1 text-left shrink-0">
+                    <div className="text-[9px] uppercase tracking-widest text-on-surface-variant mb-2 font-bold">Fields</div>
+                    {[
+                      { icon: 'short_text', label: 'Short Text' },
+                      { icon: 'person', label: 'Full Name' },
+                      { icon: 'mail', label: 'Email' },
+                      { icon: 'star', label: 'Rating' },
+                      { icon: 'toggle_on', label: 'Yes / No' },
+                      { icon: 'draw', label: 'Signature' },
+                    ].map((f, i) => (
+                      <div key={i} className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] transition-colors ${
+                        i === 2 ? 'bg-primary/15 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-[#1a1a1a]'
+                      }`}>
+                        <span className="material-symbols-outlined text-[14px]">{f.icon}</span>
+                        {f.label}
                       </div>
-                    </div>
-                    <div className="space-y-1.5 animate-pulse opacity-50">
-                      <label className="text-on-surface font-label-md">Suggested Experience Level</label>
-                      <div className="p-3 bg-surface-container-lowest border border-outline-variant rounded-xl flex items-center justify-between">
-                        <span className="text-on-surface-variant">Senior Lead</span>
-                        <span className="material-symbols-outlined text-on-surface-variant text-[18px]">magic_button</span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
-                  <div className="bg-surface-container rounded-xl p-5 border border-outline-variant flex flex-col justify-center text-left">
-                    <div className="mb-3">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="material-symbols-outlined text-primary text-[16px]">psychology</span>
-                        <span className="font-label-sm text-primary uppercase">Adaptive Flow</span>
+                  {/* Canvas area */}
+                  <div className="flex-1 p-5 space-y-3 text-left bg-[#0a0a0a]">
+                    <div className="p-3 bg-surface-container-high border border-outline-variant rounded-lg">
+                      <div className="text-[10px] uppercase text-on-surface-variant mb-1 font-bold tracking-wider">Full Name</div>
+                      <div className="flex gap-2">
+                        <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded px-2 py-1.5 text-[12px] text-on-surface-variant">First Name</div>
+                        <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded px-2 py-1.5 text-[12px] text-on-surface-variant">Last Name</div>
                       </div>
-                      <h3 className="font-headline-md text-[18px] mb-1.5 text-white">Refining fields based on "Software"</h3>
-                      <p className="text-on-surface-variant text-label-sm">The system has automatically expanded the technical stack requirements and hidden non-relevant general sections.</p>
                     </div>
-                    <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full w-2/3"></div>
+                    <div className="p-3 bg-primary/5 border-2 border-primary/40 rounded-lg ring-2 ring-primary/20">
+                      <div className="text-[10px] uppercase text-primary mb-1 font-bold tracking-wider flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">mail</span> Email Address
+                      </div>
+                      <div className="bg-surface-container-lowest border border-outline-variant rounded px-2 py-1.5 text-[12px] text-on-surface-variant">you@company.com</div>
+                    </div>
+                    <div className="p-3 bg-surface-container-high border border-outline-variant rounded-lg">
+                      <div className="text-[10px] uppercase text-on-surface-variant mb-1.5 font-bold tracking-wider">Rate your experience</div>
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(s => (
+                          <span key={s} className={`material-symbols-outlined text-[18px] ${s <= 4 ? 'text-primary' : 'text-on-surface-variant/30'}`} style={s <= 4 ? { fontVariationSettings: "'FILL' 1" } : {}}>star</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -172,73 +188,79 @@ export default function LandingPage() {
         <section id="how-it-works" className="px-margin-desktop py-24 border-t border-[#1a1a1a]/60 bg-[#0a0a0a]">
           <div className="grid grid-cols-12 gap-gutter max-w-7xl mx-auto">
             <div className="col-span-12 md:col-span-4 flex flex-col justify-center text-left">
-              <h2 className="font-mono text-headline-lg uppercase mb-6 tracking-tighter text-white">Autonomous <br />Onboarding</h2>
+              <h2 className="font-mono text-headline-lg uppercase mb-6 tracking-tighter text-white">How It <br />Works</h2>
               <p className="text-on-surface-variant font-mono text-body-md mb-8">
-                Observe the 'Customer Onboarding Flow'. Fields highlighted in <span className="text-[#8b5cf6] font-bold">Electric Violet</span> are automatically inferred from user session metadata and peripheral API signals.
+                Three steps. No learning curve. Pick what you need, see it live, and start collecting responses.
               </p>
-              <ul className="space-y-4">
-                <li className="flex items-center gap-3 font-mono text-label-md uppercase tracking-wider text-on-surface">
-                  <span className="w-2 h-2 bg-[#8b5cf6]"></span> 0.4s Response Latency
-                </li>
-                <li className="flex items-center gap-3 font-mono text-label-md uppercase tracking-wider text-on-surface">
-                  <span className="w-2 h-2 bg-[#8b5cf6]"></span> Geo-Spatial Intelligence
-                </li>
-                <li className="flex items-center gap-3 font-mono text-label-md uppercase tracking-wider text-on-surface">
-                  <span className="w-2 h-2 bg-[#8b5cf6]"></span> Behavioral Prediction
-                </li>
-              </ul>
+              <button
+                onClick={() => navigate('/auth')}
+                className="self-start bg-[#8b5cf6] text-[#0a0a0a] px-6 py-2.5 font-mono text-label-md font-bold uppercase tracking-widest active:scale-95 transition-transform rounded-none hover:bg-[#a78bfa]"
+              >
+                Try It Now
+              </button>
             </div>
 
             <div className="col-span-12 md:col-span-8">
               <div className="glass-module p-6 lg:p-8 relative overflow-hidden bg-[#0a0a0a] border-2 border-outline-variant rounded-none text-left">
                 <div className="absolute top-0 left-0 p-3 border-r-2 border-b-2 border-outline-variant font-mono text-label-sm uppercase opacity-50">
-                  Flow_Preview_01
+                  Workflow
                 </div>
-                <div className="space-y-5 mt-8">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="font-mono text-label-sm uppercase text-on-surface-variant">Full Legal Name</label>
-                      <div className="bg-[#0a0a0a] border-2 border-outline-variant p-3 text-on-surface-variant font-body-md rounded-none">Alex Sterling</div>
+                <div className="space-y-0 mt-8">
+                  {/* Step 1 */}
+                  <div className="flex gap-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">01</div>
+                      <div className="w-px flex-1 border-l-2 border-dashed border-[#8b5cf6]/30 my-2"></div>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="font-mono text-label-sm uppercase text-[#8b5cf6] font-bold">Company Domain (AI INFERRED)</label>
-                      <div className="bg-[#0a0a0a] border-2 border-[#8b5cf6] p-3 text-[#8b5cf6] font-body-md flex justify-between items-center rounded-none">
-                        asterling.tech
-                        <span className="material-symbols-outlined text-[18px]">bolt</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="font-mono text-label-sm uppercase text-[#8b5cf6] font-bold">Primary Objective (PREDICTED)</label>
-                    <div className="bg-[#0a0a0a] border-2 border-[#8b5cf6] p-3 text-[#8b5cf6] font-body-md flex justify-between items-center rounded-none">
-                      Enterprise API Infrastructure Deployment
-                      <span className="material-symbols-outlined text-[18px]">psychology</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-1.5 col-span-2">
-                      <label className="font-mono text-label-sm uppercase text-on-surface-variant">Integration Stack</label>
+                    <div className="pb-8">
+                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Choose Your Fields</h3>
+                      <p className="text-on-surface-variant font-mono text-label-md mb-3">Browse the sidebar and click any template to add it. Full Name, Email, Rating, NPS, Signature — each one drops in with a ready-to-go question.</p>
                       <div className="flex gap-2">
-                        <span className="border border-outline-variant px-2.5 py-1 font-mono text-label-sm uppercase rounded-none">Node.js</span>
-                        <span className="border border-outline-variant px-2.5 py-1 font-mono text-label-sm uppercase rounded-none">React</span>
-                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">Python</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">person</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">mail</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">star</span>
+                        <span className="border border-outline-variant px-2.5 py-1 font-mono text-label-sm uppercase text-on-surface-variant rounded-none">+27 more</span>
                       </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-mono text-label-sm uppercase text-on-surface-variant">Team Size</label>
-                      <div className="bg-[#0a0a0a] border-2 border-outline-variant p-3 text-on-surface-variant font-body-md text-center rounded-none">50-200</div>
                     </div>
                   </div>
 
-                  <div className="pt-5 border-t border-outline-variant flex justify-end">
-                    <button
-                      onClick={() => navigate('/auth')}
-                      className="bg-[#8b5cf6] text-[#0a0a0a] px-6 py-2.5 font-mono text-label-md font-bold uppercase tracking-widest active:scale-95 transition-transform rounded-none hover:bg-[#a78bfa]"
-                    >
-                      Confirm Configuration
-                    </button>
+                  {/* Step 2 */}
+                  <div className="flex gap-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">02</div>
+                      <div className="w-px flex-1 border-l-2 border-dashed border-[#8b5cf6]/30 my-2"></div>
+                    </div>
+                    <div className="pb-8">
+                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Preview on Device</h3>
+                      <p className="text-on-surface-variant font-mono text-label-md mb-3">A phone mockup updates in real time as you build. What you see is exactly what respondents get — no surprises after publishing.</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-24 border-2 border-outline-variant rounded-lg flex items-center justify-center bg-[#0a0a0a]">
+                          <span className="material-symbols-outlined text-[#8b5cf6] text-[20px]">smartphone</span>
+                        </div>
+                        <span className="material-symbols-outlined text-[#8b5cf6]/50 text-[16px]">sync</span>
+                        <span className="font-mono text-label-sm text-on-surface-variant uppercase">Live Sync</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex gap-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">03</div>
+                    </div>
+                    <div>
+                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Publish & Collect</h3>
+                      <p className="text-on-surface-variant font-mono text-label-md mb-3">Hit publish, share the link, and watch responses flow into your dashboard. Filter, review, and export — all from one screen.</p>
+                      <div className="flex items-center gap-3">
+                        <div className="bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 px-3 py-1.5 font-mono text-label-sm text-[#8b5cf6] uppercase rounded-none flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[14px]">check_circle</span> Published
+                        </div>
+                        <span className="material-symbols-outlined text-outline-variant text-[16px]">arrow_forward</span>
+                        <div className="border border-outline-variant px-3 py-1.5 font-mono text-label-sm text-on-surface-variant uppercase rounded-none flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[14px]">inbox</span> 24 Responses
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -254,8 +276,8 @@ export default function LandingPage() {
         {/* 4. Precision Engineering Bento Grid (from Sophisticated - exactly as it is) */}
         <section id="precision-engineering-section" className="py-24 px-margin-desktop max-w-container-max mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-headline-lg text-headline-lg mb-4 text-white">Precision Engineering</h2>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Designed for the world's most demanding interfaces, combining AI intelligence with architectural elegance.</p>
+            <h2 className="font-headline-lg text-headline-lg mb-4 text-white">Everything You Need to Collect Data</h2>
+            <p className="text-on-surface-variant max-w-xl mx-auto">A visual builder, a live device preview, and a response inbox — all in one place.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-stack-lg h-auto md:h-[450px]">
@@ -265,12 +287,12 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-primary text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>neurology</span>
                 </div>
-                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Neural Pathfinding</h3>
-                <p className="text-on-surface-variant text-body-md">Our forms learn from every interaction. If a user hesitates, the interface subtly adapts its phrasing to ensure clarity and completion.</p>
+                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Visual Form Builder</h3>
+                <p className="text-on-surface-variant text-body-md">A clean sidebar lists every field type by category. Click one and it drops into your form canvas. Edit the question text inline, toggle required, reorder — no code, no confusion.</p>
               </div>
               <div className="mt-6 flex gap-4">
-                <div className="bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 text-primary text-label-sm">Active Learning</div>
-                <div className="bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 text-primary text-label-sm">Semantic Logic</div>
+                <div className="bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 text-primary text-label-sm">Inline Editing</div>
+                <div className="bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 text-primary text-label-sm">Categorized Library</div>
               </div>
             </div>
 
@@ -280,10 +302,10 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-[100px] text-primary">security</span>
               </div>
               <div className="relative z-10">
-                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Fortified Privacy</h3>
-                <p className="text-on-surface-variant text-body-md">Zero-knowledge proofs and end-to-end encryption for every data point collected.</p>
+                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Real-Time Device Preview</h3>
+                <p className="text-on-surface-variant text-body-md">As you add fields, a phone mockup on the right updates instantly — showing exactly what your respondents will see.</p>
                 <a className="inline-flex items-center gap-2 mt-4 text-primary font-label-md hover:gap-3 transition-all" href="#">
-                  Security Protocols <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  Try It Now <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
               </div>
             </div>
@@ -293,27 +315,27 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 border border-outline-variant">
                 <span className="material-symbols-outlined text-on-surface text-[24px]">speed</span>
               </div>
-              <h3 className="font-label-md text-label-md font-bold uppercase tracking-widest mb-2 text-white">99.8% Completion</h3>
-              <p className="text-on-surface-variant text-label-md">Industry leading throughput with AI assistance.</p>
+              <h3 className="font-label-md text-label-md font-bold uppercase tracking-widest mb-2 text-white">Instant Setup</h3>
+              <p className="text-on-surface-variant text-label-md">Click a template, tweak the question, publish. That's it.</p>
             </div>
 
             {/* Bento Item 4 */}
             <div className="md:col-span-8 bg-surface-container-lowest rounded-2xl p-6 lg:p-8 border border-outline-variant flex flex-col md:flex-row items-center gap-6 hover:border-primary/40 transition-colors text-left">
               <div className="flex-1">
-                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Enterprise Grade Scaling</h3>
-                <p className="text-on-surface-variant text-body-md">Whether it's 10 or 10 million responses, our infrastructure handles the load with millisecond latency.</p>
+                <h3 className="font-headline-md text-headline-md mb-2.5 text-white">Response Dashboard</h3>
+                <p className="text-on-surface-variant text-body-md">Every response lands in a clean, organized dashboard. Filter, search, and review submissions without spreadsheets or external tools.</p>
               </div>
               <div className="flex-shrink-0 grid grid-cols-2 gap-4">
                 <div className="w-20 h-20 rounded-2xl bg-surface-container border border-outline-variant flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-primary font-bold text-[18px]">5ms</div>
-                    <div className="text-[10px] text-on-surface-variant uppercase">Latency</div>
+                    <span className="material-symbols-outlined text-primary text-[24px]">table_chart</span>
+                    <div className="text-[10px] text-on-surface-variant uppercase">Table</div>
                   </div>
                 </div>
                 <div className="w-20 h-20 rounded-2xl bg-surface-container border border-outline-variant flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-primary font-bold text-[18px]">32x</div>
-                    <div className="text-[10px] text-on-surface-variant uppercase">Growth</div>
+                    <span className="material-symbols-outlined text-primary text-[24px]">filter_alt</span>
+                    <div className="text-[10px] text-on-surface-variant uppercase">Filter</div>
                   </div>
                 </div>
               </div>
@@ -325,8 +347,8 @@ export default function LandingPage() {
         <section className="w-full px-margin-desktop py-24 border-t border-[#1a1a1a]/60 bg-[#0a0a0a]">
           <div className="max-w-6xl mx-auto w-full">
             <div className="mb-20 text-center">
-              <h2 className="font-headline-lg text-headline-lg font-semibold text-on-surface mb-4 text-white">Engineered for the Modern Web</h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Skip the drag-and-drop. Describe your ideal data structure, and our AI constructs a high-performance, dynamic interface in seconds.</p>
+              <h2 className="font-headline-lg text-headline-lg font-semibold text-on-surface mb-4 text-white">How It All Comes Together</h2>
+              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Three core pieces that make form building effortless — from first click to final submission.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
@@ -335,10 +357,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center mb-6 border border-outline-variant/30">
                   <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                 </div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 text-white">Architected for Speed</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant flex-grow">Forms render at edge speeds. Zero bloat, compiled React components delivered instantly to your users, ensuring zero drop-off.</p>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 text-white">Pick Your Fields</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant flex-grow">Browse categories like Templates, Ratings, Interactive, and Layout. Each field comes with a pre-written question so you can add it and move on.</p>
                 <div className="mt-6 pt-6 border-t border-[#1e1e1e]">
-                  <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider flex items-center gap-1 cursor-pointer">View Benchmarks <span className="material-symbols-outlined text-[14px]">chevron_right</span></span>
+                  <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider flex items-center gap-1 cursor-pointer">Open Builder <span className="material-symbols-outlined text-[14px]">chevron_right</span></span>
                 </div>
               </div>
 
@@ -348,10 +370,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center mb-6 border border-outline-variant/30 relative z-10">
                   <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>schema</span>
                 </div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 relative z-10 text-white">AI Schema Engine</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant flex-grow relative z-10">Input plain text requirements. The engine automatically generates complex validation logic, JSON schemas, and backend routing rules.</p>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 relative z-10 text-white">Customize Everything</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant flex-grow relative z-10">Change the question text, mark fields as required, reorder blocks. The preview updates as you type so you always know what you're publishing.</p>
                 <div className="mt-6 p-3 bg-[#0a0a0a] border border-[#1e1e1e] rounded font-mono text-[12px] text-on-surface-variant relative z-10 overflow-hidden">
-                  <code className="!bg-transparent !p-0 !text-[12px] !text-on-surface-variant !inline-block whitespace-nowrap">{`{ "type": "object", "strict": true }`}</code>
+                  <code className="!bg-transparent !p-0 !text-[12px] !text-on-surface-variant !inline-block whitespace-nowrap">{`title → required → reorder → publish`}</code>
                 </div>
               </div>
 
@@ -360,8 +382,8 @@ export default function LandingPage() {
                 <div className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center mb-6 border border-outline-variant/30">
                   <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>monitoring</span>
                 </div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 text-white">Instant Insights</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant flex-grow">Don't just collect data, understand it. AI synthesizes responses in real-time, providing immediate semantic analysis and sentiment scoring.</p>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-3 text-white">Collect & Review</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant flex-grow">Once published, every submission goes straight to your Response Dashboard. Filter by date, search by content, and export when you need to.</p>
                 <div className="mt-6 pt-6 border-t border-[#1e1e1e] flex gap-2">
                   <div className="h-1 flex-grow bg-[#1e1e1e] rounded-full overflow-hidden">
                     <div className="h-full bg-primary w-[75%] rounded-full"></div>
@@ -376,59 +398,52 @@ export default function LandingPage() {
         <section className="py-24 bg-[#0a0a0a] border-t border-[#1a1a1a]/60 relative overflow-hidden">
           <div className="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 lg:grid-cols-2 items-center gap-20">
             <div className="text-left">
-              <h2 className="font-display-lg text-[40px] mb-stack-lg leading-tight text-white">Adaptive Interfaces That <span className="text-primary">Evolve.</span></h2>
+              <h2 className="font-display-lg text-[40px] mb-stack-lg leading-tight text-white">Not Just Text Boxes <br/>and <span className="text-primary">Dropdowns.</span></h2>
               <p className="text-body-lg text-on-surface-variant mb-stack-lg">
-                Gone are the days of static, rigid forms. NxtForm AI creates a conversation between you and your data. The interface reconfigures in real-time, surfacing only the most relevant questions based on context, intent, and previous answers.
+                Most form builders stop at basic inputs. NxtForm goes further with specialized fields that would take hours to code by hand — available in a single click.
               </p>
               <ul className="space-y-4">
                 <li className="flex items-start gap-4">
                   <span className="material-symbols-outlined text-primary mt-1">check_circle</span>
                   <div>
-                    <h4 className="font-label-md text-label-md font-bold text-on-surface">Context-Aware Logic</h4>
-                    <p className="text-label-md text-on-surface-variant">Fields mutate and transform based on user input for a frictionless path.</p>
+                    <h4 className="font-label-md text-label-md font-bold text-on-surface">Survey-Ready Components</h4>
+                    <p className="text-label-md text-on-surface-variant">NPS (0-10), Star Rating, Emoji Rating, Matrix Grid, and Linear Scale — designed for collecting nuanced feedback.</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
                   <span className="material-symbols-outlined text-primary mt-1">check_circle</span>
                   <div>
-                    <h4 className="font-label-md text-label-md font-bold text-on-surface">Predictive Assistance</h4>
-                    <p className="text-label-md text-on-surface-variant">AI anticipates the next data point, suggesting completions to save time.</p>
+                    <h4 className="font-label-md text-label-md font-bold text-on-surface">Advanced Input Types</h4>
+                    <p className="text-label-md text-on-surface-variant">Signature Pad, OTP verification, Color Picker, Credit Card, Slider, Counter, and Tags — each with a polished preview.</p>
                   </div>
                 </li>
               </ul>
             </div>
 
             <div className="relative flex justify-center">
-              {/* Complex UI Visual Mock */}
-              <div className="w-full max-w-lg aspect-square glass-card rounded-[2rem] p-stack-lg border border-primary/20 relative group overflow-hidden">
+              {/* Field Type Showcase */}
+              <div className="w-full max-w-lg glass-card rounded-[2rem] p-6 border border-primary/20 relative group overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full"></div>
                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full"></div>
-                <div className="relative z-10 space-y-6 text-left">
-                  <div className="p-6 bg-surface-container-high border border-outline-variant rounded-2xl transform group-hover:-translate-y-2 transition-transform">
-                    <div className="h-2 w-24 bg-outline-variant rounded-full mb-4"></div>
-                    <div className="space-y-3">
-                      <div className="h-4 w-full bg-surface-container-highest rounded-lg"></div>
-                      <div className="h-4 w-3/4 bg-surface-container-highest rounded-lg"></div>
+                <div className="relative z-10 grid grid-cols-3 gap-3">
+                  {[
+                    { icon: 'star', label: 'Star Rating', active: false },
+                    { icon: 'speed', label: 'NPS (0-10)', active: true },
+                    { icon: 'draw', label: 'Signature', active: false },
+                    { icon: 'grid_on', label: 'Matrix', active: false },
+                    { icon: 'pin', label: 'OTP Input', active: true },
+                    { icon: 'credit_card', label: 'Payment', active: false },
+                    { icon: 'palette', label: 'Color Picker', active: true },
+                    { icon: 'linear_scale', label: 'Slider', active: false },
+                    { icon: 'mood', label: 'Emoji Rating', active: false },
+                  ].map((field, i) => (
+                    <div key={i} className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all group-hover:scale-[1.02] ${
+                      field.active ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-surface-container-high border-outline-variant text-on-surface-variant'
+                    }`}>
+                      <span className="material-symbols-outlined text-[22px]">{field.icon}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">{field.label}</span>
                     </div>
-                  </div>
-                  <div className="p-6 bg-primary/10 border border-primary/40 rounded-2xl transform translate-x-12 group-hover:translate-x-16 transition-transform">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="material-symbols-outlined text-primary text-sm">spark</span>
-                      <div className="h-2 w-32 bg-primary/30 rounded-full"></div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="h-10 bg-primary/20 rounded-lg"></div>
-                      <div className="h-10 bg-primary/20 rounded-lg"></div>
-                      <div className="h-10 bg-primary rounded-lg shadow-lg shadow-primary/20"></div>
-                    </div>
-                  </div>
-                  <div className="p-6 bg-surface-container-high border border-outline-variant rounded-2xl transform -translate-x-8 group-hover:-translate-x-12 transition-transform">
-                    <div className="h-2 w-16 bg-outline-variant rounded-full mb-4"></div>
-                    <div className="h-12 w-full bg-surface-container-highest rounded-lg flex items-center px-4">
-                      <div className="w-2 h-2 rounded-full bg-primary mr-3 pulse-dot"></div>
-                      <div className="h-2 w-1/2 bg-outline-variant rounded-full"></div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -439,17 +454,20 @@ export default function LandingPage() {
         <section id="get-started" className="py-24 px-margin-desktop text-center bg-[#0a0a0a] border-t border-[#1a1a1a]/60">
           <div className="max-w-3xl mx-auto glass-card p-12 rounded-2xl border border-outline-variant relative overflow-hidden flex flex-col items-center">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
-            <h2 className="font-headline-lg text-headline-lg mb-6 text-white">Ready for the Future of Data?</h2>
-            <p className="text-on-surface-variant text-body-lg mb-stack-lg">Join 2,000+ industry leaders building high-performance intake engines with NxtForm AI.</p>
+            <h2 className="font-headline-lg text-headline-lg mb-6 text-white">Ready to Build Your First Form?</h2>
+            <p className="text-on-surface-variant text-body-lg mb-stack-lg">It's free to start. Pick your fields, customize the questions, and share your form in minutes.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-stack-md">
               <button
                 onClick={() => navigate('/auth')}
                 className="bg-on-surface text-background px-10 py-4 rounded-full font-label-md text-label-md font-bold hover:scale-105 transition-all"
               >
-                Get Started Free
+                Start Building
               </button>
-              <button className="text-on-surface border border-outline px-10 py-4 rounded-full font-label-md text-label-md hover:bg-on-surface/5 transition-all">
-                Schedule Demo
+              <button
+                onClick={handleScrollToFeatures}
+                className="text-on-surface border border-outline px-10 py-4 rounded-full font-label-md text-label-md hover:bg-on-surface/5 transition-all"
+              >
+                Explore Features
               </button>
             </div>
           </div>
@@ -465,7 +483,7 @@ export default function LandingPage() {
                 </div>
                 <span className="font-headline-sm text-headline-sm font-bold text-on-surface">NxtForm AI</span>
               </div>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">© 2024 NxtForm AI. All rights reserved.</p>
+              <p className="font-label-sm text-label-sm text-on-surface-variant">© 2025 NxtForm AI. All rights reserved.</p>
             </div>
             <div className="flex gap-stack-lg">
               <a className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a>

@@ -8,6 +8,9 @@ export default function WorkspaceBuilder() {
   // State for form blocks
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
+  const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [blocks, setBlocks] = useState([
     {
       id: 'welcome',
@@ -173,6 +176,27 @@ export default function WorkspaceBuilder() {
           </div>
 
           <div className="flex items-center gap-6">
+            {/* Form Mode Toggle */}
+            <div className="flex bg-surface-container-high rounded-lg p-0.5 border border-outline-variant">
+              <button
+                onClick={() => setFormMode('conversational')}
+                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${
+                  formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">swipe_up</span>
+                Conversational
+              </button>
+              <button
+                onClick={() => setFormMode('classic')}
+                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${
+                  formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">view_agenda</span>
+                Classic
+              </button>
+            </div>
             <div className="flex items-center gap-4 border-r border-outline-variant pr-6 text-on-surface-variant">
               <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">undo</span></button>
               <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">redo</span></button>
@@ -203,6 +227,12 @@ export default function WorkspaceBuilder() {
           <aside className="w-64 border-r border-[#1a1a1a] bg-[#0a0a0a] flex flex-col shrink-0">
             <div className="p-4 border-b border-outline-variant">
               <h2 className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider text-xs">Library Elements</h2>
+              {formMode === 'classic' && (
+                <p className="text-[10px] text-primary mt-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[10px]">info</span>
+                  Classic mode — all fields visible at once
+                </p>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-custom">
               
@@ -463,9 +493,62 @@ export default function WorkspaceBuilder() {
             {/* Blocks flow list */}
             <div className="flex-1 overflow-y-auto builder-scroll p-12 flex flex-col items-center">
               <div className="w-full max-w-xl pb-32 pt-8">
-                
-                {/* Start Node */}
-                <div className="flex justify-center mb-6">
+
+              {/* Canvas Header */}
+              <div className="w-full mb-8">
+                <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">{formTitle}</h1>
+                  <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
+                    {blocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setFormMode(formMode === 'conversational' ? 'classic' : 'conversational')}
+                  className="text-[10px] text-gray-400 uppercase tracking-wider bg-white border border-gray-200 px-3 py-1 rounded-full hover:border-primary hover:text-primary transition-colors"
+                >
+                  {formMode === 'conversational' ? 'Flow View' : 'Page View'}
+                </button>
+              </div>
+
+              {/* Classic Mode: Page Tabs */}
+              {formMode === 'classic' && (
+                <div className="flex items-center gap-2 mt-4">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
+                        currentPage === page
+                          ? 'bg-gray-900 text-white shadow-sm'
+                          : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
+                      }`}
+                    >
+                      Page {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => { setTotalPages(totalPages + 1); setCurrentPage(totalPages + 1); }}
+                    className="w-7 h-7 flex items-center justify-center bg-white border border-dashed border-gray-300 text-gray-400 hover:border-gray-500 hover:text-gray-600 transition-colors"
+                    title="Add Page"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">add</span>
+                  </button>
+                  {totalPages > 1 && (
+                    <button
+                      onClick={() => { if (totalPages > 1) { setTotalPages(totalPages - 1); if (currentPage > totalPages - 1) setCurrentPage(totalPages - 1); } }}
+                      className="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors ml-1"
+                      title="Remove Last Page"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">remove</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Start Node */}
+            <div className="flex justify-center mb-6">
                   <div className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-600 font-label-sm text-label-sm uppercase tracking-widest rounded-full flex items-center gap-2">
                     <span className="material-symbols-outlined text-[16px]">play_arrow</span>
                     Start Node
@@ -678,12 +761,21 @@ export default function WorkspaceBuilder() {
               <div className="flex-1 bg-white pt-10 pb-6 px-5 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left">
                 {/* Progress bar */}
                 <div className="w-full h-1 bg-gray-100 mb-6 rounded-full overflow-hidden">
-                  <div className="w-1/3 h-full bg-gray-900"></div>
+                  <div className={`h-full bg-gray-900 transition-all`} style={{ width: formMode === 'conversational' ? '33%' : '100%' }}></div>
                 </div>
 
-                {/* Displaying active block content */}
-                <div className="flex-1 flex flex-col justify-start">
-                  
+                {/* Mode indicator in preview */}
+                <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[10px]">{formMode === 'conversational' ? 'swipe_up' : 'view_agenda'}</span>
+                  {formMode === 'conversational' ? 'One at a time' : `All fields · Page ${currentPage}`}
+                </div>
+
+                {/* Displaying active block content — Conversational: single block, Classic: all blocks */}
+                <div className="flex-1 flex flex-col justify-start pb-4">
+                  {(formMode === 'conversational' ? [activeBlock] : blocks).map((renderBlock, idx) => {
+                    const activeBlock = renderBlock;
+                    return (
+                      <div key={activeBlock.id} className={formMode === 'classic' ? 'mb-10 last:mb-0' : 'flex-1 flex flex-col justify-start'}>
                   {activeBlock.type === 'welcome' && (
                     <div className="text-center pt-8">
                       <span className="material-symbols-outlined text-primary text-[48px] mb-4">waving_hand</span>
@@ -1070,16 +1162,27 @@ export default function WorkspaceBuilder() {
                     </div>
                   )}
 
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Navigation inside phone mockup */}
-                <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100">
-                  <button className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-500 rounded-sm">
-                    <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
-                  </button>
-                  <button className="w-8 h-8 bg-gray-900 text-white flex items-center justify-center rounded-sm">
-                    <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
-                  </button>
+                <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100 bg-white sticky bottom-0 z-10">
+                  {formMode === 'conversational' ? (
+                    <>
+                      <button className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-500 rounded-sm">
+                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_up</span>
+                      </button>
+                      <button className="w-8 h-8 bg-gray-900 text-white flex items-center justify-center rounded-sm">
+                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button className="w-full h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm">
+                      {currentPage < totalPages ? 'Next Page' : 'Submit'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
