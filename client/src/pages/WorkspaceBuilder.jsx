@@ -1,5 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+const SortableBlock = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="w-full relative">
+      {typeof children === 'function' ? children({ listeners, attributes }) : children}
+    </div>
+  );
+};
 
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
@@ -138,6 +178,22 @@ export default function WorkspaceBuilder() {
     };
     setBlocks([...blocks, duplicated]);
     setActiveBlockId(newId);
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      setBlocks((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   React.useEffect(() => {
@@ -599,25 +655,37 @@ export default function WorkspaceBuilder() {
                 <div className="w-px h-8 bg-gray-300 mx-auto mb-2 relative"></div>
 
                 {/* Dynamic Block Rendering */}
-                {blocks.map((block, index) => {
-                  const isActive = block.id === activeBlockId;
-                  return (
-                    <div key={block.id} className="w-full">
-                      {/* Form Block Item */}
-                      <div 
-                        onClick={() => setActiveBlockId(block.id)}
-                        className={`bg-white border text-gray-900 sharp-corners shadow-sm relative group transition-all duration-200 cursor-pointer ${
-                          isActive 
-                            ? 'border-primary ring-2 ring-primary/20 shadow-[0_0_20px_rgba(208,188,255,0.15)]' 
-                            : 'border-gray-200 hover:border-primary'
-                        }`}
-                      >
-                        {/* Drag Handle on active */}
-                        {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab bg-[#fbf9ff] border-r border-[#d0bcff]/30 text-primary">
-                            <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
-                          </div>
-                        )}
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={blocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                    {blocks.map((block, index) => {
+                      const isActive = block.id === activeBlockId;
+                      return (
+                        <SortableBlock key={block.id} id={block.id}>
+                          {({ listeners, attributes }) => (
+                            <div className="w-full">
+                              {/* Form Block Item */}
+                              <div 
+                                onClick={() => setActiveBlockId(block.id)}
+                                className={`bg-white border text-gray-900 sharp-corners shadow-sm relative group transition-all duration-200 cursor-pointer ${
+                                  isActive 
+                                    ? 'border-primary ring-2 ring-primary/20 shadow-[0_0_20px_rgba(208,188,255,0.15)]' 
+                                    : 'border-gray-200 hover:border-primary'
+                                }`}
+                              >
+                                {/* Drag Handle on active */}
+                                {isActive && (
+                                  <div 
+                                    {...listeners}
+                                    {...attributes}
+                                    className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing bg-[#fbf9ff] border-r border-[#d0bcff]/30 text-primary z-10"
+                                  >
+                                    <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
+                                  </div>
+                                )}
 
                         {/* AI Indicator badge */}
                         {(block.type === 'sentiment' || block.type === 'upload' || block.aiLogic) && (
@@ -655,35 +723,6 @@ export default function WorkspaceBuilder() {
                                 <div className="w-px h-4 bg-gray-200"></div>
                               </>
                             )}
-                            <button
-                              onClick={() => {
-                                if (index > 0) {
-                                  const newBlocks = [...blocks];
-                                  [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
-                                  setBlocks(newBlocks);
-                                }
-                              }}
-                              disabled={index === 0}
-                              className={`transition-colors ${index === 0 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-800'}`}
-                              title="Move Up"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (index < blocks.length - 1) {
-                                  const newBlocks = [...blocks];
-                                  [newBlocks[index + 1], newBlocks[index]] = [newBlocks[index], newBlocks[index + 1]];
-                                  setBlocks(newBlocks);
-                                }
-                              }}
-                              disabled={index === blocks.length - 1}
-                              className={`transition-colors ${index === blocks.length - 1 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:text-gray-800'}`}
-                              title="Move Down"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
-                            </button>
-                            <div className="w-px h-4 bg-gray-200"></div>
                             <button 
                               onClick={() => duplicateBlock(block)}
                               className="text-gray-400 hover:text-gray-800 transition-colors" 
@@ -805,10 +844,14 @@ export default function WorkspaceBuilder() {
                         </div>
                       )}
                     </div>
-                  );
-                })}
+                  )}
+                </SortableBlock>
+              );
+            })}
+          </SortableContext>
+        </DndContext>
 
-                {/* End node */}
+        {/* End node */}
                 <div className="relative w-full h-12 flex items-center justify-center my-2">
                   <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
                 </div>
