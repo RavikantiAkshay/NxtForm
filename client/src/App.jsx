@@ -22,7 +22,12 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route 
+          path="/auth" 
+          element={
+            localStorage.getItem('nxtform_token') ? <Navigate to="/workspace" replace /> : <AuthPage />
+          } 
+        />
 
         {/* Protected App Routes */}
         <Route 

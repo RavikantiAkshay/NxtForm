@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppSidebar from '../components/AppSidebar';
+import TopNavbar from '../components/TopNavbar';
 
 export default function ResponseDashboard() {
   const navigate = useNavigate();
@@ -72,11 +72,11 @@ export default function ResponseDashboard() {
   );
 
   return (
-    <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen flex overflow-hidden font-sans antialiased">
-      <AppSidebar activePage="responses" />
+    <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased">
+      <TopNavbar />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 w-full max-w-[1440px] mx-auto">
           
           <header className="mb-stack-lg flex flex-col md:flex-row md:justify-between md:items-end border-b border-outline-variant pb-stack-md">
             <div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppSidebar from '../components/AppSidebar';
 
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
@@ -142,8 +141,6 @@ export default function WorkspaceBuilder() {
 
   return (
     <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen overflow-hidden flex font-sans">
-      <AppSidebar activePage="builder" />
-
       {/* Main Workspace Frame */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         

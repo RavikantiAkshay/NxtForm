@@ -7,14 +7,51 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate successful login/signup and redirect to workspace dashboard
-    // We'll store a mock token in localStorage
-    localStorage.setItem('nxtform_token', 'mock-token-xyz');
-    localStorage.setItem('nxtform_user', JSON.stringify({ name: name || 'Demo User', email }));
-    navigate('/workspace');
+    setError(null);
+    setLoading(true);
+
+    try {
+      const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      
+      const payload = isSignUp 
+        ? { name, username, email, password }
+        : { email, password };
+
+      const res = await fetch(`${apiUrl.replace('/api', '')}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      localStorage.setItem('nxtform_token', data.token);
+      localStorage.setItem('nxtform_user', JSON.stringify({ 
+        _id: data._id,
+        name: data.name, 
+        username: data.username,
+        email: data.email 
+      }));
+      
+      navigate('/workspace');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const maskStyle = {
@@ -127,19 +164,39 @@ export default function AuthPage() {
 
           {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {isSignUp && (
-              <div>
-                <label className="block text-[13px] font-medium text-[#8a8494] mb-1.5" htmlFor="name">Full Name</label>
-                <input 
-                  className="w-full bg-[#0c0c0c] border border-[#222] rounded-lg px-3.5 py-2.5 text-[#e5e2e1] focus:outline-none focus:border-[#8b5cf6]/50 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.08)] text-[14px] transition-all duration-200 placeholder:text-[#3a3a3a]" 
-                  id="name" 
-                  type="text" 
-                  placeholder="Your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-[13px] font-medium">
+                {error}
               </div>
+            )}
+            
+            {isSignUp && (
+              <>
+                <div>
+                  <label className="block text-[13px] font-medium text-[#8a8494] mb-1.5" htmlFor="name">Full Name</label>
+                  <input 
+                    className="w-full bg-[#0c0c0c] border border-[#222] rounded-lg px-3.5 py-2.5 text-[#e5e2e1] focus:outline-none focus:border-[#8b5cf6]/50 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.08)] text-[14px] transition-all duration-200 placeholder:text-[#3a3a3a]" 
+                    id="name" 
+                    type="text" 
+                    placeholder="Your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium text-[#8a8494] mb-1.5" htmlFor="username">Username</label>
+                  <input 
+                    className="w-full bg-[#0c0c0c] border border-[#222] rounded-lg px-3.5 py-2.5 text-[#e5e2e1] focus:outline-none focus:border-[#8b5cf6]/50 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.08)] text-[14px] transition-all duration-200 placeholder:text-[#3a3a3a]" 
+                    id="username" 
+                    type="text" 
+                    placeholder="Choose a unique username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
             )}
             
             <div>
@@ -175,8 +232,10 @@ export default function AuthPage() {
 
             <button 
               type="submit" 
-              className="w-full bg-[#8b5cf6] text-white py-2.5 px-4 rounded-lg font-semibold text-[14px] hover:bg-[#7c3aed] hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-200 mt-1"
+              disabled={loading}
+              className="w-full bg-[#8b5cf6] text-white py-2.5 px-4 rounded-lg font-semibold text-[14px] hover:bg-[#7c3aed] hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
+              {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
               {isSignUp ? 'Create Workspace' : 'Sign In'}
             </button>
           </form>

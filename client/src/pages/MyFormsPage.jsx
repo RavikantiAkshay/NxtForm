@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppSidebar from '../components/AppSidebar';
+import TopNavbar from '../components/TopNavbar';
 
 export default function MyFormsPage() {
   const navigate = useNavigate();
@@ -58,10 +58,10 @@ export default function MyFormsPage() {
   );
 
   return (
-    <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen flex overflow-hidden font-sans antialiased">
-      <AppSidebar activePage="forms" />
+    <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased">
+      <TopNavbar />
 
-      <main className="flex-1 flex flex-col h-full overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden w-full max-w-[1440px] mx-auto">
         {/* Header */}
         <header className="shrink-0 px-8 py-6 border-b border-[#1a1a1a]">
           <div className="flex items-center justify-between">

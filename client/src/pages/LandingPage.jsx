@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import TopNavbar from '../components/TopNavbar';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -12,56 +13,8 @@ export default function LandingPage() {
   return (
     <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen selection:bg-primary selection:text-on-primary antialiased font-body-md text-body-md overflow-x-hidden">
 
-      {/* 1. Navigation Shell (from Sophisticated) */}
-      <header className="w-full top-0 sticky z-50 bg-[#131313]/80 backdrop-blur-md border-b border-outline-variant">
-        <div className="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-on-primary text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>dataset</span>
-            </div>
-            <span className="font-headline-md text-headline-md font-bold text-on-surface">NxtForm AI</span>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-stack-lg">
-            <a
-              className="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-200"
-              href="#precision-engineering-section"
-              onClick={handleScrollToFeatures}
-            >
-              Features
-            </a>
-            <a
-              className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200"
-              href="#how-it-works"
-              onClick={(e) => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }}
-            >
-              How it Works
-            </a>
-            <a
-              className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200"
-              href="#get-started"
-              onClick={(e) => { e.preventDefault(); document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' }); }}
-            >
-              Get Started
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-stack-md">
-            <button
-              onClick={() => navigate('/auth')}
-              className="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate('/auth')}
-              className="bg-primary text-on-primary px-stack-lg py-2 rounded-full font-label-md text-label-md font-bold hover:brightness-110 active:scale-95 transition-all"
-            >
-              Create Form
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* 1. Unified Navigation Shell */}
+      <TopNavbar />
 
       <main>
         {/* 2. Hero Section (from Sophisticated - Side-by-side layout optimized for fit) */}
@@ -201,25 +154,25 @@ export default function LandingPage() {
             </div>
 
             <div className="col-span-12 md:col-span-8">
-              <div className="glass-module p-6 lg:p-8 relative overflow-hidden bg-[#0a0a0a] border-2 border-outline-variant rounded-none text-left">
-                <div className="absolute top-0 left-0 p-3 border-r-2 border-b-2 border-outline-variant font-mono text-label-sm uppercase opacity-50">
+              <div className="glass-module p-6 lg:p-10 relative overflow-hidden bg-[#0a0a0a] border-2 border-outline-variant rounded-2xl text-left shadow-2xl">
+                <div className="absolute top-0 left-0 p-3 border-r-2 border-b-2 border-outline-variant rounded-tl-2xl rounded-br-lg font-mono text-label-sm uppercase text-on-surface-variant/70">
                   Workflow
                 </div>
                 <div className="space-y-0 mt-8">
                   {/* Step 1 */}
                   <div className="flex gap-6">
                     <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">01</div>
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-bold text-sm shrink-0 shadow-[0_0_15px_rgba(139,92,246,0.3)]">01</div>
                       <div className="w-px flex-1 border-l-2 border-dashed border-[#8b5cf6]/30 my-2"></div>
                     </div>
                     <div className="pb-8">
-                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Choose Your Fields</h3>
-                      <p className="text-on-surface-variant font-mono text-label-md mb-3">Browse the sidebar and click any template to add it. Full Name, Email, Rating, NPS, Signature — each one drops in with a ready-to-go question.</p>
+                      <h3 className="font-headline-sm text-on-surface font-semibold mb-2">Choose Your Fields</h3>
+                      <p className="text-on-surface-variant font-body-md text-[15px] mb-4">Browse the sidebar and click any template to add it. Full Name, Email, Rating, NPS, Signature — each one drops in with a ready-to-go question.</p>
                       <div className="flex gap-2">
-                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">person</span>
-                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">mail</span>
-                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-2.5 py-1 font-mono text-label-sm uppercase text-[#8b5cf6] rounded-none">star</span>
-                        <span className="border border-outline-variant px-2.5 py-1 font-mono text-label-sm uppercase text-on-surface-variant rounded-none">+27 more</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-3 py-1.5 text-sm flex items-center justify-center text-[#8b5cf6] rounded-full material-symbols-outlined">person</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-3 py-1.5 text-sm flex items-center justify-center text-[#8b5cf6] rounded-full material-symbols-outlined">mail</span>
+                        <span className="border border-[#8b5cf6] bg-[#8b5cf6]/10 px-3 py-1.5 text-sm flex items-center justify-center text-[#8b5cf6] rounded-full material-symbols-outlined">star</span>
+                        <span className="border border-outline-variant px-3 py-1.5 text-sm font-medium text-on-surface-variant rounded-full">+27 more</span>
                       </div>
                     </div>
                   </div>
@@ -227,18 +180,19 @@ export default function LandingPage() {
                   {/* Step 2 */}
                   <div className="flex gap-6">
                     <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">02</div>
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-bold text-sm shrink-0 shadow-[0_0_15px_rgba(139,92,246,0.3)]">02</div>
                       <div className="w-px flex-1 border-l-2 border-dashed border-[#8b5cf6]/30 my-2"></div>
                     </div>
                     <div className="pb-8">
-                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Preview on Device</h3>
-                      <p className="text-on-surface-variant font-mono text-label-md mb-3">A phone mockup updates in real time as you build. What you see is exactly what respondents get — no surprises after publishing.</p>
+                      <h3 className="font-headline-sm text-on-surface font-semibold mb-2">Preview on Device</h3>
+                      <p className="text-on-surface-variant font-body-md text-[15px] mb-4">A phone mockup updates in real time as you build. What you see is exactly what respondents get — no surprises after publishing.</p>
                       <div className="flex items-center gap-3">
-                        <div className="w-14 h-24 border-2 border-outline-variant rounded-lg flex items-center justify-center bg-[#0a0a0a]">
+                        <div className="w-14 h-24 border border-outline-variant rounded-xl flex items-center justify-center bg-[#0d0d0d] shadow-inner relative overflow-hidden">
+                          <div className="absolute top-1 w-4 h-1 bg-outline-variant rounded-full"></div>
                           <span className="material-symbols-outlined text-[#8b5cf6] text-[20px]">smartphone</span>
                         </div>
                         <span className="material-symbols-outlined text-[#8b5cf6]/50 text-[16px]">sync</span>
-                        <span className="font-mono text-label-sm text-on-surface-variant uppercase">Live Sync</span>
+                        <span className="font-label-md text-on-surface-variant font-medium">Live Sync</span>
                       </div>
                     </div>
                   </div>
@@ -246,18 +200,18 @@ export default function LandingPage() {
                   {/* Step 3 */}
                   <div className="flex gap-6">
                     <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-mono font-bold text-sm shrink-0">03</div>
+                      <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-[#0a0a0a] font-bold text-sm shrink-0 shadow-[0_0_15px_rgba(139,92,246,0.3)]">03</div>
                     </div>
                     <div>
-                      <h3 className="font-mono text-on-surface font-bold uppercase tracking-wider mb-1.5">Publish & Collect</h3>
-                      <p className="text-on-surface-variant font-mono text-label-md mb-3">Hit publish, share the link, and watch responses flow into your dashboard. Filter, review, and export — all from one screen.</p>
+                      <h3 className="font-headline-sm text-on-surface font-semibold mb-2">Publish & Collect</h3>
+                      <p className="text-on-surface-variant font-body-md text-[15px] mb-4">Hit publish, share the link, and watch responses flow into your dashboard. Filter, review, and export — all from one screen.</p>
                       <div className="flex items-center gap-3">
-                        <div className="bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 px-3 py-1.5 font-mono text-label-sm text-[#8b5cf6] uppercase rounded-none flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[14px]">check_circle</span> Published
+                        <div className="bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 px-4 py-2 font-label-md font-medium text-[#8b5cf6] rounded-full flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px]">check_circle</span> Published
                         </div>
-                        <span className="material-symbols-outlined text-outline-variant text-[16px]">arrow_forward</span>
-                        <div className="border border-outline-variant px-3 py-1.5 font-mono text-label-sm text-on-surface-variant uppercase rounded-none flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[14px]">inbox</span> 24 Responses
+                        <span className="material-symbols-outlined text-outline-variant text-[18px]">arrow_forward</span>
+                        <div className="border border-outline-variant px-4 py-2 font-label-md font-medium text-on-surface-variant rounded-full flex items-center gap-2 bg-[#0d0d0d]">
+                          <span className="material-symbols-outlined text-[16px]">inbox</span> 24 Responses
                         </div>
                       </div>
                     </div>
