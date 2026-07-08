@@ -958,6 +958,84 @@ export default function WorkspaceBuilder() {
                                     </div>
                                   )}
 
+                                  {/* Matrix Rows & Columns Editor */}
+                                  {block.type === 'matrix' && (
+                                    <div className="mt-4 space-y-4">
+                                      <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Rows (One per line)</label>
+                                        <textarea
+                                          value={(block.rows || ['Quality', 'Speed']).join('\n')}
+                                          onChange={(e) => {
+                                            const newRows = e.target.value.split('\n');
+                                            updateBlockValue(block.id, 'rows', newRows);
+                                          }}
+                                          placeholder="Enter rows..."
+                                          className="w-full mt-1 font-body-sm text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-2 resize-none h-20 focus:border-primary focus:outline-none focus:ring-0"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Columns (One per line)</label>
+                                        <textarea
+                                          value={(block.columns || ['Poor', 'Avg', 'Good']).join('\n')}
+                                          onChange={(e) => {
+                                            const newCols = e.target.value.split('\n');
+                                            updateBlockValue(block.id, 'columns', newCols);
+                                          }}
+                                          placeholder="Enter columns..."
+                                          className="w-full mt-1 font-body-sm text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-2 resize-none h-20 focus:border-primary focus:outline-none focus:ring-0"
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Slider Min/Max Editor */}
+                                  {block.type === 'slider' && (
+                                    <div className="mt-4 space-y-4">
+                                      <div className="flex gap-4">
+                                        <div className="flex-1">
+                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Min Value</label>
+                                          <input
+                                            type="number"
+                                            value={block.min !== undefined ? block.min : 0}
+                                            onChange={(e) => updateBlockValue(block.id, 'min', parseInt(e.target.value) || 0)}
+                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
+                                          />
+                                        </div>
+                                        <div className="flex-1">
+                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Max Value</label>
+                                          <input
+                                            type="number"
+                                            value={block.max !== undefined ? block.max : 100}
+                                            onChange={(e) => updateBlockValue(block.id, 'max', parseInt(e.target.value) || 100)}
+                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
+                                          />
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-4">
+                                        <div className="flex-1">
+                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Min Label</label>
+                                          <input
+                                            type="text"
+                                            value={block.minLabel || ''}
+                                            onChange={(e) => updateBlockValue(block.id, 'minLabel', e.target.value)}
+                                            placeholder="e.g. Min"
+                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
+                                          />
+                                        </div>
+                                        <div className="flex-1">
+                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Max Label</label>
+                                          <input
+                                            type="text"
+                                            value={block.maxLabel || ''}
+                                            onChange={(e) => updateBlockValue(block.id, 'maxLabel', e.target.value)}
+                                            placeholder="e.g. Max"
+                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
                                   {/* AI Logic Display */}
                                   {block.aiLogic && (
                                     <div className="mt-6 p-3 bg-gray-50 border border-gray-100 flex items-start gap-3">
@@ -1515,32 +1593,34 @@ export default function WorkspaceBuilder() {
                           return (
                             <div>
                               <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                              <div className="border border-gray-200 rounded bg-white overflow-hidden text-xs">
-                                <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
-                                  <div className="w-1/3"></div>
-                                  {renderCols.map(col => (
-                                    <div key={col} className="flex-1 text-center">{col}</div>
+                              <div className="border border-gray-200 rounded bg-white overflow-x-auto text-xs">
+                                <div className="min-w-max">
+                                  <div className="flex bg-gray-50 border-b border-gray-200 p-2 font-bold text-gray-500">
+                                    <div className="w-32 flex-shrink-0"></div>
+                                    {renderCols.map(col => (
+                                      <div key={col} className="w-24 flex-shrink-0 text-center px-1 break-words">{col}</div>
+                                    ))}
+                                  </div>
+                                  {renderRows.map((row, i) => (
+                                    <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
+                                      <div className="w-32 flex-shrink-0 font-semibold text-gray-700 pr-2 break-words">{row}</div>
+                                      {renderCols.map(col => {
+                                        const isSelected = val[row] === col;
+                                        return (
+                                          <div key={col} className="w-24 flex-shrink-0 flex justify-center">
+                                            <button 
+                                              type="button"
+                                              onClick={() => setVal(row, col)}
+                                              className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${isSelected ? 'border-gray-900 bg-gray-900' : 'border-gray-300 bg-white hover:border-gray-400'}`}
+                                            >
+                                              {isSelected && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                                            </button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
                                   ))}
                                 </div>
-                                {renderRows.map((row, i) => (
-                                  <div key={i} className="flex p-2 border-b border-gray-100 last:border-0 items-center">
-                                    <div className="w-1/3 font-semibold text-gray-700">{row}</div>
-                                    {renderCols.map(col => {
-                                      const isSelected = val[row] === col;
-                                      return (
-                                        <div key={col} className="flex-1 flex justify-center">
-                                          <button 
-                                            type="button"
-                                            onClick={() => setVal(row, col)}
-                                            className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${isSelected ? 'border-gray-900 bg-gray-900' : 'border-gray-300 bg-white hover:border-gray-400'}`}
-                                          >
-                                            {isSelected && <div className="w-2 h-2 rounded-full bg-white"></div>}
-                                          </button>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                ))}
                               </div>
                             </div>
                           );
@@ -1569,7 +1649,14 @@ export default function WorkspaceBuilder() {
                           return (
                             <div>
                               <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                              <div className="py-4 relative">
+                              <div className="pt-8 pb-4 relative">
+                                <div 
+                                  className="absolute top-1 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold py-1 px-2 rounded flex items-center justify-center min-w-[24px]"
+                                  style={{ left: `calc(${percentage}% + ${8 - (percentage * 0.16)}px)` }}
+                                >
+                                  {val}
+                                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-gray-900"></div>
+                                </div>
                                 <input 
                                   type="range" 
                                   min={min} 
