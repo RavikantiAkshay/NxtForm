@@ -11,6 +11,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDraggable,
+  useDroppable,
+  DragOverlay
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -172,6 +175,86 @@ const SignaturePad = ({ onChange }) => {
   );
 };
 
+const DraggableLibraryItem = ({ type, label, icon, desc, onClick }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `library-item-${type}`,
+    data: {
+      type: 'library-item',
+      blockType: type,
+      label,
+      icon,
+      desc
+    }
+  });
+
+  return (
+    <button
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group ${isDragging ? 'opacity-50' : ''} ${desc ? 'border border-outline-variant bg-surface-container-high p-3 relative overflow-hidden' : ''}`}
+    >
+      {desc && <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>}
+      <span className={`material-symbols-outlined ${desc ? 'text-primary text-[18px]' : 'text-[18px]'}`}>{icon}</span>
+      {desc ? (
+        <div className="flex flex-col">
+          <span className="font-label-sm text-label-sm text-on-surface">{label}</span>
+          <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">{desc}</span>
+        </div>
+      ) : (
+        <span className="text-[12px] font-medium tracking-wide flex-1">{label}</span>
+      )}
+    </button>
+  );
+};
+
+const DraggableGridItem = ({ type, label, icon, onClick, isFullWidth }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `grid-item-${type}`,
+    data: {
+      type: 'library-item',
+      blockType: type,
+      label,
+      icon
+    }
+  });
+
+  return (
+    <button
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={`border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm text-center ${isDragging ? 'opacity-50' : ''} ${isFullWidth ? 'col-span-2' : ''}`}
+    >
+      <span className="material-symbols-outlined text-[20px]">{icon}</span>
+      <span className="text-[9px] uppercase font-bold tracking-wider">{label}</span>
+    </button>
+  );
+};
+
+const DropZone = ({ index }) => {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `dropzone-${index}`,
+    data: {
+      type: 'dropzone',
+      index
+    }
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="relative z-10 w-full flex items-center justify-center h-full"
+    >
+      <button className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shadow-sm border ${isOver ? 'bg-primary text-white border-primary scale-150' : 'bg-white text-gray-400 border-gray-300 hover:text-primary hover:border-primary hover:scale-110'}`}>
+        <span className="material-symbols-outlined text-[16px]">add</span>
+      </button>
+    </div>
+  );
+};
+
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
 
@@ -179,6 +262,7 @@ export default function WorkspaceBuilder() {
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
   const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
+  const [activeDragItem, setActiveDragItem] = useState(null);
   const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
   const [isLibraryVisible, setIsLibraryVisible] = useState(true);
   const [zoom, setZoom] = useState(100);
@@ -187,7 +271,7 @@ export default function WorkspaceBuilder() {
   const [templateSearch, setTemplateSearch] = useState('');
   const [previewData, setPreviewData] = useState({});
   const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
-  const [blocks, setBlocks] = useState([
+  const initialBlocks = [
     {
       id: 'welcome',
       type: 'welcome',
@@ -197,6 +281,7 @@ export default function WorkspaceBuilder() {
       description: 'We value your feedback to help us improve our services.',
       buttonText: 'Start Survey',
       required: false,
+      page: 1,
     },
     {
       id: 'rating-1',
@@ -213,8 +298,40 @@ export default function WorkspaceBuilder() {
         { value: '5', label: 'Excellent' }
       ],
       aiLogic: 'If score is < 3, route to "Detailed Feedback". Otherwise, jump to "End Screen".',
+      page: 1,
     }
-  ]);
+  ];
+
+  const [blocks, setBlocksState] = useState(initialBlocks);
+  const [blockHistory, setBlockHistory] = useState([initialBlocks]);
+  const [blockHistoryIndex, setBlockHistoryIndex] = useState(0);
+
+  const setBlocks = (newBlocksOrUpdater) => {
+    setBlocksState(prev => {
+      const newBlocks = typeof newBlocksOrUpdater === 'function' ? newBlocksOrUpdater(prev) : newBlocksOrUpdater;
+      
+      const newHistory = blockHistory.slice(0, blockHistoryIndex + 1);
+      newHistory.push(newBlocks);
+      setBlockHistory(newHistory);
+      setBlockHistoryIndex(newHistory.length - 1);
+      
+      return newBlocks;
+    });
+  };
+
+  const handleUndo = () => {
+    if (blockHistoryIndex > 0) {
+      setBlockHistoryIndex(blockHistoryIndex - 1);
+      setBlocksState(blockHistory[blockHistoryIndex - 1]);
+    }
+  };
+
+  const handleRedo = () => {
+    if (blockHistoryIndex < blockHistory.length - 1) {
+      setBlockHistoryIndex(blockHistoryIndex + 1);
+      setBlocksState(blockHistory[blockHistoryIndex + 1]);
+    }
+  };
 
   // Sidebar item list helper
   const addBlock = (type, typeName, icon) => {
@@ -226,6 +343,7 @@ export default function WorkspaceBuilder() {
       icon,
       title: `New ${typeName} question`,
       required: false,
+      page: currentPage,
     };
 
     // Nice natural titles for templates
@@ -319,15 +437,90 @@ export default function WorkspaceBuilder() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const handleDragStart = (event) => {
+    const { active } = event;
+    if (active.data.current?.type === 'library-item') {
+      setActiveDragItem(active.data.current);
+    }
+  };
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (active.id !== over?.id) {
+    
+    if (!over) {
+      setActiveDragItem(null);
+      return;
+    }
+
+    if (active.data.current?.type === 'library-item' && over.data.current?.type === 'dropzone') {
+      const { blockType, label, icon } = active.data.current;
+      const insertIndex = over.data.current.index;
+      
+      const newId = `${blockType}-${Date.now()}`;
+      const newBlock = {
+        id: newId,
+        type: blockType,
+        typeName: label,
+        title: label,
+        icon: icon,
+        required: false,
+        page: currentPage
+      };
+
+      if (['choice', 'dropdown', 'checkbox'].includes(blockType)) {
+        newBlock.options = [
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' }
+        ];
+      } else if (blockType === 'rating') {
+        newBlock.options = [
+          { value: '1', label: 'Very Poor' },
+          { value: '2', label: 'Poor' },
+          { value: '3', label: 'Average' },
+          { value: '4', label: 'Good' },
+          { value: '5', label: 'Excellent' }
+        ];
+      } else if (blockType === 'sentiment' || blockType === 'upload') {
+        newBlock.description = blockType === 'sentiment' ? 'AI Sentiment Analyzer will flag emotional context.' : 'Smart Upload will extract metadata automatically.';
+        newBlock.required = true;
+      } else if (['text', 'longtext', 'email', 'number', 'phone', 'url', 'password', 'company'].includes(blockType)) {
+        newBlock.placeholder = `Enter ${label.toLowerCase()}...`;
+      }
+
+      if (blockType === 'terms') {
+        newBlock.options = [{ label: 'I agree to the Terms & Conditions and Privacy Policy' }];
+      }
+
+      setBlocks(prev => {
+        const visibleBlocksForPage = formMode === 'classic' ? prev.filter(b => b.page === currentPage) : prev;
+        const updated = [...prev];
+        
+        let globalInsertIndex = prev.length;
+        if (insertIndex < visibleBlocksForPage.length) {
+          globalInsertIndex = prev.findIndex(b => b.id === visibleBlocksForPage[insertIndex].id);
+        } else if (visibleBlocksForPage.length > 0) {
+          globalInsertIndex = prev.findIndex(b => b.id === visibleBlocksForPage[visibleBlocksForPage.length - 1].id) + 1;
+        }
+
+        updated.splice(globalInsertIndex, 0, newBlock);
+        return updated;
+      });
+      setActiveBlockId(newId);
+      setActiveDragItem(null);
+      return;
+    }
+
+    if (active.id !== over.id && !active.data.current?.type) {
       setBlocks((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
+        if(oldIndex === -1 || newIndex === -1) return items;
         return arrayMove(items, oldIndex, newIndex);
       });
     }
+
+    setActiveDragItem(null);
   };
 
   React.useEffect(() => {
@@ -339,10 +532,17 @@ export default function WorkspaceBuilder() {
   }, [previewDevice]);
 
   const activeBlock = blocks.find(b => b.id === activeBlockId) || blocks[0];
+  const visibleBlocks = formMode === 'classic' ? blocks.filter(b => b.page === currentPage) : blocks;
 
   return (
-    <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen overflow-hidden flex font-sans">
-      {/* Main Workspace Frame */}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen overflow-hidden flex font-sans">
+        {/* Main Workspace Frame */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
 
         {/* Builder Header */}
@@ -394,8 +594,20 @@ export default function WorkspaceBuilder() {
               </button>
             </div>
             <div className="flex items-center gap-4 border-r border-outline-variant pr-6 text-on-surface-variant">
-              <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">undo</span></button>
-              <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">redo</span></button>
+              <button 
+                onClick={handleUndo} 
+                disabled={blockHistoryIndex === 0}
+                className={`transition-colors ${blockHistoryIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
+              >
+                <span className="material-symbols-outlined">undo</span>
+              </button>
+              <button 
+                onClick={handleRedo} 
+                disabled={blockHistoryIndex === blockHistory.length - 1}
+                className={`transition-colors ${blockHistoryIndex === blockHistory.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
+              >
+                <span className="material-symbols-outlined">redo</span>
+              </button>
             </div>
             <div className="flex gap-4">
               <button
@@ -445,41 +657,11 @@ export default function WorkspaceBuilder() {
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Basic Inputs</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => addBlock('text', 'Short Text', 'short_text')}
-                    className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm text-left"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">short_text</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Short Text</span>
-                  </button>
-                  <button
-                    onClick={() => addBlock('longtext', 'Long Text', 'notes')}
-                    className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">notes</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Long Text</span>
-                  </button>
-                  <button
-                    onClick={() => addBlock('choice', 'Choice Option', 'radio_button_checked')}
-                    className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">radio_button_checked</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Choice</span>
-                  </button>
-                  <button
-                    onClick={() => addBlock('checkbox', 'Checkboxes', 'check_box')}
-                    className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">check_box</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Checkboxes</span>
-                  </button>
-                  <button
-                    onClick={() => addBlock('dropdown', 'Dropdown', 'arrow_drop_down_circle')}
-                    className="border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm col-span-2"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">arrow_drop_down_circle</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Dropdown</span>
-                  </button>
+                  <DraggableGridItem type="text" label="Short Text" icon="short_text" onClick={() => addBlock('text', 'Short Text', 'short_text')} />
+                  <DraggableGridItem type="longtext" label="Long Text" icon="notes" onClick={() => addBlock('longtext', 'Long Text', 'notes')} />
+                  <DraggableGridItem type="choice" label="Choice Option" icon="radio_button_checked" onClick={() => addBlock('choice', 'Choice Option', 'radio_button_checked')} />
+                  <DraggableGridItem type="checkbox" label="Checkboxes" icon="check_box" onClick={() => addBlock('checkbox', 'Checkboxes', 'check_box')} />
+                  <DraggableGridItem type="dropdown" label="Dropdown" icon="arrow_drop_down_circle" isFullWidth onClick={() => addBlock('dropdown', 'Dropdown', 'arrow_drop_down_circle')} />
                 </div>
               </div>
 
@@ -487,7 +669,7 @@ export default function WorkspaceBuilder() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-label-sm text-label-sm text-on-surface-variant">Templates</h3>
-                  <div className="flex items-center bg-[#1a1a1a] rounded px-2 py-1 w-24">
+                  <div className="flex items-center bg-[#1a1a1a] rounded px-2 py-1 w-32">
                     <span className="material-symbols-outlined text-[12px] text-gray-500 mr-1">search</span>
                     <input 
                       type="text" 
@@ -514,10 +696,7 @@ export default function WorkspaceBuilder() {
                     { type: 'date_range', label: 'Date Range', icon: 'date_range' },
                     { type: 'number', label: 'Number Field', icon: 'tag' }
                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -541,10 +720,7 @@ export default function WorkspaceBuilder() {
                     { type: 'color_picker', label: 'Color Picker', icon: 'palette' },
                     { type: 'otp', label: 'OTP Input', icon: 'pin' }
                    ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -566,10 +742,7 @@ export default function WorkspaceBuilder() {
                     { type: 'linear_scale', label: 'Linear Scale (1-5)', icon: 'linear_scale' },
                     { type: 'yes_no', label: 'Yes/No Toggle', icon: 'toggle_on' }
                    ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -589,10 +762,7 @@ export default function WorkspaceBuilder() {
                     { type: 'signature', label: 'Signature Pad', icon: 'draw' },
                     { type: 'terms', label: 'Terms & Conditions', icon: 'gavel' }
                    ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -610,10 +780,7 @@ export default function WorkspaceBuilder() {
                     { type: 'divider', label: 'Divider', icon: 'horizontal_rule' },
                     { type: 'spacer', label: 'Spacer', icon: 'space_bar' }
                    ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -632,18 +799,7 @@ export default function WorkspaceBuilder() {
                   {[{ type: 'sentiment', label: 'AI Sentiment', icon: 'psychology', desc: 'Analysis text inputs' },
                     { type: 'upload', label: 'Smart Upload', icon: 'document_scanner', desc: 'Auto-extract metadata' }
                    ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <button
-                      key={t.type}
-                      onClick={() => addBlock(t.type, t.label, t.icon)}
-                      className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
-                    >
-                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <span className="material-symbols-outlined text-primary">{t.icon}</span>
-                      <div className="flex flex-col">
-                        <span className="font-label-sm text-label-sm text-on-surface">{t.label}</span>
-                        <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">{t.desc}</span>
-                      </div>
-                    </button>
+                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} desc={t.desc} onClick={() => addBlock(t.type, t.label, t.icon)} />
                   ))}
                 </div>
               </div>
@@ -702,7 +858,7 @@ export default function WorkspaceBuilder() {
                     <div>
                       <h1 className="text-xl font-bold text-gray-900">{formTitle}</h1>
                       <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
-                        {blocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
+                        {visibleBlocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
                       </p>
                     </div>
                     <button
@@ -757,16 +913,14 @@ export default function WorkspaceBuilder() {
                 </div>
 
                 {/* Connector */}
-                <div className="w-px h-8 bg-gray-300 mx-auto mb-2 relative"></div>
+                <div className="relative w-full h-12 flex items-center justify-center my-2">
+                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
+                  <DropZone index={0} />
+                </div>
 
                 {/* Dynamic Block Rendering */}
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext items={blocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
-                    {blocks.map((block, index) => {
+                  <SortableContext items={visibleBlocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                    {visibleBlocks.map((block, index) => {
                       const isActive = block.id === activeBlockId;
                       return (
                         <SortableBlock key={block.id} id={block.id}>
@@ -1041,12 +1195,10 @@ export default function WorkspaceBuilder() {
                               </div>
 
                               {/* Connector Line below item */}
-                              {index < blocks.length - 1 && (
+                              {index < visibleBlocks.length - 1 && (
                                 <div className="relative w-full h-12 flex items-center justify-center">
-                                  <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
-                                  <button className="relative z-10 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition-all shadow-sm">
-                                    <span className="material-symbols-outlined text-[16px]">add</span>
-                                  </button>
+                                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
+                                  <DropZone index={index + 1} />
                                 </div>
                               )}
                             </div>
@@ -1055,11 +1207,11 @@ export default function WorkspaceBuilder() {
                       );
                     })}
                   </SortableContext>
-                </DndContext>
 
                 {/* End node */}
                 <div className="relative w-full h-12 flex items-center justify-center my-2">
-                  <div className="absolute inset-0 flex justify-center"><div class="w-px h-full bg-gray-300"></div></div>
+                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
+                  {visibleBlocks.length > 0 && <DropZone index={visibleBlocks.length} />}
                 </div>
                 <div className="flex justify-center">
                   <div className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-600 font-label-sm text-label-sm uppercase tracking-widest rounded-full flex items-center gap-2">
@@ -2477,6 +2629,16 @@ export default function WorkspaceBuilder() {
 
       </main>
 
-    </div>
+      <DragOverlay>
+        {activeDragItem ? (
+          <div className="bg-white border-2 border-primary text-gray-900 rounded-sm p-3 flex items-center gap-2 shadow-xl opacity-90 scale-105 pointer-events-none min-w-[200px] z-50">
+            <span className="material-symbols-outlined text-primary text-[18px]">{activeDragItem.icon}</span>
+            <span className="text-xs font-bold tracking-wide">{activeDragItem.label}</span>
+          </div>
+        ) : null}
+      </DragOverlay>
+
+      </div>
+    </DndContext>
   );
 }
