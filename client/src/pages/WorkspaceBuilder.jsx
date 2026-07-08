@@ -2617,22 +2617,33 @@ export default function WorkspaceBuilder() {
                       );
                     })()
                   ) : (
-                    <div className="flex gap-3 w-full">
+                    <div className="flex gap-2 w-full">
                       {currentPage > 1 && (
                         <button 
                           onClick={() => setCurrentPage(prev => prev - 1)}
-                          className="flex-1 h-10 bg-white text-gray-900 border border-gray-200 flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-gray-50 transition-colors"
+                          className="flex-1 h-10 bg-white text-gray-900 border border-gray-200 flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-gray-50 transition-colors"
                         >
-                          Previous Page
+                          Previous
                         </button>
                       )}
                       <button 
                         onClick={() => {
+                          const newPreviewData = { ...previewData };
+                          visibleBlocks.forEach(b => delete newPreviewData[b.id]);
+                          setPreviewData(newPreviewData);
+                        }}
+                        className="flex-1 h-10 bg-white text-red-500 border border-gray-200 flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-red-50 transition-colors"
+                        title="Clear Page Inputs"
+                      >
+                        Clear
+                      </button>
+                      <button 
+                        onClick={() => {
                           if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
                         }}
-                        className="flex-1 h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-black transition-colors"
+                        className="flex-1 h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black transition-colors"
                       >
-                        {currentPage < totalPages ? 'Next Page' : 'Submit'}
+                        {currentPage < totalPages ? 'Next' : 'Submit'}
                       </button>
                     </div>
                   )}
