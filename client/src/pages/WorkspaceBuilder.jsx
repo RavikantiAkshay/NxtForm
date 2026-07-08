@@ -1706,42 +1706,77 @@ export default function WorkspaceBuilder() {
                           );
                         })()}
 
-                        {activeBlock.type === 'rating_stars' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="flex gap-2">
-                              {[1, 2, 3, 4, 5].map(star => (
-                                <span key={star} className="material-symbols-outlined text-[32px] text-gray-300">star_rate</span>
-                              ))}
+                        {activeBlock.type === 'rating_stars' && (() => {
+                          const val = previewData[activeBlock.id] || 0;
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex gap-2">
+                                {[1, 2, 3, 4, 5].map(star => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, star)}
+                                    className="outline-none"
+                                  >
+                                    <span className={`material-symbols-outlined text-[32px] transition-colors ${star <= val ? 'text-yellow-400' : 'text-gray-300'}`}>
+                                      star_rate
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
-                        {activeBlock.type === 'emoji_rating' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded p-4">
-                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😢</span>
-                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😐</span>
-                              <span className="text-[32px] grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">😀</span>
+                        {activeBlock.type === 'emoji_rating' && (() => {
+                          const val = previewData[activeBlock.id];
+                          const emojis = [
+                            { emoji: '😢', value: 1 },
+                            { emoji: '😐', value: 2 },
+                            { emoji: '😀', value: 3 }
+                          ];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded p-4">
+                                {emojis.map(({ emoji, value }) => (
+                                  <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, value)}
+                                    className={`text-[32px] transition-all cursor-pointer outline-none ${val === value ? 'grayscale-0 opacity-100 scale-110' : 'grayscale opacity-40 hover:grayscale-0 hover:opacity-100'}`}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
-                        {activeBlock.type === 'linear_scale' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200 rounded">
-                              {[1, 2, 3, 4, 5].map(num => (
-                                <div key={num} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm font-bold text-gray-500 bg-white">
-                                  {num}
-                                </div>
-                              ))}
+                        {activeBlock.type === 'linear_scale' && (() => {
+                          const val = previewData[activeBlock.id];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div className="flex justify-between items-center bg-gray-50 p-4 border border-gray-200 rounded">
+                                {[1, 2, 3, 4, 5].map(num => (
+                                  <button
+                                    key={num}
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, num)}
+                                    className={`w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold transition-colors outline-none ${val === num ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'}`}
+                                  >
+                                    {num}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                         {activeBlock.type === 'nps' && (() => {
                           const val = previewData[activeBlock.id];
