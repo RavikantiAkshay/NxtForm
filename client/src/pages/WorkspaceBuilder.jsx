@@ -674,97 +674,97 @@ export default function WorkspaceBuilder() {
       <main className="flex-1 flex flex-col h-full overflow-hidden">
 
         {/* Builder Header */}
-        <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0 z-40">
-          <div className="flex items-center gap-4">
+        <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-4 bg-[#0a0a0a] shrink-0 z-40 whitespace-nowrap">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/workspace')}
               className="text-[#555] hover:text-white transition-colors flex items-center"
             >
-              <span className="material-symbols-outlined mr-2">arrow_back</span>
-              <span className="font-label-md text-label-md">Exit</span>
+              <span className="material-symbols-outlined mr-1 text-[18px]">arrow_back</span>
+              <span className="font-label-sm text-sm">Exit</span>
             </button>
-            <div className="h-4 w-px bg-outline-variant mx-2"></div>
+            <div className="h-4 w-px bg-outline-variant mx-1"></div>
 
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
-                className="bg-transparent border-none focus:ring-0 text-white font-headline-md text-headline-md font-semibold p-0 w-64 focus:border-b focus:border-primary focus:outline-none"
+                className="bg-transparent border-none focus:ring-0 text-white font-semibold p-0 w-32 md:w-48 text-base focus:border-b focus:border-primary focus:outline-none truncate"
               />
-              <span className="material-symbols-outlined text-[18px] text-on-surface-variant">edit</span>
+              <span className="material-symbols-outlined text-[16px] text-on-surface-variant">edit</span>
             </div>
 
-            <div className={`ml-4 px-2 py-0.5 border rounded font-label-sm text-label-sm flex items-center gap-1 ${isPublishedState ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
+            <div className={`ml-2 px-2 py-0.5 border rounded flex items-center gap-1 text-xs ${isPublishedState ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
               <span className={`w-2 h-2 rounded-full ${isPublishedState ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
               {isPublishedState ? 'Published' : 'Draft'}
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             {/* Form Mode Toggle */}
-            <div className="flex bg-surface-container-high rounded-lg p-0.5 border border-outline-variant">
+            <div className="flex bg-surface-container-high rounded p-0.5 border border-outline-variant hidden md:flex">
               <button
                 onClick={() => setFormMode('conversational')}
-                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                className={`px-2 py-1 rounded text-xs flex items-center gap-1 transition-all ${formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
                   }`}
               >
                 <span className="material-symbols-outlined text-[14px]">swipe_up</span>
-                Conversational
+                <span className="hidden lg:inline">Conversational</span>
               </button>
               <button
                 onClick={() => setFormMode('classic')}
-                className={`px-3 py-1.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 transition-all ${formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                className={`px-2 py-1 rounded text-xs flex items-center gap-1 transition-all ${formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
                   }`}
               >
                 <span className="material-symbols-outlined text-[14px]">view_agenda</span>
-                Classic
+                <span className="hidden lg:inline">Classic</span>
               </button>
             </div>
-            <div className="flex items-center gap-4 border-r border-outline-variant pr-6 text-on-surface-variant">
+            <div className="flex items-center gap-2 border-r border-outline-variant pr-4 text-on-surface-variant">
               <button 
                 onClick={handleUndo} 
                 disabled={blockHistoryIndex === 0}
                 className={`transition-colors ${blockHistoryIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
               >
-                <span className="material-symbols-outlined">undo</span>
+                <span className="material-symbols-outlined text-[18px]">undo</span>
               </button>
               <button 
                 onClick={handleRedo} 
                 disabled={blockHistoryIndex === blockHistory.length - 1}
                 className={`transition-colors ${blockHistoryIndex === blockHistory.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
               >
-                <span className="material-symbols-outlined">redo</span>
+                <span className="material-symbols-outlined text-[18px]">redo</span>
               </button>
             </div>
-            <div className="flex gap-4 items-center pl-2">
+            <div className="flex gap-3 items-center pl-1">
               <button
                 onClick={() => navigate(`/workspace`)}
-                className="px-4 py-2 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-md text-label-md flex items-center gap-2 rounded"
+                className="px-3 py-1.5 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all text-sm flex items-center gap-1.5 rounded"
               >
-                <span className="material-symbols-outlined text-[18px]">dashboard</span>
-                Dashboard
+                <span className="material-symbols-outlined text-[16px]">dashboard</span>
+                <span className="hidden xl:inline">Dashboard</span>
               </button>
               
-              <div className="h-6 w-px bg-outline-variant mx-1"></div>
+              <div className="h-5 w-px bg-outline-variant mx-1"></div>
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-400 hover:text-white transition-colors mr-2 group" title="Require respondents to share their email">
+              <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-400 hover:text-white transition-colors mr-1 group whitespace-nowrap" title="Require respondents to share their email">
                 <input 
                   type="checkbox" 
                   checked={collectEmail} 
                   onChange={(e) => setCollectEmail(e.target.checked)} 
-                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary focus:ring-offset-gray-900 cursor-pointer" 
+                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary focus:ring-offset-gray-900 cursor-pointer" 
                 />
-                <span className="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">alternate_email</span>
-                Collect Emails
+                <span className="material-symbols-outlined text-[14px] group-hover:text-primary transition-colors">alternate_email</span>
+                <span className="hidden xl:inline">Collect Emails</span>
               </label>
 
               {isPublishedState && (
                 <button
                   onClick={handleUnpublish}
-                  className="px-4 py-2 border border-red-500/30 hover:border-red-500 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all font-label-md text-label-md flex items-center gap-2 rounded"
+                  className="px-3 py-1.5 border border-red-500/30 hover:border-red-500 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-sm flex items-center gap-1.5 rounded whitespace-nowrap"
                 >
-                  <span className="material-symbols-outlined text-[18px]">unpublished</span>
+                  <span className="material-symbols-outlined text-[16px]">unpublished</span>
                   Unpublish
                 </button>
               )}
@@ -772,12 +772,12 @@ export default function WorkspaceBuilder() {
               <button
                 onClick={handlePublish}
                 disabled={isPublishing}
-                className={`px-6 py-2 ${isPublishing ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary font-label-md text-label-md font-bold transition-all flex items-center gap-2 rounded`}
+                className={`px-4 py-1.5 ${isPublishing ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary text-sm font-bold transition-all flex items-center gap-1.5 rounded whitespace-nowrap`}
               >
-                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {isPublishing ? 'sync' : 'send'}
                 </span>
-                {isPublishing ? 'Publishing...' : (isPublishedState ? 'Update Form' : 'Publish Form')}
+                {isPublishing ? 'Publishing...' : (isPublishedState ? 'Update' : 'Publish')}
               </button>
             </div>
           </div>
