@@ -1467,18 +1467,7 @@ export default function WorkspaceBuilder() {
                           );
                         })()}
 
-                        {activeBlock.type === 'otp' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="flex gap-2 justify-center">
-                              {[1, 2, 3, 4, 5, 6].map(box => (
-                                <div key={box} className="w-10 h-12 border-2 border-gray-200 rounded flex items-center justify-center text-gray-400 bg-white">
-                                  -
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+
 
                         {activeBlock.type === 'color_picker' && (
                           <div>
@@ -2064,17 +2053,79 @@ export default function WorkspaceBuilder() {
                           );
                         })()}
 
-                        {activeBlock.type === 'dropdown' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                              <span>Select an option...</span>
-                              <span className="material-symbols-outlined">arrow_drop_down</span>
+                        {activeBlock.type === 'dropdown' && (() => {
+                          const val = previewData[activeBlock.id];
+                          const selectedOpt = activeBlock.options?.find(o => o.value === val);
+                          const selectOptions = activeBlock.options?.map(opt => ({ value: opt.value, label: opt.label })) || [];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <Select
+                                value={selectedOpt ? { value: selectedOpt.value, label: selectedOpt.label } : null}
+                                onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
+                                options={selectOptions}
+                                placeholder="Select an option..."
+                                styles={{
+                                  control: (baseStyles, state) => ({
+                                    ...baseStyles,
+                                    backgroundColor: '#f9fafb',
+                                    borderColor: state.isFocused ? '#111827' : '#e5e7eb',
+                                    boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
+                                    padding: '2px',
+                                    borderRadius: '0.375rem',
+                                    '&:hover': {
+                                      borderColor: '#111827'
+                                    }
+                                  })
+                                }}
+                              />
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
+
+                        {activeBlock.type === 'otp' && (() => {
+                          const val = previewData[activeBlock.id] || '';
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div className="flex gap-2 justify-between">
+                                {[0, 1, 2, 3, 4, 5].map((idx) => (
+                                  <input
+                                    key={idx}
+                                    type="text"
+                                    maxLength="1"
+                                    value={val[idx] || ''}
+                                    onChange={(e) => {
+                                      const char = e.target.value.replace(/\D/g, ''); // numbers only
+                                      if (char || e.target.value === '') {
+                                        let newVal = val.split('');
+                                        newVal[idx] = char;
+                                        updatePreviewData(activeBlock.id, newVal.join(''));
+                                        
+                                        // auto focus next
+                                        if (char && idx < 5) {
+                                          const nextInput = e.target.nextElementSibling;
+                                          if (nextInput) nextInput.focus();
+                                        }
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Backspace' && !val[idx] && idx > 0) {
+                                        const prevInput = e.target.previousElementSibling;
+                                        if (prevInput) prevInput.focus();
+                                      }
+                                    }}
+                                    className="w-10 h-12 text-center text-lg font-bold bg-gray-50 border border-gray-200 rounded focus:border-gray-900 focus:ring-0 outline-none transition-colors"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {activeBlock.type === 'sentiment' && (
                           <div>
