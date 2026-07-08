@@ -1547,26 +1547,83 @@ export default function WorkspaceBuilder() {
 
 
 
-                        {activeBlock.type === 'color_picker' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="flex items-center gap-3 p-2 border border-gray-200 rounded bg-white">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500"></div>
-                              <span className="text-sm text-gray-400">#HEXCODE</span>
-                            </div>
-                          </div>
-                        )}
+                        {activeBlock.type === 'color_picker' && (() => {
+                          const val = previewData[activeBlock.id] || '#000000';
+                          const isValidHex = /^#[0-9A-F]{6}$/i.test(val);
+                          const pickerColor = isValidHex ? val : '#000000';
 
-                        {activeBlock.type === 'tags' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="p-2 border border-gray-200 rounded bg-white flex gap-2 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">Design <span className="material-symbols-outlined text-[12px]">close</span></span>
-                              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">UI/UX <span className="material-symbols-outlined text-[12px]">close</span></span>
-                              <input type="text" disabled placeholder="Add tag..." className="bg-transparent outline-none text-sm w-20" />
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex items-center gap-3 p-2 border border-gray-200 rounded bg-white w-48 focus-within:border-gray-900 transition-colors">
+                                <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 relative">
+                                  <input 
+                                    type="color"
+                                    value={pickerColor}
+                                    onChange={(e) => updatePreviewData(activeBlock.id, e.target.value)}
+                                    className="absolute -top-2 -left-2 w-12 h-12 cursor-pointer border-0 p-0"
+                                  />
+                                </div>
+                                <input
+                                  type="text"
+                                  value={val}
+                                  onChange={(e) => updatePreviewData(activeBlock.id, e.target.value)}
+                                  onBlur={(e) => {
+                                    let v = e.target.value;
+                                    if (v && !v.startsWith('#')) v = '#' + v;
+                                    if (/^#[0-9A-F]{3}$/i.test(v)) {
+                                      v = '#' + v[1]+v[1] + v[2]+v[2] + v[3]+v[3];
+                                    }
+                                    if (!/^#[0-9A-F]{6}$/i.test(v)) v = '#000000';
+                                    updatePreviewData(activeBlock.id, v.toUpperCase());
+                                  }}
+                                  className="text-sm text-gray-700 font-mono uppercase border-none focus:ring-0 p-0 w-full bg-transparent outline-none flex-1"
+                                  placeholder="#HEXCODE"
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
+
+                        {activeBlock.type === 'tags' && (() => {
+                          const val = previewData[activeBlock.id] || [];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="p-2 border border-gray-200 rounded bg-white flex gap-2 flex-wrap min-h-[42px] items-center cursor-text">
+                                {val.map((tag, i) => (
+                                  <span key={i} className="px-2 py-1 bg-gray-100 text-xs rounded-full flex items-center gap-1">
+                                    {tag} 
+                                    <span 
+                                      className="material-symbols-outlined text-[12px] cursor-pointer hover:text-red-500"
+                                      onClick={() => updatePreviewData(activeBlock.id, val.filter((_, idx) => idx !== i))}
+                                    >
+                                      close
+                                    </span>
+                                  </span>
+                                ))}
+                                <input 
+                                  type="text" 
+                                  placeholder={val.length === 0 ? "Add tags..." : ""}
+                                  className="bg-transparent outline-none text-sm min-w-[80px] flex-1" 
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && e.target.value.trim()) {
+                                      e.preventDefault();
+                                      const newTag = e.target.value.trim();
+                                      if (!val.includes(newTag)) {
+                                        updatePreviewData(activeBlock.id, [...val, newTag]);
+                                      }
+                                      e.target.value = '';
+                                    } else if (e.key === 'Backspace' && e.target.value === '' && val.length > 0) {
+                                      updatePreviewData(activeBlock.id, val.slice(0, -1));
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <p className="text-[10px] text-gray-400 mt-1">Press Enter to add a tag</p>
+                            </div>
+                          );
+                        })()}
 
                         {activeBlock.type === 'credit_card' && (
                           <div>
