@@ -1743,48 +1743,79 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {activeBlock.type === 'nps' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="flex justify-between items-center bg-gray-50 p-2 border border-gray-200 rounded">
-                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                                <div key={num} className="w-6 h-8 rounded border border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-500 bg-white">
-                                  {num}
-                                </div>
-                              ))}
+                        {activeBlock.type === 'nps' && (() => {
+                          const val = previewData[activeBlock.id];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div className="flex justify-between items-center bg-gray-50 p-2 border border-gray-200 rounded">
+                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                                  <button 
+                                    key={num} 
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, num)}
+                                    className={`w-6 h-8 rounded border flex items-center justify-center text-[10px] font-bold transition-colors ${val === num ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'}`}
+                                  >
+                                    {num}
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="flex justify-between mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                                <span>Not likely</span>
+                                <span>Very likely</span>
+                              </div>
                             </div>
-                            <div className="flex justify-between mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
-                              <span>Not likely</span>
-                              <span>Very likely</span>
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
-                        {activeBlock.type === 'yes_no' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="flex gap-4">
-                              <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">Yes</div>
-                              <div className="flex-1 border border-gray-200 rounded py-3 text-center text-sm font-bold text-gray-500 bg-gray-50">No</div>
+                        {activeBlock.type === 'yes_no' && (() => {
+                          const val = previewData[activeBlock.id];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div className="flex gap-4">
+                                <button 
+                                  type="button" 
+                                  onClick={() => updatePreviewData(activeBlock.id, 'yes')}
+                                  className={`flex-1 border rounded py-3 text-center text-sm font-bold transition-colors ${val === 'yes' ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}`}
+                                >
+                                  Yes
+                                </button>
+                                <button 
+                                  type="button" 
+                                  onClick={() => updatePreviewData(activeBlock.id, 'no')}
+                                  className={`flex-1 border rounded py-3 text-center text-sm font-bold transition-colors ${val === 'no' ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}`}
+                                >
+                                  No
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
-                        {activeBlock.type === 'terms' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="flex items-start gap-3 p-4 border border-gray-200 rounded bg-gray-50">
-                              <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0 mt-0.5 bg-white"></span>
-                              <span className="text-xs text-gray-600 leading-relaxed">{activeBlock.options?.[0]?.label || 'I agree to the terms'}</span>
+                        {activeBlock.type === 'terms' && (() => {
+                          const isChecked = previewData[activeBlock.id] || false;
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div 
+                                className="flex items-start gap-3 p-4 border border-gray-200 rounded bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                onClick={() => updatePreviewData(activeBlock.id, !isChecked)}
+                              >
+                                <span className={`w-4 h-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${isChecked ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-300'}`}>
+                                  {isChecked && <span className="material-symbols-outlined text-[12px] font-bold">check</span>}
+                                </span>
+                                <span className="text-xs text-gray-600 leading-relaxed select-none">{activeBlock.options?.[0]?.label || 'I agree to the terms'}</span>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                         {activeBlock.type === 'heading' && (
                           <div className="pt-4 pb-2 border-b-2 border-gray-900">
@@ -1867,17 +1898,35 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {(activeBlock.type === 'upload' || activeBlock.type === 'fileupload') && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="border-2 border-dashed border-gray-200 rounded p-6 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-                              <span className="material-symbols-outlined text-[32px] text-gray-300 mb-1">cloud_upload</span>
-                              <span className="text-[10px]">Tap to upload files</span>
+                        {(activeBlock.type === 'upload' || activeBlock.type === 'fileupload') && (() => {
+                          const file = previewData[activeBlock.id];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <label className="block w-full cursor-pointer">
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  onChange={(e) => {
+                                    if(e.target.files && e.target.files[0]) {
+                                      updatePreviewData(activeBlock.id, { name: e.target.files[0].name });
+                                    }
+                                  }}
+                                />
+                                <div className={`border-2 border-dashed rounded p-6 flex flex-col items-center justify-center transition-colors ${file ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300'} text-gray-400`}>
+                                  <span className={`material-symbols-outlined text-[32px] mb-1 ${file ? 'text-gray-900' : 'text-gray-300'}`}>
+                                    {file ? 'draft' : 'cloud_upload'}
+                                  </span>
+                                  <span className={`text-[10px] ${file ? 'text-gray-900 font-bold' : ''}`}>
+                                    {file ? file.name : 'Tap to upload files'}
+                                  </span>
+                                </div>
+                              </label>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                       </div>
                     );
