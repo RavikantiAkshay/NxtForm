@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavbar from '../components/TopNavbar';
 
@@ -9,6 +9,19 @@ export default function MyFormsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem('nxtform_user') || '{"name":"User"}');
+  const cursorOrbRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (cursorOrbRef.current) {
+        // Offset by half the width/height (250px) to center it on the cursor
+        cursorOrbRef.current.style.transform = `translate(${e.clientX - 250}px, ${e.clientY - 250}px)`;
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchForms = async () => {
@@ -63,8 +76,12 @@ export default function MyFormsPage() {
   return (
     <div className="bg-[#050505] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased relative">
       {/* Background glow orbs for premium aesthetic */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#8b5cf6]/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none"></div>
+      <div 
+        ref={cursorOrbRef} 
+        className="fixed top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-[#8b5cf6]/20 via-[#6366f1]/20 to-transparent rounded-full blur-[100px] pointer-events-none z-0 transition-transform duration-700 ease-out"
+        style={{ transform: 'translate(-250px, -250px)' }} // Initial off-screen or center
+      ></div>
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
       <TopNavbar />
 
