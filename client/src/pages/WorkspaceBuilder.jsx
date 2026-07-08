@@ -47,6 +47,131 @@ const SortableBlock = ({ id, children }) => {
   );
 };
 
+const SignaturePad = ({ onChange }) => {
+  const canvasRef = React.useRef(null);
+  const [isDrawing, setIsDrawing] = React.useState(false);
+  const [history, setHistory] = React.useState([]);
+
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    e.preventDefault();
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    
+    const canvas = canvasRef.current;
+    const dataUrl = canvas.toDataURL();
+    
+    setHistory(prev => [...prev, dataUrl]);
+    onChange(dataUrl);
+  };
+
+  const undo = () => {
+    if (history.length === 0) return;
+    const newHistory = [...history];
+    newHistory.pop(); // remove last stroke
+    setHistory(newHistory);
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    if (newHistory.length > 0) {
+      const img = new Image();
+      img.src = newHistory[newHistory.length - 1];
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        onChange(newHistory[newHistory.length - 1]);
+      };
+    } else {
+      onChange(null);
+    }
+  };
+
+  const clear = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHistory([]);
+    onChange(null);
+  };
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#111827';
+  }, []);
+
+  return (
+    <div className="relative border-2 border-gray-200 rounded h-32 bg-gray-50 overflow-hidden">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full cursor-crosshair touch-none relative z-10"
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
+      />
+      <div className="absolute bottom-2 right-2 flex gap-3 z-20">
+        <button 
+          type="button" 
+          disabled={history.length === 0}
+          className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${history.length === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-900'}`}
+          onClick={undo}
+        >
+          Undo
+        </button>
+        <button 
+          type="button" 
+          disabled={history.length === 0}
+          className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${history.length === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-900'}`}
+          onClick={clear}
+        >
+          Clear
+        </button>
+      </div>
+      {history.length === 0 && !isDrawing && (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40 text-gray-400 z-0">
+          <span className="text-xs select-none">Draw signature here</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
 
@@ -1869,9 +1994,7 @@ export default function WorkspaceBuilder() {
                             <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
                               {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
                             </h2>
-                            <div className="border-2 border-gray-200 rounded p-6 h-32 flex items-center justify-center text-gray-400 bg-gray-50">
-                              <span className="text-xs">Draw signature here</span>
-                            </div>
+                            <SignaturePad onChange={(dataUrl) => updatePreviewData(activeBlock.id, dataUrl)} />
                           </div>
                         )}
 
