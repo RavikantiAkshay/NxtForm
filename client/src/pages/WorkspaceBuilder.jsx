@@ -1258,7 +1258,8 @@ export default function WorkspaceBuilder() {
               )}
 
               {/* Screen Content */}
-              <div className="flex-1 bg-white pt-10 pb-6 px-5 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left">
+              <div className={`flex-1 flex flex-col relative overflow-y-auto hide-scrollbar text-gray-900 text-left ${previewDevice === 'desktop' ? 'bg-[#f5f5f5] items-center py-10 px-8' : 'bg-white pt-10 pb-6 px-5'}`}>
+                <div className={`flex flex-col flex-1 w-full ${previewDevice === 'desktop' ? 'max-w-3xl bg-white shadow-sm rounded-xl p-10 border border-gray-200' : ''}`}>
                 {/* Progress bar */}
                 <div className="w-full h-1 bg-gray-100 mb-6 rounded-full overflow-hidden">
                   <div
@@ -2635,6 +2636,7 @@ export default function WorkspaceBuilder() {
                       </button>
                     </div>
                   )}
+                </div>
                 </div>
               </div>
             </div>
