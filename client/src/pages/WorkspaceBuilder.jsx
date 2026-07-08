@@ -184,6 +184,7 @@ export default function WorkspaceBuilder() {
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [templateSearch, setTemplateSearch] = useState('');
   const [previewData, setPreviewData] = useState({});
   const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
   const [blocks, setBlocks] = useState([
@@ -484,195 +485,169 @@ export default function WorkspaceBuilder() {
 
               {/* Ready-to-use Templates (Compact List) */}
               <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Templates</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-label-sm text-label-sm text-on-surface-variant">Templates</h3>
+                  <div className="flex items-center bg-[#1a1a1a] rounded px-2 py-1 w-24">
+                    <span className="material-symbols-outlined text-[12px] text-gray-500 mr-1">search</span>
+                    <input 
+                      type="text" 
+                      placeholder="Search..." 
+                      value={templateSearch}
+                      onChange={(e) => setTemplateSearch(e.target.value)}
+                      className="bg-transparent border-none outline-none text-[10px] text-white w-full placeholder-gray-500"
+                    />
+                  </div>
+                </div>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => addBlock('fullname', 'Full Name', 'person')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">person</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Full Name</span>
-                  </button>
-                  <button onClick={() => addBlock('email', 'Email Address', 'mail')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">mail</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Email</span>
-                  </button>
-                  <button onClick={() => addBlock('phone', 'Phone Number', 'call')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">call</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Phone Number</span>
-                  </button>
-                  <button onClick={() => addBlock('address', 'Address', 'home')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">home</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Address</span>
-                  </button>
-                  <button onClick={() => addBlock('company', 'Company Name', 'domain')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">domain</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Company</span>
-                  </button>
-                  <button onClick={() => addBlock('country', 'Country Selector', 'public')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">public</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Country</span>
-                  </button>
-                  <button onClick={() => addBlock('language', 'Language Selector', 'translate')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">translate</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Language</span>
-                  </button>
-                  <button onClick={() => addBlock('url', 'Website URL', 'link')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">link</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Website URL</span>
-                  </button>
-                  <button onClick={() => addBlock('password', 'Password', 'password')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">password</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Password</span>
-                  </button>
-                  <button onClick={() => addBlock('date', 'Date Picker', 'calendar_today')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Date</span>
-                  </button>
-                  <button onClick={() => addBlock('time', 'Time Picker', 'schedule')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">schedule</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Time</span>
-                  </button>
-                  <button onClick={() => addBlock('date_range', 'Date Range', 'date_range')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">date_range</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Date Range</span>
-                  </button>
-                  <button onClick={() => addBlock('number', 'Number Field', 'tag')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">tag</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Number</span>
-                  </button>
+                  {[
+                    { type: 'fullname', label: 'Full Name', icon: 'person' },
+                    { type: 'email', label: 'Email Address', icon: 'mail' },
+                    { type: 'phone', label: 'Phone Number', icon: 'call' },
+                    { type: 'address', label: 'Address', icon: 'home' },
+                    { type: 'company', label: 'Company Name', icon: 'domain' },
+                    { type: 'country', label: 'Country Selector', icon: 'public' },
+                    { type: 'language', label: 'Language Selector', icon: 'translate' },
+                    { type: 'url', label: 'Website URL', icon: 'link' },
+                    { type: 'password', label: 'Password', icon: 'password' },
+                    { type: 'date', label: 'Date Picker', icon: 'calendar_today' },
+                    { type: 'time', label: 'Time Picker', icon: 'schedule' },
+                    { type: 'date_range', label: 'Date Range', icon: 'date_range' },
+                    { type: 'number', label: 'Number Field', icon: 'tag' }
+                  ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
+                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* Interactive & Specialized */}
+              {/* Interactive & Specialized */}
+              {[{ type: 'matrix', label: 'Matrix / Grid', icon: 'grid_on' },
+                { type: 'slider', label: 'Slider', icon: 'linear_scale' },
+                { type: 'counter', label: 'Counter (+/-)', icon: 'exposure' },
+                { type: 'tags', label: 'Tags / Chips', icon: 'label' },
+                { type: 'color_picker', label: 'Color Picker', icon: 'palette' },
+                { type: 'otp', label: 'OTP Input', icon: 'pin' }
+               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Interactive</h3>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => addBlock('matrix', 'Matrix / Grid', 'grid_on')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">grid_on</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Matrix / Grid</span>
-                  </button>
-                  <button onClick={() => addBlock('slider', 'Slider', 'linear_scale')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">linear_scale</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Slider</span>
-                  </button>
-                  <button onClick={() => addBlock('counter', 'Counter (+/-)', 'exposure')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">exposure</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Counter</span>
-                  </button>
-                  <button onClick={() => addBlock('tags', 'Tags / Chips', 'label')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">label</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Tags / Chips</span>
-                  </button>
-                  <button onClick={() => addBlock('color_picker', 'Color Picker', 'palette')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">palette</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Color Picker</span>
-                  </button>
-                  <button onClick={() => addBlock('otp', 'OTP Input', 'pin')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">pin</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">OTP Input</span>
-                  </button>
+                  {[{ type: 'matrix', label: 'Matrix / Grid', icon: 'grid_on' },
+                    { type: 'slider', label: 'Slider', icon: 'linear_scale' },
+                    { type: 'counter', label: 'Counter (+/-)', icon: 'exposure' },
+                    { type: 'tags', label: 'Tags / Chips', icon: 'label' },
+                    { type: 'color_picker', label: 'Color Picker', icon: 'palette' },
+                    { type: 'otp', label: 'OTP Input', icon: 'pin' }
+                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
+                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+              )}
 
               {/* Ratings & Scales */}
+              {[{ type: 'rating_stars', label: 'Star Rating', icon: 'star' },
+                { type: 'emoji_rating', label: 'Emoji Rating', icon: 'mood' },
+                { type: 'nps', label: 'NPS (0-10)', icon: 'speed' },
+                { type: 'linear_scale', label: 'Linear Scale (1-5)', icon: 'linear_scale' },
+                { type: 'yes_no', label: 'Yes/No Toggle', icon: 'toggle_on' }
+               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Ratings & Scales</h3>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => addBlock('rating_stars', 'Star Rating', 'star')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">star</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Star Rating</span>
-                  </button>
-                  <button onClick={() => addBlock('emoji_rating', 'Emoji Rating', 'mood')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">mood</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Emoji Rating</span>
-                  </button>
-                  <button onClick={() => addBlock('nps', 'NPS (0-10)', 'speed')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">speed</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">NPS (0-10)</span>
-                  </button>
-                  <button onClick={() => addBlock('linear_scale', 'Linear Scale', 'linear_scale')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">linear_scale</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Linear Scale (1-5)</span>
-                  </button>
-                  <button onClick={() => addBlock('yes_no', 'Yes/No Toggle', 'toggle_on')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">toggle_on</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Yes / No Toggle</span>
-                  </button>
+                  {[{ type: 'rating_stars', label: 'Star Rating', icon: 'star' },
+                    { type: 'emoji_rating', label: 'Emoji Rating', icon: 'mood' },
+                    { type: 'nps', label: 'NPS (0-10)', icon: 'speed' },
+                    { type: 'linear_scale', label: 'Linear Scale (1-5)', icon: 'linear_scale' },
+                    { type: 'yes_no', label: 'Yes/No Toggle', icon: 'toggle_on' }
+                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
+                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+              )}
 
               {/* Advanced & Legal */}
+              {[{ type: 'credit_card', label: 'Credit Card Payment', icon: 'credit_card' },
+                { type: 'fileupload', label: 'File Upload', icon: 'upload_file' },
+                { type: 'signature', label: 'Signature Pad', icon: 'draw' },
+                { type: 'terms', label: 'Terms & Conditions', icon: 'gavel' }
+               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Advanced & Legal</h3>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => addBlock('credit_card', 'Credit Card Payment', 'credit_card')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">credit_card</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Credit Card</span>
-                  </button>
-                  <button onClick={() => addBlock('fileupload', 'File Upload', 'upload_file')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">upload_file</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">File Upload</span>
-                  </button>
-                  <button onClick={() => addBlock('signature', 'Signature Pad', 'draw')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">draw</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Signature Pad</span>
-                  </button>
-                  <button onClick={() => addBlock('terms', 'Terms & Conditions', 'gavel')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">gavel</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Terms & Conditions</span>
-                  </button>
+                  {[{ type: 'credit_card', label: 'Credit Card Payment', icon: 'credit_card' },
+                    { type: 'fileupload', label: 'File Upload', icon: 'upload_file' },
+                    { type: 'signature', label: 'Signature Pad', icon: 'draw' },
+                    { type: 'terms', label: 'Terms & Conditions', icon: 'gavel' }
+                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
+                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+              )}
 
               {/* Layout */}
+              {[{ type: 'heading', label: 'Section Heading', icon: 'title' },
+                { type: 'divider', label: 'Divider', icon: 'horizontal_rule' },
+                { type: 'spacer', label: 'Spacer', icon: 'space_bar' }
+               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Layout</h3>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => addBlock('heading', 'Section Heading', 'title')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">title</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Section Heading</span>
-                  </button>
-                  <button onClick={() => addBlock('divider', 'Divider', 'horizontal_rule')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">horizontal_rule</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Divider</span>
-                  </button>
-                  <button onClick={() => addBlock('spacer', 'Spacer', 'space_bar')} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
-                    <span className="material-symbols-outlined text-[18px]">space_bar</span>
-                    <span className="text-[12px] font-medium tracking-wide flex-1">Spacer</span>
-                  </button>
+                  {[{ type: 'heading', label: 'Section Heading', icon: 'title' },
+                    { type: 'divider', label: 'Divider', icon: 'horizontal_rule' },
+                    { type: 'spacer', label: 'Spacer', icon: 'space_bar' }
+                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button key={t.type} onClick={() => addBlock(t.type, t.label, t.icon)} className="w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group">
+                      <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+                      <span className="text-[12px] font-medium tracking-wide flex-1">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+              )}
 
               {/* Smart AI Fields */}
+              {[{ type: 'sentiment', label: 'AI Sentiment', icon: 'psychology', desc: 'Analysis text inputs' },
+                { type: 'upload', label: 'Smart Upload', icon: 'document_scanner', desc: 'Auto-extract metadata' }
+               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
               <div>
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
                   Smart AI Fields
                 </h3>
                 <div className="space-y-2">
-                  <button
-                    onClick={() => addBlock('sentiment', 'AI Sentiment', 'psychology')}
-                    className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
-                  >
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="material-symbols-outlined text-primary">psychology</span>
-                    <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm text-on-surface">AI Sentiment</span>
-                      <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">Analysis text inputs</span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => addBlock('upload', 'Smart Upload', 'document_scanner')}
-                    className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
-                  >
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="material-symbols-outlined text-primary">document_scanner</span>
-                    <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm text-on-surface">Smart Upload</span>
-                      <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">Auto-extract metadata</span>
-                    </div>
-                  </button>
+                  {[{ type: 'sentiment', label: 'AI Sentiment', icon: 'psychology', desc: 'Analysis text inputs' },
+                    { type: 'upload', label: 'Smart Upload', icon: 'document_scanner', desc: 'Auto-extract metadata' }
+                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
+                    <button
+                      key={t.type}
+                      onClick={() => addBlock(t.type, t.label, t.icon)}
+                      className="w-full border border-outline-variant bg-surface-container-high p-3 flex items-center gap-3 hover:border-primary transition-colors text-left rounded-sm relative overflow-hidden group"
+                    >
+                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <span className="material-symbols-outlined text-primary">{t.icon}</span>
+                      <div className="flex flex-col">
+                        <span className="font-label-sm text-label-sm text-on-surface">{t.label}</span>
+                        <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">{t.desc}</span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
+              )}
 
             </div>
           </aside>
@@ -1204,6 +1179,18 @@ export default function WorkspaceBuilder() {
                                 </div>
                               ))}
                             </div>
+                          </div>
+                        )}
+
+                        {activeBlock.type === 'longtext' && (
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                            <textarea
+                              value={previewData[activeBlock.id] || ''}
+                              onChange={(e) => updatePreviewData(activeBlock.id, e.target.value)}
+                              placeholder={activeBlock.placeholder || "Type your response here..."}
+                              className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors h-32 resize-y"
+                            />
                           </div>
                         )}
 
@@ -2286,18 +2273,6 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {activeBlock.type === 'longtext' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <textarea
-                              disabled
-                              placeholder={activeBlock.placeholder || 'Enter details...'}
-                              className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 h-20 resize-none"
-                            />
-                          </div>
-                        )}
 
                         {activeBlock.type === 'choice' && (() => {
                           const val = previewData[activeBlock.id];
