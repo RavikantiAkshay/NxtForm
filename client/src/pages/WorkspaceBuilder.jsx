@@ -271,6 +271,8 @@ export default function WorkspaceBuilder() {
   const [templateSearch, setTemplateSearch] = useState('');
   const [previewData, setPreviewData] = useState({});
   const [isPublishing, setIsPublishing] = useState(false);
+  const [formId, setFormId] = useState(null);
+  const [lastPublishedState, setLastPublishedState] = useState(null);
   const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
   const initialBlocks = [
     {
@@ -344,22 +346,35 @@ export default function WorkspaceBuilder() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/forms', {
-        method: 'POST',
+      const currentState = JSON.stringify({
+        title: formTitle,
+        mode: formMode,
+        blocks: blocks
+      });
+
+      if (lastPublishedState === currentState) {
+        alert('Form is already published and up-to-date!');
+        setIsPublishing(false);
+        return;
+      }
+
+      const url = formId ? `http://localhost:5000/api/forms/${formId}` : 'http://localhost:5000/api/forms';
+      const method = formId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          title: formTitle,
-          mode: formMode,
-          blocks: blocks
-        })
+        body: currentState
       });
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Form published successfully! Unique ID: ${data._id}`);
+        setFormId(data._id);
+        setLastPublishedState(currentState);
+        alert(`Form ${formId ? 'updated' : 'published'} successfully! Unique ID: ${data._id}`);
       } else {
         const errorData = await response.json();
         alert(`Failed to publish form: ${errorData.message}`);
