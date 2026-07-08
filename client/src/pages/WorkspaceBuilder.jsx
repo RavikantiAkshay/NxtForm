@@ -1283,12 +1283,12 @@ export default function WorkspaceBuilder() {
 
                 {/* Displaying active block content — Conversational: single block, Classic: all blocks */}
                 <div className="flex-1 flex flex-col justify-start pb-4">
-                  {blocks.length === 0 ? (
+                  {visibleBlocks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
                       <span className="material-symbols-outlined text-4xl mb-2">inbox</span>
                       <p className="text-sm">Empty Form</p>
                     </div>
-                  ) : (formMode === 'conversational' ? [activeBlock] : blocks).map((renderBlock, idx) => {
+                  ) : (formMode === 'conversational' ? [activeBlock] : visibleBlocks).map((renderBlock, idx) => {
                     const activeBlock = renderBlock;
                     if (!activeBlock) return null;
                     return (
@@ -1301,8 +1301,8 @@ export default function WorkspaceBuilder() {
                             {formMode === 'conversational' && (
                               <button
                                 onClick={() => {
-                                  if (blocks.length > 1) {
-                                    setActiveBlockId(blocks[1].id);
+                                  if (visibleBlocks.length > 1) {
+                                    setActiveBlockId(visibleBlocks[1].id);
                                   }
                                 }}
                                 className="px-6 py-2 bg-gray-900 text-white font-label-md text-label-md w-full rounded-sm"
@@ -2616,9 +2616,24 @@ export default function WorkspaceBuilder() {
                       );
                     })()
                   ) : (
-                    <button className="w-full h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-black transition-colors">
-                      {currentPage < totalPages ? 'Next Page' : 'Submit'}
-                    </button>
+                    <div className="flex gap-3 w-full">
+                      {currentPage > 1 && (
+                        <button 
+                          onClick={() => setCurrentPage(prev => prev - 1)}
+                          className="flex-1 h-10 bg-white text-gray-900 border border-gray-200 flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-gray-50 transition-colors"
+                        >
+                          Previous Page
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => {
+                          if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+                        }}
+                        className="flex-1 h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-black transition-colors"
+                      >
+                        {currentPage < totalPages ? 'Next Page' : 'Submit'}
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
