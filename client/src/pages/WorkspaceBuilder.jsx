@@ -269,7 +269,7 @@ export default function WorkspaceBuilder() {
       newBlock.title = naturalTitles[type];
     }
 
-    if (type === 'choice' || type === 'dropdown') {
+    if (type === 'choice' || type === 'dropdown' || type === 'checkbox') {
       newBlock.options = [
         { value: '1', label: 'Option 1' },
         { value: '2', label: 'Option 2' },
