@@ -903,27 +903,52 @@ export default function WorkspaceBuilder() {
                                     </div>
                                   )}
 
-                                  {/* Choice/Dropdown Options List */}
-                                  {(block.type === 'choice' || block.type === 'dropdown') && (
+                                  {/* Choice/Dropdown/Checkbox Options List */}
+                                  {(block.type === 'choice' || block.type === 'dropdown' || block.type === 'checkbox') && (
                                     <div className="space-y-2 mt-2">
                                       {block.options?.map((opt, i) => (
-                                        <div key={i} className="flex items-center gap-2">
-                                          <span className="material-symbols-outlined text-gray-300 text-sm">radio_button_unchecked</span>
-                                          <input
-                                            type="text"
-                                            value={opt.label}
-                                            onChange={(e) => {
-                                              const newOpts = [...block.options];
-                                              newOpts[i].label = e.target.value;
-                                              updateBlockValue(block.id, 'options', newOpts);
+                                        <div key={i} className="flex items-center justify-between group">
+                                          <div className="flex items-center gap-2 flex-1">
+                                            <span className="material-symbols-outlined text-gray-300 text-sm">
+                                              {block.type === 'checkbox' ? 'check_box_outline_blank' : 'radio_button_unchecked'}
+                                            </span>
+                                            <input
+                                              type="text"
+                                              value={opt.label}
+                                              onChange={(e) => {
+                                                const newOpts = [...block.options];
+                                                newOpts[i].label = e.target.value;
+                                                updateBlockValue(block.id, 'options', newOpts);
+                                              }}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                  e.preventDefault();
+                                                  const newOpts = [...block.options];
+                                                  newOpts.splice(i + 1, 0, { value: `option-${Date.now()}`, label: `Option ${newOpts.length + 1}` });
+                                                  updateBlockValue(block.id, 'options', newOpts);
+                                                }
+                                              }}
+                                              className="bg-transparent border-none text-gray-700 text-sm p-0 focus:ring-0 focus:border-b focus:border-primary focus:outline-none w-full"
+                                            />
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (block.options.length > 1) {
+                                                const newOpts = block.options.filter((_, idx) => idx !== i);
+                                                updateBlockValue(block.id, 'options', newOpts);
+                                              }
                                             }}
-                                            className="bg-transparent border-none text-gray-700 text-sm p-0 focus:ring-0 focus:border-b focus:border-primary focus:outline-none"
-                                          />
+                                            className={`text-gray-300 hover:text-red-500 transition-colors ${block.options.length <= 1 ? 'invisible' : 'opacity-0 group-hover:opacity-100'}`}
+                                            title="Remove Option"
+                                          >
+                                            <span className="material-symbols-outlined text-[16px]">close</span>
+                                          </button>
                                         </div>
                                       ))}
                                       <button
                                         onClick={() => {
-                                          const newOpts = [...block.options, { value: `${block.options.length + 1}`, label: `Option ${block.options.length + 1}` }];
+                                          const newOpts = [...block.options, { value: `option-${Date.now()}`, label: `Option ${block.options.length + 1}` }];
                                           updateBlockValue(block.id, 'options', newOpts);
                                         }}
                                         className="text-primary text-xs font-semibold hover:underline mt-2 flex items-center gap-1"
@@ -2011,21 +2036,33 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {activeBlock.type === 'choice' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                              {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                            </h2>
-                            <div className="space-y-2">
-                              {activeBlock.options?.map((opt, i) => (
-                                <div key={i} className="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                                  <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"></span>
-                                  <span className="text-sm text-gray-700">{opt.label}</span>
-                                </div>
-                              ))}
+                        {activeBlock.type === 'choice' && (() => {
+                          const val = previewData[activeBlock.id];
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                              </h2>
+                              <div className="space-y-2">
+                                {activeBlock.options?.map((opt, i) => {
+                                  const isSelected = val === opt.value;
+                                  return (
+                                    <div 
+                                      key={i} 
+                                      onClick={() => updatePreviewData(activeBlock.id, opt.value)}
+                                      className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isSelected ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                                    >
+                                      <span className={`w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors ${isSelected ? 'border-gray-900' : 'border-gray-300'}`}>
+                                        {isSelected && <span className="w-2 h-2 rounded-full bg-gray-900"></span>}
+                                      </span>
+                                      <span className={`text-sm ${isSelected ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                         {activeBlock.type === 'dropdown' && (
                           <div>
