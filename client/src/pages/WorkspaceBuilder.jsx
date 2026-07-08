@@ -1579,6 +1579,7 @@ export default function WorkspaceBuilder() {
                                   }}
                                   className="text-sm text-gray-700 font-mono uppercase border-none focus:ring-0 p-0 w-full bg-transparent outline-none flex-1"
                                   placeholder="#HEXCODE"
+                                  maxLength={7}
                                 />
                               </div>
                             </div>
@@ -1625,21 +1626,86 @@ export default function WorkspaceBuilder() {
                           );
                         })()}
 
-                        {activeBlock.type === 'credit_card' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="border border-gray-200 rounded overflow-hidden">
-                              <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center">
-                                <span className="text-gray-400 text-sm">Card Number</span>
-                                <span className="material-symbols-outlined text-gray-300">credit_card</span>
-                              </div>
-                              <div className="flex bg-white">
-                                <div className="p-3 border-r border-gray-200 flex-1 text-gray-400 text-sm">MM/YY</div>
-                                <div className="p-3 flex-1 text-gray-400 text-sm">CVC</div>
+                        {activeBlock.type === 'credit_card' && (() => {
+                          const val = previewData[activeBlock.id] || { number: '', expiry: '', cvc: '' };
+                          
+                          const formatCardNumber = (num) => {
+                            const cleaned = ('' + num).replace(/\D/g, '');
+                            const match = cleaned.match(/.{1,4}/g);
+                            return match ? match.join(' ') : cleaned;
+                          };
+                          
+                          const formatExpiry = (exp) => {
+                            let cleaned = ('' + exp).replace(/\D/g, '');
+                            if (cleaned.length > 0) {
+                              if (parseInt(cleaned[0]) > 1) cleaned = '0' + cleaned;
+                              if (cleaned.length >= 2) {
+                                let mm = parseInt(cleaned.substring(0, 2));
+                                if (mm > 12) cleaned = '12' + cleaned.substring(2);
+                                if (mm === 0 && cleaned.length >= 2) cleaned = '01' + cleaned.substring(2);
+                                cleaned = cleaned.substring(0, 2) + (cleaned.length > 2 ? '/' + cleaned.substring(2, 4) : '');
+                              }
+                            }
+                            return cleaned;
+                          };
+
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="border border-gray-200 rounded overflow-hidden bg-white focus-within:border-gray-900 transition-colors">
+                                <div className="p-3 border-b border-gray-200 flex justify-between items-center relative">
+                                  <input 
+                                    type="text"
+                                    value={val.number || ''}
+                                    onChange={(e) => {
+                                      const cleaned = e.target.value.replace(/\D/g, '');
+                                      if (cleaned.length <= 16) {
+                                        updatePreviewData(activeBlock.id, { ...val, number: formatCardNumber(cleaned) });
+                                      }
+                                    }}
+                                    placeholder="Card Number"
+                                    className="w-full text-sm outline-none bg-transparent"
+                                  />
+                                  <span className="material-symbols-outlined text-gray-300 absolute right-3 pointer-events-none">credit_card</span>
+                                </div>
+                                <div className="flex bg-white">
+                                  <div className="border-r border-gray-200 flex-1 relative">
+                                    <input 
+                                      type="text"
+                                      value={val.expiry || ''}
+                                      onChange={(e) => {
+                                        const newVal = e.target.value;
+                                        if (val.expiry?.endsWith('/') && newVal.length === val.expiry.length - 1) {
+                                          updatePreviewData(activeBlock.id, { ...val, expiry: newVal.slice(0, -1) });
+                                        } else {
+                                          updatePreviewData(activeBlock.id, { ...val, expiry: formatExpiry(newVal) });
+                                        }
+                                      }}
+                                      placeholder="MM/YY"
+                                      className="w-full p-3 text-sm outline-none bg-transparent"
+                                      maxLength={5}
+                                    />
+                                  </div>
+                                  <div className="flex-1 relative">
+                                    <input 
+                                      type="text"
+                                      value={val.cvc || ''}
+                                      onChange={(e) => {
+                                        const cleaned = e.target.value.replace(/\D/g, '');
+                                        if (cleaned.length <= 4) {
+                                          updatePreviewData(activeBlock.id, { ...val, cvc: cleaned });
+                                        }
+                                      }}
+                                      placeholder="CVC"
+                                      className="w-full p-3 text-sm outline-none bg-transparent"
+                                      maxLength={4}
+                                    />
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
 
                         {activeBlock.type === 'matrix' && (() => {
                           const val = previewData[activeBlock.id] || {};
