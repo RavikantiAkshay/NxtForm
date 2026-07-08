@@ -14,7 +14,8 @@ const formBlockSchema = new mongoose.Schema({
     label: String
   }],
   aiLogic: { type: String },
-  buttonText: { type: String }
+  buttonText: { type: String },
+  page: { type: Number, default: 1 }
 });
 
 const formSchema = new mongoose.Schema({

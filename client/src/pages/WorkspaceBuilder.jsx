@@ -270,6 +270,7 @@ export default function WorkspaceBuilder() {
   const [totalPages, setTotalPages] = useState(1);
   const [templateSearch, setTemplateSearch] = useState('');
   const [previewData, setPreviewData] = useState({});
+  const [isPublishing, setIsPublishing] = useState(false);
   const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
   const initialBlocks = [
     {
@@ -331,6 +332,43 @@ export default function WorkspaceBuilder() {
       setBlockHistoryIndex(blockHistoryIndex + 1);
       setBlocksState(blockHistory[blockHistoryIndex + 1]);
     }
+  };
+
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      const token = localStorage.getItem('nxtform_token');
+      if (!token) {
+        alert('You must be logged in to publish a form.');
+        setIsPublishing(false);
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: formTitle,
+          mode: formMode,
+          blocks: blocks
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Form published successfully! Unique ID: ${data._id}`);
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to publish form: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error publishing form:', error);
+      alert('An error occurred while publishing the form.');
+    }
+    setIsPublishing(false);
   };
 
   // Sidebar item list helper
@@ -618,11 +656,14 @@ export default function WorkspaceBuilder() {
                 View Dashboard
               </button>
               <button
-                onClick={() => alert('Form published! Responses will now compile.')}
-                className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md font-bold hover:bg-primary-container hover:electric-violet-glow transition-all flex items-center gap-2"
+                onClick={handlePublish}
+                disabled={isPublishing}
+                className={`px-6 py-2 ${isPublishing ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary font-label-md text-label-md font-bold transition-all flex items-center gap-2`}
               >
-                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
-                Publish Form
+                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {isPublishing ? 'sync' : 'send'}
+                </span>
+                {isPublishing ? 'Publishing...' : 'Publish Form'}
               </button>
             </div>
           </div>
