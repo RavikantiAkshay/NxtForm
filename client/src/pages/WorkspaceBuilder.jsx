@@ -274,6 +274,8 @@ export default function WorkspaceBuilder() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [formId, setFormId] = useState(null);
   const [lastPublishedState, setLastPublishedState] = useState(null);
+  const [collectEmail, setCollectEmail] = useState(false);
+  const [isPublishedState, setIsPublishedState] = useState(false);
   const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
   const initialBlocks = [
     {
@@ -321,13 +323,18 @@ export default function WorkspaceBuilder() {
             setFormTitle(data.title);
             setFormMode(data.mode);
             setBlocksState(data.blocks);
+            setIsPublishedState(data.isPublished);
+            if (data.settings?.collectEmail !== undefined) {
+              setCollectEmail(data.settings.collectEmail);
+            }
             setBlockHistory([data.blocks]);
             setBlockHistoryIndex(0);
             
             const currentState = JSON.stringify({
               title: data.title,
               mode: data.mode,
-              blocks: data.blocks
+              blocks: data.blocks,
+              collectEmail: data.settings?.collectEmail || false
             });
             setLastPublishedState(currentState);
             
@@ -383,10 +390,11 @@ export default function WorkspaceBuilder() {
       const currentState = JSON.stringify({
         title: formTitle,
         mode: formMode,
-        blocks: blocks
+        blocks: blocks,
+        collectEmail: collectEmail
       });
 
-      if (lastPublishedState === currentState) {
+      if (lastPublishedState === currentState && isPublishedState === true) {
         alert('Form is already published and up-to-date!');
         setIsPublishing(false);
         return;
@@ -401,14 +409,23 @@ export default function WorkspaceBuilder() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: currentState
+        body: JSON.stringify({
+          title: formTitle,
+          mode: formMode,
+          blocks: blocks,
+          isPublished: true,
+          settings: {
+            collectEmail: collectEmail
+          }
+        })
       });
 
       if (response.ok) {
         const data = await response.json();
         setFormId(data._id);
         setLastPublishedState(currentState);
-        alert(`Form ${formId ? 'updated' : 'published'} successfully! Unique ID: ${data._id}`);
+        setIsPublishedState(true);
+        alert('Form published successfully! Anyone with the link can now fill it.');
       } else {
         const errorData = await response.json();
         alert(`Failed to publish form: ${errorData.message}`);
@@ -416,8 +433,32 @@ export default function WorkspaceBuilder() {
     } catch (error) {
       console.error('Error publishing form:', error);
       alert('An error occurred while publishing the form.');
+    } finally {
+      setIsPublishing(false);
     }
-    setIsPublishing(false);
+  };
+
+  const handleUnpublish = async () => {
+    if (!formId) return;
+    try {
+      const token = localStorage.getItem('nxtform_token');
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          isPublished: false
+        })
+      });
+      if (response.ok) {
+        setIsPublishedState(false);
+        alert('Form has been unpublished. It is no longer accessible to the public.');
+      }
+    } catch (error) {
+      console.error('Error unpublishing:', error);
+    }
   };
 
   // Sidebar item list helper
@@ -654,9 +695,9 @@ export default function WorkspaceBuilder() {
               <span className="material-symbols-outlined text-[18px] text-on-surface-variant">edit</span>
             </div>
 
-            <div className="ml-4 px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-primary font-label-sm text-label-sm flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-              Draft
+            <div className={`ml-4 px-2 py-0.5 border rounded font-label-sm text-label-sm flex items-center gap-1 ${isPublishedState ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
+              <span className={`w-2 h-2 rounded-full ${isPublishedState ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
+              {isPublishedState ? 'Published' : 'Draft'}
             </div>
           </div>
 
@@ -696,23 +737,47 @@ export default function WorkspaceBuilder() {
                 <span className="material-symbols-outlined">redo</span>
               </button>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center pl-2">
               <button
-                onClick={() => navigate(`/dashboard/customer-feedback`)}
-                className="px-4 py-2 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-md text-label-md flex items-center gap-2"
+                onClick={() => navigate(`/workspace`)}
+                className="px-4 py-2 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-md text-label-md flex items-center gap-2 rounded"
               >
-                <span className="material-symbols-outlined text-[18px]">visibility</span>
-                View Dashboard
+                <span className="material-symbols-outlined text-[18px]">dashboard</span>
+                Dashboard
               </button>
+              
+              <div className="h-6 w-px bg-outline-variant mx-1"></div>
+
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-400 hover:text-white transition-colors mr-2 group" title="Require respondents to share their email">
+                <input 
+                  type="checkbox" 
+                  checked={collectEmail} 
+                  onChange={(e) => setCollectEmail(e.target.checked)} 
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary focus:ring-offset-gray-900 cursor-pointer" 
+                />
+                <span className="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">alternate_email</span>
+                Collect Emails
+              </label>
+
+              {isPublishedState && (
+                <button
+                  onClick={handleUnpublish}
+                  className="px-4 py-2 border border-red-500/30 hover:border-red-500 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all font-label-md text-label-md flex items-center gap-2 rounded"
+                >
+                  <span className="material-symbols-outlined text-[18px]">unpublished</span>
+                  Unpublish
+                </button>
+              )}
+
               <button
                 onClick={handlePublish}
                 disabled={isPublishing}
-                className={`px-6 py-2 ${isPublishing ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary font-label-md text-label-md font-bold transition-all flex items-center gap-2`}
+                className={`px-6 py-2 ${isPublishing ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary font-label-md text-label-md font-bold transition-all flex items-center gap-2 rounded`}
               >
                 <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {isPublishing ? 'sync' : 'send'}
                 </span>
-                {isPublishing ? 'Publishing...' : 'Publish Form'}
+                {isPublishing ? 'Publishing...' : (isPublishedState ? 'Update Form' : 'Publish Form')}
               </button>
             </div>
           </div>

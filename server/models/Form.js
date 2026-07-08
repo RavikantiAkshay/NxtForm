@@ -42,6 +42,9 @@ const formSchema = new mongoose.Schema({
   theme: {
     primaryColor: { type: String, default: '#8b5cf6' },
     backgroundColor: { type: String, default: '#0a0a0a' }
+  },
+  settings: {
+    collectEmail: { type: Boolean, default: true }
   }
 }, {
   timestamps: true
