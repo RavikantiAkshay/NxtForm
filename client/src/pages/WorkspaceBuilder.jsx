@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
@@ -257,6 +257,7 @@ const DropZone = ({ index }) => {
 
 export default function WorkspaceBuilder() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // State for form blocks
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
@@ -308,6 +309,39 @@ export default function WorkspaceBuilder() {
   const [blocks, setBlocksState] = useState(initialBlocks);
   const [blockHistory, setBlockHistory] = useState([initialBlocks]);
   const [blockHistoryIndex, setBlockHistoryIndex] = useState(0);
+
+  useEffect(() => {
+    if (location.state?.formId) {
+      const fetchForm = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/api/forms/${location.state.formId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFormId(data._id);
+            setFormTitle(data.title);
+            setFormMode(data.mode);
+            setBlocksState(data.blocks);
+            setBlockHistory([data.blocks]);
+            setBlockHistoryIndex(0);
+            
+            const currentState = JSON.stringify({
+              title: data.title,
+              mode: data.mode,
+              blocks: data.blocks
+            });
+            setLastPublishedState(currentState);
+            
+            // Re-calculate total pages
+            const maxPage = Math.max(...data.blocks.map(b => b.page || 1), 1);
+            setTotalPages(maxPage);
+          }
+        } catch (error) {
+          console.error("Failed to fetch form:", error);
+        }
+      };
+      fetchForm();
+    }
+  }, [location.state?.formId]);
 
   const setBlocks = (newBlocksOrUpdater) => {
     setBlocksState(prev => {

@@ -1,61 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavbar from '../components/TopNavbar';
 
 export default function MyFormsPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [forms, setForms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem('nxtform_user') || '{"name":"User"}');
 
-  // Mock forms data
-  const forms = [
-    {
-      id: 'customer-feedback',
-      title: 'Customer Feedback Survey 2024',
-      description: 'Annual satisfaction survey with AI sentiment analysis for product improvement.',
-      status: 'published',
-      responses: 1248,
-      createdAt: 'Jun 15, 2024',
-      updatedAt: '2 hours ago',
-      icon: 'rate_review',
-    },
-    {
-      id: 'product-launch',
-      title: 'Product Launch Registration',
-      description: 'Pre-launch signup form with smart field validation and interest tracking.',
-      status: 'draft',
-      responses: 0,
-      createdAt: 'Jul 01, 2024',
-      updatedAt: '5 mins ago',
-      icon: 'rocket_launch',
-    },
-    {
-      id: 'employee-satisfaction',
-      title: 'Employee Satisfaction Q4',
-      description: 'Quarterly internal pulse survey with anonymous sentiment scoring.',
-      status: 'published',
-      responses: 356,
-      createdAt: 'May 22, 2024',
-      updatedAt: '1 day ago',
-      icon: 'groups',
-    },
-    {
-      id: 'event-rsvp',
-      title: 'Tech Summit RSVP',
-      description: 'Event registration with dietary preferences, session selection, and QR ticketing.',
-      status: 'published',
-      responses: 89,
-      createdAt: 'Jun 28, 2024',
-      updatedAt: '3 days ago',
-      icon: 'event',
-    },
-  ];
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
+        const token = localStorage.getItem('nxtform_token');
+        const response = await fetch('http://localhost:5000/api/forms', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setForms(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch forms:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchForms();
+  }, []);
 
   const filteredForms = forms.filter(
-    f => f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         f.description.toLowerCase().includes(searchQuery.toLowerCase())
+    f => (f.title || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   return (
     <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased">
@@ -86,7 +66,12 @@ export default function MyFormsPage() {
 
         {/* Forms Grid */}
         <div className="flex-1 overflow-y-auto px-8 py-6">
-          {filteredForms.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <span className="material-symbols-outlined text-[56px] text-[#8b5cf6] animate-spin mb-4">sync</span>
+              <h3 className="text-lg font-semibold text-[#555] mb-2">Loading your forms...</h3>
+            </div>
+          ) : filteredForms.length === 0 ? (
             /* Empty State */
             <div className="flex flex-col items-center justify-center h-full text-center">
               <span className="material-symbols-outlined text-[56px] text-[#222] mb-4">description</span>
@@ -108,38 +93,40 @@ export default function MyFormsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredForms.map((form) => (
                 <div
-                  key={form.id}
+                  key={form._id}
                   className="bg-[#111] border border-[#1e1e1e] rounded-xl p-5 flex flex-col hover:border-[#8b5cf6]/30 hover:shadow-[0_0_24px_rgba(139,92,246,0.06)] transition-all group cursor-pointer"
-                  onClick={() => navigate('/workspace/edit')}
+                  onClick={() => navigate('/workspace/edit', { state: { formId: form._id } })}
                 >
                   {/* Card Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="w-10 h-10 rounded-lg bg-[#8b5cf6]/8 border border-[#1e1e1e] flex items-center justify-center group-hover:bg-[#8b5cf6]/15 transition-colors">
-                      <span className="material-symbols-outlined text-[#8b5cf6] text-[20px]">{form.icon}</span>
+                      <span className="material-symbols-outlined text-[#8b5cf6] text-[20px]">{form.mode === 'conversational' ? 'swipe_up' : 'view_agenda'}</span>
                     </div>
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
-                      form.status === 'published'
+                      form.isPublished
                         ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                     }`}>
-                      {form.status === 'published' ? '● Published' : '● Draft'}
+                      {form.isPublished ? '● Published' : '● Draft'}
                     </span>
                   </div>
 
                   {/* Title & Description */}
                   <h3 className="text-[15px] font-semibold text-white mb-1.5 group-hover:text-[#c4b5fd] transition-colors">{form.title}</h3>
-                  <p className="text-[12px] text-[#6b6577] leading-relaxed mb-4 line-clamp-2">{form.description}</p>
+                  <p className="text-[12px] text-[#6b6577] leading-relaxed mb-4 line-clamp-2">
+                    {form.blocks?.length || 0} fields • {form.mode} mode
+                  </p>
 
                   {/* Footer Stats */}
                   <div className="mt-auto pt-4 border-t border-[#1a1a1a] flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5 text-[11px] text-[#555]">
                         <span className="material-symbols-outlined text-[14px]">forum</span>
-                        {form.responses} responses
+                        0 responses
                       </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-[#555]">
                         <span className="material-symbols-outlined text-[14px]">schedule</span>
-                        {form.updatedAt}
+                        {new Date(form.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
 
