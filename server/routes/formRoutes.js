@@ -82,4 +82,26 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// @desc    Delete a form
+// @route   DELETE /api/forms/:id
+// @access  Private
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const form = await Form.findById(req.params.id);
+
+    if (form) {
+      if (form.userId.toString() !== req.user._id.toString()) {
+        return res.status(401).json({ message: 'Not authorized to delete this form' });
+      }
+
+      await form.deleteOne();
+      res.json({ message: 'Form removed' });
+    } else {
+      res.status(404).json({ message: 'Form not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
