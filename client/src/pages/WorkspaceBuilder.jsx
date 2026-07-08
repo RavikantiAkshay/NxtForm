@@ -1298,15 +1298,7 @@ export default function WorkspaceBuilder() {
                           </div>
                         )}
 
-                        {activeBlock.type === 'time' && (
-                          <div>
-                            <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
-                            <div className="w-full p-3 border border-gray-200 rounded flex justify-between items-center text-sm text-gray-400 bg-gray-50">
-                              <span>--:-- AM/PM</span>
-                              <span className="material-symbols-outlined">schedule</span>
-                            </div>
-                          </div>
-                        )}
+
 
                         {activeBlock.type === 'date_range' && (() => {
                           const dateVal = previewData[activeBlock.id];
@@ -1867,6 +1859,78 @@ export default function WorkspaceBuilder() {
                             </div>
                           </div>
                         )}
+
+                        {activeBlock.type === 'time' && (() => {
+                          const val = previewData[activeBlock.id] || { hh: '', mm: '', period: 'AM' };
+
+                          const formatHH = (str) => {
+                            let cleaned = str.replace(/\D/g, '');
+                            if (cleaned.length > 0) {
+                              if (parseInt(cleaned[0]) > 1) cleaned = '0' + cleaned;
+                              if (cleaned.length >= 2) {
+                                let hh = parseInt(cleaned.substring(0, 2));
+                                if (hh > 12) cleaned = '12';
+                                if (hh === 0 && cleaned.length >= 2) cleaned = '01';
+                              }
+                            }
+                            return cleaned;
+                          };
+
+                          const formatMM = (str) => {
+                            let cleaned = str.replace(/\D/g, '');
+                            if (cleaned.length > 0) {
+                              if (parseInt(cleaned[0]) > 5) cleaned = '0' + cleaned;
+                              if (cleaned.length >= 2) {
+                                let mm = parseInt(cleaned.substring(0, 2));
+                                if (mm > 59) cleaned = '59';
+                              }
+                            }
+                            return cleaned;
+                          };
+
+                          return (
+                            <div>
+                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">{activeBlock.title}</h2>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded px-3 py-2 focus-within:border-gray-900 transition-colors">
+                                  <input 
+                                    type="text" 
+                                    placeholder="--" 
+                                    value={val.hh}
+                                    onChange={(e) => updatePreviewData(activeBlock.id, { ...val, hh: formatHH(e.target.value) })}
+                                    className="w-6 text-center text-sm font-medium bg-transparent outline-none"
+                                    maxLength={2}
+                                  />
+                                  <span className="text-gray-400 font-bold">:</span>
+                                  <input 
+                                    type="text" 
+                                    placeholder="--" 
+                                    value={val.mm}
+                                    onChange={(e) => updatePreviewData(activeBlock.id, { ...val, mm: formatMM(e.target.value) })}
+                                    className="w-6 text-center text-sm font-medium bg-transparent outline-none"
+                                    maxLength={2}
+                                  />
+                                </div>
+                                <div className="flex bg-gray-50 border border-gray-200 rounded overflow-hidden">
+                                  <button 
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, { ...val, period: 'AM' })}
+                                    className={`px-3 py-2 text-xs font-bold transition-colors ${val.period === 'AM' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-200'}`}
+                                  >
+                                    AM
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    onClick={() => updatePreviewData(activeBlock.id, { ...val, period: 'PM' })}
+                                    className={`px-3 py-2 text-xs font-bold transition-colors ${val.period === 'PM' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-200'}`}
+                                  >
+                                    PM
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {activeBlock.type === 'date' && (() => {
                           const dateVal = previewData[activeBlock.id];
