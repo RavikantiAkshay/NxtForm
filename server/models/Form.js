@@ -21,7 +21,8 @@ const formBlockSchema = new mongoose.Schema({
   min: Number,
   max: Number,
   minLabel: String,
-  maxLabel: String
+  maxLabel: String,
+  allowOther: { type: Boolean, default: false }
 });
 
 const formSchema = new mongoose.Schema({

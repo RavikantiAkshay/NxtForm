@@ -212,6 +212,21 @@ const PublishedForm = () => {
 
   const handleSubmit = async () => {
     try {
+      // Validate "Other" text inputs
+      for (const block of blocks) {
+        if (block.allowOther) {
+          const val = previewData[block.id];
+          const isOther = Array.isArray(val) ? val.includes('__other__') : val === '__other__';
+          if (isOther) {
+            const otherText = previewData[`${block.id}_other`];
+            if (!otherText || otherText.trim() === '') {
+              alert(`Please specify a value for "Other" in "${block.title}"`);
+              return;
+            }
+          }
+        }
+      }
+
       setSubmitting(true);
       const token = localStorage.getItem('nxtform_token');
       const answersArray = Object.entries(previewData).map(([blockId, value]) => ({ blockId, value }));
@@ -414,6 +429,39 @@ const PublishedForm = () => {
                                   </div>
                                 );
                               })}
+                              
+                              {activeBlock.allowOther && (() => {
+                                const isOtherChecked = previewData[activeBlock.id]?.includes('__other__');
+                                return (
+                                  <div className="flex flex-col gap-2">
+                                    <div
+                                      onClick={() => {
+                                        const current = previewData[activeBlock.id] || [];
+                                        const next = current.includes('__other__')
+                                          ? current.filter(v => v !== '__other__')
+                                          : [...current, '__other__'];
+                                        updatePreviewData(activeBlock.id, next);
+                                      }}
+                                      className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isOtherChecked ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                                    >
+                                      <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${isOtherChecked ? 'bg-gray-900 border-gray-900' : 'border-gray-300'}`}>
+                                        {isOtherChecked && <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>}
+                                      </span>
+                                      <span className={`text-sm ${isOtherChecked ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>Other</span>
+                                    </div>
+                                    {isOtherChecked && (
+                                      <input
+                                        type="text"
+                                        value={previewData[`${activeBlock.id}_other`] || ''}
+                                        onChange={(e) => updatePreviewData(`${activeBlock.id}_other`, e.target.value)}
+                                        placeholder="Please specify..."
+                                        className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors ml-7"
+                                        style={{ width: 'calc(100% - 28px)' }}
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           </div>
                         )}
@@ -1467,6 +1515,33 @@ const PublishedForm = () => {
                                     </div>
                                   );
                                 })}
+                                
+                                {activeBlock.allowOther && (() => {
+                                  const isOtherSelected = val === '__other__';
+                                  return (
+                                    <div className="flex flex-col gap-2">
+                                      <div
+                                        onClick={() => updatePreviewData(activeBlock.id, '__other__')}
+                                        className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${isOtherSelected ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                                      >
+                                        <span className={`w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors ${isOtherSelected ? 'border-gray-900' : 'border-gray-300'}`}>
+                                          {isOtherSelected && <span className="w-2 h-2 rounded-full bg-gray-900"></span>}
+                                        </span>
+                                        <span className={`text-sm ${isOtherSelected ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>Other</span>
+                                      </div>
+                                      {isOtherSelected && (
+                                        <input
+                                          type="text"
+                                          value={previewData[`${activeBlock.id}_other`] || ''}
+                                          onChange={(e) => updatePreviewData(`${activeBlock.id}_other`, e.target.value)}
+                                          placeholder="Please specify..."
+                                          className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors ml-7"
+                                          style={{ width: 'calc(100% - 28px)' }}
+                                        />
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                               </div>
                             </div>
                           );
@@ -1474,32 +1549,46 @@ const PublishedForm = () => {
 
                         {activeBlock.type === 'dropdown' && (() => {
                           const val = previewData[activeBlock.id];
-                          const selectedOpt = activeBlock.options?.find(o => o.value === val);
+                          const selectedOpt = activeBlock.options?.find(o => o.value === val) || (val === '__other__' ? { value: '__other__', label: 'Other' } : null);
                           const selectOptions = activeBlock.options?.map(opt => ({ value: opt.value, label: opt.label })) || [];
+                          if (activeBlock.allowOther) {
+                            selectOptions.push({ value: '__other__', label: 'Other' });
+                          }
                           return (
-                            <div>
-                              <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
-                                {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
-                              </h2>
-                              <Select
-                                value={selectedOpt ? { value: selectedOpt.value, label: selectedOpt.label } : null}
-                                onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
-                                options={selectOptions}
-                                placeholder="Select an option..."
-                                styles={{
-                                  control: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    backgroundColor: '#f9fafb',
-                                    borderColor: state.isFocused ? '#111827' : '#e5e7eb',
-                                    boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
-                                    padding: '2px',
-                                    borderRadius: '0.375rem',
-                                    '&:hover': {
-                                      borderColor: '#111827'
-                                    }
-                                  })
-                                }}
-                              />
+                            <div className="flex flex-col gap-2">
+                              <div>
+                                <h2 className="text-base font-bold text-gray-900 mb-4 leading-snug">
+                                  {activeBlock.title} {activeBlock.required && <span className="text-red-500">*</span>}
+                                </h2>
+                                <Select
+                                  value={selectedOpt ? { value: selectedOpt.value, label: selectedOpt.label } : null}
+                                  onChange={(selectedOption) => updatePreviewData(activeBlock.id, selectedOption.value)}
+                                  options={selectOptions}
+                                  placeholder="Select an option..."
+                                  styles={{
+                                    control: (baseStyles, state) => ({
+                                      ...baseStyles,
+                                      backgroundColor: '#f9fafb',
+                                      borderColor: state.isFocused ? '#111827' : '#e5e7eb',
+                                      boxShadow: state.isFocused ? '0 0 0 1px #111827' : 'none',
+                                      padding: '2px',
+                                      borderRadius: '0.375rem',
+                                      '&:hover': {
+                                        borderColor: '#111827'
+                                      }
+                                    })
+                                  }}
+                                />
+                              </div>
+                              {val === '__other__' && (
+                                <input
+                                  type="text"
+                                  value={previewData[`${activeBlock.id}_other`] || ''}
+                                  onChange={(e) => updatePreviewData(`${activeBlock.id}_other`, e.target.value)}
+                                  placeholder="Please specify..."
+                                  className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
+                                />
+                              )}
                             </div>
                           );
                         })()}
