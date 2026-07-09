@@ -7,6 +7,9 @@ export default function MyFormsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [forms, setForms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const user = JSON.parse(localStorage.getItem('nxtform_user') || '{"name":"User"}');
   const cursorOrbRef = useRef(null);
@@ -127,7 +130,7 @@ export default function MyFormsPage() {
               </p>
               {!searchQuery && (
                 <button
-                  onClick={() => navigate('/workspace/edit')}
+                  onClick={() => setIsAiModalOpen(true)}
                   className="bg-[#8b5cf6] text-white px-8 py-3.5 rounded-xl font-bold text-[15px] hover:bg-[#7c3aed] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all flex items-center gap-2 hover:-translate-y-0.5"
                 >
                   <span className="material-symbols-outlined text-[20px]">add</span>
@@ -215,7 +218,7 @@ export default function MyFormsPage() {
               {/* Create New Card */}
               <div
                 className="bg-transparent border-2 border-dashed border-[#333] rounded-2xl p-6 flex flex-col items-center justify-center min-h-[220px] hover:border-[#8b5cf6]/60 hover:bg-[#8b5cf6]/5 transition-all duration-300 cursor-pointer group"
-                onClick={() => navigate('/workspace/edit')}
+                onClick={() => setIsAiModalOpen(true)}
               >
                 <div className="w-14 h-14 rounded-full bg-[#111] border border-[#333] flex items-center justify-center mb-4 group-hover:bg-[#8b5cf6]/20 group-hover:border-[#8b5cf6]/40 group-hover:scale-110 transition-all duration-300 shadow-lg">
                   <span className="material-symbols-outlined text-[#666] text-[28px] group-hover:text-[#c4b5fd] transition-colors">add</span>
@@ -226,6 +229,99 @@ export default function MyFormsPage() {
           )}
         </div>
       </main>
+
+      {/* AI Generation Modal */}
+      {isAiModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#111] border border-[#333] rounded-2xl p-8 max-w-lg w-full shadow-2xl relative">
+            <button 
+              onClick={() => setIsAiModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#8b5cf6]">auto_awesome</span>
+              Create New Form
+            </h2>
+            <p className="text-gray-400 text-sm mb-6">Choose how you'd like to build your next intelligent form.</p>
+            
+            <div className="flex flex-col gap-4">
+              <div 
+                onClick={() => { setIsAiModalOpen(false); navigate('/workspace/edit'); }}
+                className="p-4 border border-[#333] rounded-xl hover:border-[#8b5cf6] hover:bg-[#8b5cf6]/10 cursor-pointer transition-colors flex items-center gap-4"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#222] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white">edit_square</span>
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Start from Scratch</h3>
+                  <p className="text-xs text-gray-500 mt-1">Build your form manually using our drag-and-drop editor.</p>
+                </div>
+              </div>
+
+              <div className="p-4 border border-[#8b5cf6]/50 bg-[#8b5cf6]/5 rounded-xl transition-colors">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-[#8b5cf6]/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#8b5cf6]">smart_toy</span>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold">Build with AI</h3>
+                    <p className="text-xs text-gray-400 mt-1">Describe what you need, and AI will generate the fields.</p>
+                  </div>
+                </div>
+                
+                <textarea
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="e.g. A job application form asking for name, email, resume, and experience..."
+                  className="w-full bg-black/50 border border-[#444] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#8b5cf6] h-24 resize-none mb-3"
+                  disabled={isGenerating}
+                />
+                
+                <button
+                  onClick={async () => {
+                    if(!aiPrompt.trim()) return;
+                    setIsGenerating(true);
+                    try {
+                      const token = localStorage.getItem('nxtform_token');
+                      const res = await fetch('http://localhost:5000/api/ai/generate-form', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ prompt: aiPrompt })
+                      });
+                      if(res.ok) {
+                        const blocks = await res.json();
+                        setIsAiModalOpen(false);
+                        navigate('/workspace/edit', { state: { aiBlocks: blocks } });
+                      } else {
+                        alert('Failed to generate form. Please try again.');
+                      }
+                    } catch(e) {
+                      console.error(e);
+                      alert('An error occurred.');
+                    } finally {
+                      setIsGenerating(false);
+                    }
+                  }}
+                  disabled={!aiPrompt.trim() || isGenerating}
+                  className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                >
+                  {isGenerating ? (
+                    <><span className="material-symbols-outlined animate-spin">sync</span> Generating...</>
+                  ) : (
+                    <><span className="material-symbols-outlined">magic_button</span> Generate Form</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

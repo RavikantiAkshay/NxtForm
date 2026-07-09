@@ -308,8 +308,9 @@ export default function WorkspaceBuilder() {
     }
   ];
 
-  const [blocks, setBlocksState] = useState(initialBlocks);
-  const [blockHistory, setBlockHistory] = useState([initialBlocks]);
+  const startingBlocks = location.state?.aiBlocks || initialBlocks;
+  const [blocks, setBlocksState] = useState(startingBlocks);
+  const [blockHistory, setBlockHistory] = useState([startingBlocks]);
   const [blockHistoryIndex, setBlockHistoryIndex] = useState(0);
 
   useEffect(() => {

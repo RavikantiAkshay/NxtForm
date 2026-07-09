@@ -31,6 +31,7 @@ const connectDB = async () => {
 import authRoutes from './routes/authRoutes.js';
 import formRoutes from './routes/formRoutes.js';
 import responseRoutes from './routes/responseRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 app.get('/', (req, res) => {
   res.send('NxtForm API is running');
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/forms', formRoutes);
 app.use('/api/responses', responseRoutes);
+app.use('/api/ai', aiRoutes);
 
 const PORT = process.env.PORT || 5000;
 
