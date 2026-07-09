@@ -262,7 +262,7 @@ export default function WorkspaceBuilder() {
   // State for form blocks
   const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
   const [activeBlockId, setActiveBlockId] = useState('rating-1');
-  const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
+  const [formMode, setFormMode] = useState(location.state?.aiBlocks ? 'classic' : 'conversational'); // 'conversational' or 'classic'
   const [activeDragItem, setActiveDragItem] = useState(null);
   const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
   const [isLibraryVisible, setIsLibraryVisible] = useState(true);
@@ -308,7 +308,9 @@ export default function WorkspaceBuilder() {
     }
   ];
 
-  const startingBlocks = location.state?.aiBlocks || initialBlocks;
+  const startingBlocks = location.state?.aiBlocks 
+    ? location.state.aiBlocks.map(b => ({ ...b, page: b.page || 1 }))
+    : initialBlocks;
   const [blocks, setBlocksState] = useState(startingBlocks);
   const [blockHistory, setBlockHistory] = useState([startingBlocks]);
   const [blockHistoryIndex, setBlockHistoryIndex] = useState(0);
@@ -348,8 +350,16 @@ export default function WorkspaceBuilder() {
         }
       };
       fetchForm();
+    } else if (location.state?.aiBlocks) {
+      setFormMode('classic');
+      const welcomeBlock = location.state.aiBlocks.find(b => b.type === 'welcome');
+      if (welcomeBlock && welcomeBlock.title) {
+        setFormTitle(welcomeBlock.title);
+      } else {
+        setFormTitle('AI Generated Form');
+      }
     }
-  }, [location.state?.formId]);
+  }, [location.state?.formId, location.state?.aiBlocks]);
 
   const setBlocks = (newBlocksOrUpdater) => {
     setBlocksState(prev => {

@@ -30,7 +30,8 @@ Important instructions:
 2. ALWAYS generate a unique 'id' for each block (e.g., 'email-123456', 'text-987654').
 3. For options in choice/checkbox/dropdown, value should be something like 'opt-1', 'opt-2' and label should be the actual option text.
 4. Set 'required' to true for essential fields like Name, Email, Phone, etc.
-5. Make sure the output is strictly a valid JSON object containing the "blocks" array.
+5. Set 'page' to 1 for all blocks (e.g., page: 1).
+6. Make sure the output is strictly a valid JSON object containing the "blocks" array.
 `;
 
 // @desc    Generate form blocks using AI
