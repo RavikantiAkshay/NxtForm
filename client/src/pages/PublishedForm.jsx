@@ -178,7 +178,11 @@ const PublishedForm = () => {
                if (myRes.ok) {
                  const myData = await myRes.json();
                  if (myData && myData.answers) {
-                   setPreviewData(myData.answers);
+                   const formattedData = {};
+                   myData.answers.forEach(item => {
+                     formattedData[item.blockId] = item.value;
+                   });
+                   setPreviewData(formattedData);
                  }
                }
             } catch (err) {
@@ -210,13 +214,15 @@ const PublishedForm = () => {
     try {
       setSubmitting(true);
       const token = localStorage.getItem('nxtform_token');
+      const answersArray = Object.entries(previewData).map(([blockId, value]) => ({ blockId, value }));
+      
       const response = await fetch(`http://localhost:5000/api/responses/${id}`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ answers: previewData })
+        body: JSON.stringify({ answers: answersArray })
       });
       
       if (!response.ok) {
