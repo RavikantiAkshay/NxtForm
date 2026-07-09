@@ -1,54 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+
 import Select from 'react-select';
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import ISO6391 from 'iso-639-1';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  useDraggable,
-  useDroppable,
-  DragOverlay
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 countries.registerLocale(enLocale);
-
-const SortableBlock = ({ id, children }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 'auto',
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} className="w-full relative">
-      {typeof children === 'function' ? children({ listeners, attributes }) : children}
-    </div>
-  );
-};
 
 const SignaturePad = ({ onChange }) => {
   const canvasRef = React.useRef(null);
@@ -175,1243 +133,130 @@ const SignaturePad = ({ onChange }) => {
   );
 };
 
-const DraggableLibraryItem = ({ type, label, icon, desc, onClick }) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `library-item-${type}`,
-    data: {
-      type: 'library-item',
-      blockType: type,
-      label,
-      icon,
-      desc
-    }
-  });
 
-  return (
-    <button
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 p-2 hover:bg-[#1a1a1a] text-on-surface-variant hover:text-primary rounded transition-colors text-left group ${isDragging ? 'opacity-50' : ''} ${desc ? 'border border-outline-variant bg-surface-container-high p-3 relative overflow-hidden' : ''}`}
-    >
-      {desc && <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>}
-      <span className={`material-symbols-outlined ${desc ? 'text-primary text-[18px]' : 'text-[18px]'}`}>{icon}</span>
-      {desc ? (
-        <div className="flex flex-col">
-          <span className="font-label-sm text-label-sm text-on-surface">{label}</span>
-          <span className="text-[9px] text-on-surface-variant uppercase tracking-wider">{desc}</span>
-        </div>
-      ) : (
-        <span className="text-[12px] font-medium tracking-wide flex-1">{label}</span>
-      )}
-    </button>
-  );
-};
-
-const DraggableGridItem = ({ type, label, icon, onClick, isFullWidth }) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `grid-item-${type}`,
-    data: {
-      type: 'library-item',
-      blockType: type,
-      label,
-      icon
-    }
-  });
-
-  return (
-    <button
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      onClick={onClick}
-      className={`border border-outline-variant bg-surface-container-high p-3 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-colors text-on-surface-variant rounded-sm text-center ${isDragging ? 'opacity-50' : ''} ${isFullWidth ? 'col-span-2' : ''}`}
-    >
-      <span className="material-symbols-outlined text-[20px]">{icon}</span>
-      <span className="text-[9px] uppercase font-bold tracking-wider">{label}</span>
-    </button>
-  );
-};
-
-const DropZone = ({ index }) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id: `dropzone-${index}`,
-    data: {
-      type: 'dropzone',
-      index
-    }
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className="relative z-10 w-full flex items-center justify-center h-full"
-    >
-      <button className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shadow-sm border ${isOver ? 'bg-primary text-white border-primary scale-150' : 'bg-white text-gray-400 border-gray-300 hover:text-primary hover:border-primary hover:scale-110'}`}>
-        <span className="material-symbols-outlined text-[16px]">add</span>
-      </button>
-    </div>
-  );
-};
-
-export default function WorkspaceBuilder() {
+const PublishedForm = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // State for form blocks
-  const [formTitle, setFormTitle] = useState('Customer Feedback Survey 2024');
-  const [activeBlockId, setActiveBlockId] = useState('rating-1');
-  const [formMode, setFormMode] = useState('conversational'); // 'conversational' or 'classic'
-  const [activeDragItem, setActiveDragItem] = useState(null);
-  const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' or 'desktop'
-  const [isLibraryVisible, setIsLibraryVisible] = useState(true);
-  const [zoom, setZoom] = useState(100);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [templateSearch, setTemplateSearch] = useState('');
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
   const [previewData, setPreviewData] = useState({});
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [formId, setFormId] = useState(null);
-  const [lastPublishedState, setLastPublishedState] = useState(null);
-  const [collectEmail, setCollectEmail] = useState(false);
-  const [isPublishedState, setIsPublishedState] = useState(false);
-  const updatePreviewData = (id, val) => setPreviewData(prev => ({ ...prev, [id]: val }));
-  const initialBlocks = [
-    {
-      id: 'welcome',
-      type: 'welcome',
-      icon: 'waving_hand',
-      typeName: 'Welcome Screen',
-      title: 'Welcome to our annual survey!',
-      description: 'We value your feedback to help us improve our services.',
-      buttonText: 'Start Survey',
-      required: false,
-      page: 1,
-    },
-    {
-      id: 'rating-1',
-      type: 'rating',
-      icon: 'star',
-      typeName: 'Rating Scale',
-      title: 'How satisfied are you with the NxtForm platform?',
-      required: true,
-      options: [
-        { value: '1', label: 'Poor' },
-        { value: '2', label: '' },
-        { value: '3', label: '' },
-        { value: '4', label: '' },
-        { value: '5', label: 'Excellent' }
-      ],
-      aiLogic: 'If score is < 3, route to "Detailed Feedback". Otherwise, jump to "End Screen".',
-      page: 1,
-    }
-  ];
+  const [formMode, setFormMode] = useState('classic');
+  const [blocks, setBlocks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeBlockId, setActiveBlockId] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const [blocks, setBlocksState] = useState(initialBlocks);
-  const [blockHistory, setBlockHistory] = useState([initialBlocks]);
-  const [blockHistoryIndex, setBlockHistoryIndex] = useState(0);
+  // Use desktop classes for the published version
+  const previewDevice = 'desktop';
 
   useEffect(() => {
-    if (location.state?.formId) {
-      const fetchForm = async () => {
-        try {
-          const response = await fetch(`http://localhost:5000/api/forms/${location.state.formId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setFormId(data._id);
-            setFormTitle(data.title);
-            setFormMode(data.mode);
-            setBlocksState(data.blocks);
-            setIsPublishedState(data.isPublished);
-            if (data.settings?.collectEmail !== undefined) {
-              setCollectEmail(data.settings.collectEmail);
-            }
-            setBlockHistory([data.blocks]);
-            setBlockHistoryIndex(0);
-            
-            const currentState = JSON.stringify({
-              title: data.title,
-              mode: data.mode,
-              blocks: data.blocks,
-              collectEmail: data.settings?.collectEmail || false
-            });
-            setLastPublishedState(currentState);
-            
-            // Re-calculate total pages
-            const maxPage = Math.max(...data.blocks.map(b => b.page || 1), 1);
-            setTotalPages(maxPage);
-          }
-        } catch (error) {
-          console.error("Failed to fetch form:", error);
-        }
-      };
-      fetchForm();
-    }
-  }, [location.state?.formId]);
+    const fetchFormAndData = async () => {
+      try {
+        const token = localStorage.getItem('nxtform_token');
+        const headers = { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
 
-  const setBlocks = (newBlocksOrUpdater) => {
-    setBlocksState(prev => {
-      const newBlocks = typeof newBlocksOrUpdater === 'function' ? newBlocksOrUpdater(prev) : newBlocksOrUpdater;
-      
-      const newHistory = blockHistory.slice(0, blockHistoryIndex + 1);
-      newHistory.push(newBlocks);
-      setBlockHistory(newHistory);
-      setBlockHistoryIndex(newHistory.length - 1);
-      
-      return newBlocks;
-    });
-  };
-
-  const handleUndo = () => {
-    if (blockHistoryIndex > 0) {
-      setBlockHistoryIndex(blockHistoryIndex - 1);
-      setBlocksState(blockHistory[blockHistoryIndex - 1]);
-    }
-  };
-
-  const handleRedo = () => {
-    if (blockHistoryIndex < blockHistory.length - 1) {
-      setBlockHistoryIndex(blockHistoryIndex + 1);
-      setBlocksState(blockHistory[blockHistoryIndex + 1]);
-    }
-  };
-
-  const handlePublish = async () => {
-    setIsPublishing(true);
-    try {
-      const token = localStorage.getItem('nxtform_token');
-      if (!token) {
-        alert('You must be logged in to publish a form.');
-        setIsPublishing(false);
-        return;
-      }
-
-      const currentState = JSON.stringify({
-        title: formTitle,
-        mode: formMode,
-        blocks: blocks,
-        collectEmail: collectEmail
-      });
-
-      if (lastPublishedState === currentState && isPublishedState === true) {
-        alert('Form is already published and up-to-date!');
-        setIsPublishing(false);
-        return;
-      }
-
-      const url = formId ? `http://localhost:5000/api/forms/${formId}` : 'http://localhost:5000/api/forms';
-      const method = formId ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title: formTitle,
-          mode: formMode,
-          blocks: blocks,
-          isPublished: true,
-          settings: {
-            collectEmail: collectEmail
-          }
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFormId(data._id);
-        setLastPublishedState(currentState);
-        setIsPublishedState(true);
-        alert('Form published successfully! Anyone with the link can now fill it.');
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to publish form: ${errorData.message}`);
-      }
-    } catch (error) {
-      console.error('Error publishing form:', error);
-      alert('An error occurred while publishing the form.');
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
-  const handleUnpublish = async () => {
-    if (!formId) return;
-    try {
-      const token = localStorage.getItem('nxtform_token');
-      const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          isPublished: false
-        })
-      });
-      if (response.ok) {
-        setIsPublishedState(false);
-        alert('Form has been unpublished. It is no longer accessible to the public.');
-      }
-    } catch (error) {
-      console.error('Error unpublishing:', error);
-    }
-  };
-
-  // Sidebar item list helper
-  const addBlock = (type, typeName, icon) => {
-    const newId = `${type}-${Date.now()}`;
-    let newBlock = {
-      id: newId,
-      type,
-      typeName,
-      icon,
-      title: `New ${typeName} question`,
-      required: false,
-      page: currentPage,
-    };
-
-    // Nice natural titles for templates
-    const naturalTitles = {
-      email: 'Email Address',
-      phone: 'Phone Number',
-      fullname: 'Full Name',
-      address: 'Home Address',
-      date: 'Select a Date',
-      number: 'Enter a Number',
-      url: 'Website URL',
-      password: 'Create a password',
-      rating_stars: 'Rate your experience',
-      emoji_rating: 'How are you feeling?',
-      linear_scale: 'How likely are you to recommend us?',
-      nps: 'How likely are you to recommend us to a friend?',
-      yes_no: 'Do you agree?',
-      signature: 'Please sign below',
-      fileupload: 'Upload a file',
-      upload: 'Upload your verification document',
-      terms: 'Terms & Conditions',
-      heading: 'Section Heading',
-      divider: 'Divider',
-      sentiment: 'Please provide detailed comments.',
-      checkbox: 'Select all that apply',
-      country: 'Select your country',
-      language: 'Select your language',
-      company: 'Company Name',
-      time: 'Select a Time',
-      date_range: 'Select a Date Range',
-      otp: 'Enter OTP Verification Code',
-      color_picker: 'Pick a Color',
-      tags: 'Add Tags',
-      credit_card: 'Payment Details',
-      matrix: 'Please evaluate the following',
-      counter: 'How many?',
-      slider: 'Select a value',
-      spacer: 'Spacer'
-    };
-
-    if (naturalTitles[type]) {
-      newBlock.title = naturalTitles[type];
-    }
-
-    if (type === 'choice' || type === 'dropdown' || type === 'checkbox') {
-      newBlock.options = [
-        { value: '1', label: 'Option 1' },
-        { value: '2', label: 'Option 2' },
-        { value: '3', label: 'Option 3' }
-      ];
-    } else if (type === 'sentiment' || type === 'upload') {
-      newBlock.description = type === 'sentiment' ? 'AI Sentiment Analyzer will flag emotional context.' : 'Smart Upload will extract metadata automatically.';
-      newBlock.required = true;
-    } else if (['text', 'longtext', 'email', 'number', 'phone', 'url', 'password', 'company'].includes(type)) {
-      newBlock.placeholder = `Enter ${typeName.toLowerCase()}...`;
-    }
-
-    if (type === 'terms') {
-      newBlock.options = [{ label: 'I agree to the Terms & Conditions and Privacy Policy' }];
-    }
-
-    setBlocks([...blocks, newBlock]);
-    setActiveBlockId(newId);
-  };
-
-  const updateBlockValue = (id, field, value) => {
-    setBlocks(blocks.map(b => b.id === id ? { ...b, [field]: value } : b));
-  };
-
-  const deleteBlock = (id) => {
-    const newBlocks = blocks.filter(b => b.id !== id);
-    setBlocks(newBlocks);
-    if (activeBlockId === id && newBlocks.length > 0) {
-      setActiveBlockId(newBlocks[newBlocks.length - 1].id);
-    }
-  };
-
-  const duplicateBlock = (block) => {
-    const newId = `${block.type}-${Date.now()}`;
-    const duplicated = {
-      ...block,
-      id: newId,
-      title: `${block.title} (Copy)`
-    };
-    setBlocks([...blocks, duplicated]);
-    setActiveBlockId(newId);
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const handleDragStart = (event) => {
-    const { active } = event;
-    if (active.data.current?.type === 'library-item') {
-      setActiveDragItem(active.data.current);
-    }
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    
-    if (!over) {
-      setActiveDragItem(null);
-      return;
-    }
-
-    if (active.data.current?.type === 'library-item' && over.data.current?.type === 'dropzone') {
-      const { blockType, label, icon } = active.data.current;
-      const insertIndex = over.data.current.index;
-      
-      const newId = `${blockType}-${Date.now()}`;
-      const newBlock = {
-        id: newId,
-        type: blockType,
-        typeName: label,
-        title: label,
-        icon: icon,
-        required: false,
-        page: currentPage
-      };
-
-      if (['choice', 'dropdown', 'checkbox'].includes(blockType)) {
-        newBlock.options = [
-          { value: 'option-1', label: 'Option 1' },
-          { value: 'option-2', label: 'Option 2' },
-          { value: 'option-3', label: 'Option 3' }
-        ];
-      } else if (blockType === 'rating') {
-        newBlock.options = [
-          { value: '1', label: 'Very Poor' },
-          { value: '2', label: 'Poor' },
-          { value: '3', label: 'Average' },
-          { value: '4', label: 'Good' },
-          { value: '5', label: 'Excellent' }
-        ];
-      } else if (blockType === 'sentiment' || blockType === 'upload') {
-        newBlock.description = blockType === 'sentiment' ? 'AI Sentiment Analyzer will flag emotional context.' : 'Smart Upload will extract metadata automatically.';
-        newBlock.required = true;
-      } else if (['text', 'longtext', 'email', 'number', 'phone', 'url', 'password', 'company'].includes(blockType)) {
-        newBlock.placeholder = `Enter ${label.toLowerCase()}...`;
-      }
-
-      if (blockType === 'terms') {
-        newBlock.options = [{ label: 'I agree to the Terms & Conditions and Privacy Policy' }];
-      }
-
-      setBlocks(prev => {
-        const visibleBlocksForPage = formMode === 'classic' ? prev.filter(b => b.page === currentPage) : prev;
-        const updated = [...prev];
+        const formRes = await fetch(`http://localhost:5000/api/forms/${id}`);
+        if (!formRes.ok) throw new Error('Failed to fetch form');
+        const formData = await formRes.json();
+        setForm(formData);
         
-        let globalInsertIndex = prev.length;
-        if (insertIndex < visibleBlocksForPage.length) {
-          globalInsertIndex = prev.findIndex(b => b.id === visibleBlocksForPage[insertIndex].id);
-        } else if (visibleBlocksForPage.length > 0) {
-          globalInsertIndex = prev.findIndex(b => b.id === visibleBlocksForPage[visibleBlocksForPage.length - 1].id) + 1;
+        if (formData.isPublished) {
+          setFormMode(formData.mode || 'classic');
+          setBlocks(formData.blocks || []);
+          if (formData.mode === 'conversational' && formData.blocks?.length > 0) {
+            setActiveBlockId(formData.blocks[0].id);
+          }
+          
+          if (token) {
+            try {
+               const myRes = await fetch(`http://localhost:5000/api/responses/${id}/my-response`, { headers });
+               if (myRes.ok) {
+                 const myData = await myRes.json();
+                 if (myData && myData.answers) {
+                   setPreviewData(myData.answers);
+                 }
+               }
+            } catch (err) {
+               console.error('No existing response found or error fetching it');
+            }
+          }
         }
+      } catch (error) {
+        console.error('Error fetching form details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFormAndData();
+  }, [id]);
 
-        updated.splice(globalInsertIndex, 0, newBlock);
-        return updated;
-      });
-      setActiveBlockId(newId);
-      setActiveDragItem(null);
-      return;
-    }
-
-    if (active.id !== over.id && !active.data.current?.type) {
-      setBlocks((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        if(oldIndex === -1 || newIndex === -1) return items;
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-
-    setActiveDragItem(null);
+  const updatePreviewData = (blockId, value) => {
+    setPreviewData(prev => ({ ...prev, [blockId]: value }));
   };
 
-  React.useEffect(() => {
-    if (previewDevice === 'desktop') {
-      setIsLibraryVisible(false);
-    } else {
-      setIsLibraryVisible(true);
-    }
-  }, [previewDevice]);
+  const visibleBlocks = formMode === 'classic' 
+    ? blocks.filter(b => b.page === currentPage)
+    : [];
 
-  const activeBlock = blocks.find(b => b.id === activeBlockId) || blocks[0];
-  const visibleBlocks = formMode === 'classic' ? blocks.filter(b => b.page === currentPage) : blocks;
+  const totalPages = blocks.reduce((acc, curr) => Math.max(acc, curr.page || 1), 1);
+  const activeBlock = formMode === 'conversational' ? blocks.find(b => b.id === activeBlockId) : null;
+
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+      const token = localStorage.getItem('nxtform_token');
+      const response = await fetch(`http://localhost:5000/api/responses/${id}`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ answers: previewData })
+      });
+      
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to submit response');
+      }
+      setIsSuccess(true);
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert(error.message || 'Failed to submit response');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white">Loading form...</div>;
+  }
+
+  if (!form) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white">Form not found.</div>;
+  }
+
+  if (!form.isPublished) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white flex-col gap-4">
+        <span className="material-symbols-outlined text-6xl text-gray-500">visibility_off</span>
+        <h2 className="text-2xl font-bold">This form is no longer accepting responses.</h2>
+    </div>;
+  }
+
+  if (isSuccess) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white flex-col gap-4">
+        <span className="material-symbols-outlined text-6xl text-green-500">check_circle</span>
+        <h2 className="text-2xl font-bold">Response Submitted Successfully!</h2>
+        <button onClick={() => navigate('/workspace')} className="mt-4 px-6 py-2 bg-white text-black font-bold rounded-sm">Go to Dashboard</button>
+    </div>;
+  }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="bg-[#0a0a0a] text-[#e5e2e1] h-screen overflow-hidden flex font-sans">
-        {/* Main Workspace Frame */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden">
-
-        {/* Builder Header */}
-        <header className="h-14 border-b border-[#1a1a1a] flex items-center justify-between px-4 bg-[#0a0a0a] shrink-0 z-40 whitespace-nowrap">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/workspace')}
-              className="text-[#555] hover:text-white transition-colors flex items-center"
-            >
-              <span className="material-symbols-outlined mr-1 text-[18px]">arrow_back</span>
-              <span className="font-label-sm text-sm">Exit</span>
-            </button>
-            <div className="h-4 w-px bg-outline-variant mx-1"></div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                className="bg-transparent border-none focus:ring-0 text-white font-semibold p-0 w-32 md:w-48 text-base focus:border-b focus:border-primary focus:outline-none truncate"
-              />
-              <span className="material-symbols-outlined text-[16px] text-on-surface-variant">edit</span>
-            </div>
-
-            <div className={`ml-2 px-2 py-0.5 border rounded flex items-center gap-1 text-xs ${isPublishedState ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
-              <span className={`w-2 h-2 rounded-full ${isPublishedState ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
-              {isPublishedState ? 'Published' : 'Draft'}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Form Mode Toggle */}
-            <div className="flex bg-surface-container-high rounded p-0.5 border border-outline-variant hidden md:flex">
-              <button
-                onClick={() => setFormMode('conversational')}
-                className={`px-2 py-1 rounded text-xs flex items-center gap-1 transition-all ${formMode === 'conversational' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-              >
-                <span className="material-symbols-outlined text-[14px]">swipe_up</span>
-                <span className="hidden lg:inline">Conversational</span>
-              </button>
-              <button
-                onClick={() => setFormMode('classic')}
-                className={`px-2 py-1 rounded text-xs flex items-center gap-1 transition-all ${formMode === 'classic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-              >
-                <span className="material-symbols-outlined text-[14px]">view_agenda</span>
-                <span className="hidden lg:inline">Classic</span>
-              </button>
-            </div>
-            <div className="flex items-center gap-2 border-r border-outline-variant pr-4 text-on-surface-variant">
-              <button 
-                onClick={handleUndo} 
-                disabled={blockHistoryIndex === 0}
-                className={`transition-colors ${blockHistoryIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
-              >
-                <span className="material-symbols-outlined text-[18px]">undo</span>
-              </button>
-              <button 
-                onClick={handleRedo} 
-                disabled={blockHistoryIndex === blockHistory.length - 1}
-                className={`transition-colors ${blockHistoryIndex === blockHistory.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-primary'}`}
-              >
-                <span className="material-symbols-outlined text-[18px]">redo</span>
-              </button>
-            </div>
-            <div className="flex gap-3 items-center pl-1">
-              <button
-                onClick={() => navigate(`/workspace`)}
-                className="px-3 py-1.5 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all text-sm flex items-center gap-1.5 rounded"
-              >
-                <span className="material-symbols-outlined text-[16px]">dashboard</span>
-                <span className="hidden xl:inline">Dashboard</span>
-              </button>
-              
-              <div className="h-5 w-px bg-outline-variant mx-1"></div>
-
-              <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-400 hover:text-white transition-colors mr-1 group whitespace-nowrap" title="Require respondents to share their email">
-                <input 
-                  type="checkbox" 
-                  checked={collectEmail} 
-                  onChange={(e) => setCollectEmail(e.target.checked)} 
-                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary focus:ring-offset-gray-900 cursor-pointer" 
-                />
-                <span className="material-symbols-outlined text-[14px] group-hover:text-primary transition-colors">alternate_email</span>
-                <span className="hidden xl:inline">Collect Emails</span>
-              </label>
-
-              {isPublishedState && (
-                <>
-                  <a
-                    href={`/f/${formId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 border border-primary/30 hover:border-primary text-primary hover:text-primary-container hover:bg-primary/10 transition-all text-sm flex items-center gap-1.5 rounded whitespace-nowrap"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-                    Open
-                  </a>
-                  <button
-                  onClick={handleUnpublish}
-                  className="px-3 py-1.5 border border-red-500/30 hover:border-red-500 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-sm flex items-center gap-1.5 rounded whitespace-nowrap"
-                >
-                  <span className="material-symbols-outlined text-[16px]">unpublished</span>
-                  Unpublish
-                </button>
-                </>
-              )}
-
-              <button
-                onClick={handlePublish}
-                disabled={isPublishing}
-                className={`px-4 py-1.5 ${isPublishing ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-container hover:electric-violet-glow'} text-on-primary text-sm font-bold transition-all flex items-center gap-1.5 rounded whitespace-nowrap`}
-              >
-                <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {isPublishing ? 'sync' : 'send'}
-                </span>
-                {isPublishing ? 'Publishing...' : (isPublishedState ? 'Update' : 'Publish')}
-              </button>
-            </div>
-          </div>
-        </header>
-
-        {/* Builder Workspace Area */}
-        <div className="flex-1 flex overflow-hidden relative">
-
-          {/* Left Side: Component Elements Library */}
-          <aside className={`${isLibraryVisible ? 'w-64 border-r border-[#1a1a1a] opacity-100' : 'w-0 opacity-0'} bg-[#0a0a0a] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}>
-            <div className="p-4 border-b border-outline-variant whitespace-nowrap flex justify-between items-center">
-              <div>
-                <h2 className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider text-xs">Library Elements</h2>
-                {formMode === 'classic' && (
-                  <p className="text-[10px] text-primary mt-1 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[10px]">info</span>
-                    Classic mode — all fields visible
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => setIsLibraryVisible(false)}
-                className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
-                title="Hide Library"
-              >
-                <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-custom">
-
-              {/* Basic Fields (Grid) */}
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Basic Inputs</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <DraggableGridItem type="text" label="Short Text" icon="short_text" onClick={() => addBlock('text', 'Short Text', 'short_text')} />
-                  <DraggableGridItem type="longtext" label="Long Text" icon="notes" onClick={() => addBlock('longtext', 'Long Text', 'notes')} />
-                  <DraggableGridItem type="choice" label="Choice Option" icon="radio_button_checked" onClick={() => addBlock('choice', 'Choice Option', 'radio_button_checked')} />
-                  <DraggableGridItem type="checkbox" label="Checkboxes" icon="check_box" onClick={() => addBlock('checkbox', 'Checkboxes', 'check_box')} />
-                  <DraggableGridItem type="dropdown" label="Dropdown" icon="arrow_drop_down_circle" isFullWidth onClick={() => addBlock('dropdown', 'Dropdown', 'arrow_drop_down_circle')} />
-                </div>
-              </div>
-
-              {/* Ready-to-use Templates (Compact List) */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-label-sm text-label-sm text-on-surface-variant">Templates</h3>
-                  <div className="flex items-center bg-[#1a1a1a] rounded px-2 py-1 w-32">
-                    <span className="material-symbols-outlined text-[12px] text-gray-500 mr-1">search</span>
-                    <input 
-                      type="text" 
-                      placeholder="Search..." 
-                      value={templateSearch}
-                      onChange={(e) => setTemplateSearch(e.target.value)}
-                      className="bg-transparent border-none outline-none text-[10px] text-white w-full placeholder-gray-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {[
-                    { type: 'fullname', label: 'Full Name', icon: 'person' },
-                    { type: 'email', label: 'Email Address', icon: 'mail' },
-                    { type: 'phone', label: 'Phone Number', icon: 'call' },
-                    { type: 'address', label: 'Address', icon: 'home' },
-                    { type: 'company', label: 'Company Name', icon: 'domain' },
-                    { type: 'country', label: 'Country Selector', icon: 'public' },
-                    { type: 'language', label: 'Language Selector', icon: 'translate' },
-                    { type: 'url', label: 'Website URL', icon: 'link' },
-                    { type: 'password', label: 'Password', icon: 'password' },
-                    { type: 'date', label: 'Date Picker', icon: 'calendar_today' },
-                    { type: 'time', label: 'Time Picker', icon: 'schedule' },
-                    { type: 'date_range', label: 'Date Range', icon: 'date_range' },
-                    { type: 'number', label: 'Number Field', icon: 'tag' }
-                  ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Interactive & Specialized */}
-              {/* Interactive & Specialized */}
-              {[{ type: 'matrix', label: 'Matrix / Grid', icon: 'grid_on' },
-                { type: 'slider', label: 'Slider', icon: 'linear_scale' },
-                { type: 'counter', label: 'Counter (+/-)', icon: 'exposure' },
-                { type: 'tags', label: 'Tags / Chips', icon: 'label' },
-                { type: 'color_picker', label: 'Color Picker', icon: 'palette' },
-                { type: 'otp', label: 'OTP Input', icon: 'pin' }
-               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Interactive</h3>
-                <div className="flex flex-col gap-1">
-                  {[{ type: 'matrix', label: 'Matrix / Grid', icon: 'grid_on' },
-                    { type: 'slider', label: 'Slider', icon: 'linear_scale' },
-                    { type: 'counter', label: 'Counter (+/-)', icon: 'exposure' },
-                    { type: 'tags', label: 'Tags / Chips', icon: 'label' },
-                    { type: 'color_picker', label: 'Color Picker', icon: 'palette' },
-                    { type: 'otp', label: 'OTP Input', icon: 'pin' }
-                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-              )}
-
-              {/* Ratings & Scales */}
-              {[{ type: 'rating_stars', label: 'Star Rating', icon: 'star' },
-                { type: 'emoji_rating', label: 'Emoji Rating', icon: 'mood' },
-                { type: 'nps', label: 'NPS (0-10)', icon: 'speed' },
-                { type: 'linear_scale', label: 'Linear Scale (1-5)', icon: 'linear_scale' },
-                { type: 'yes_no', label: 'Yes/No Toggle', icon: 'toggle_on' }
-               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Ratings & Scales</h3>
-                <div className="flex flex-col gap-1">
-                  {[{ type: 'rating_stars', label: 'Star Rating', icon: 'star' },
-                    { type: 'emoji_rating', label: 'Emoji Rating', icon: 'mood' },
-                    { type: 'nps', label: 'NPS (0-10)', icon: 'speed' },
-                    { type: 'linear_scale', label: 'Linear Scale (1-5)', icon: 'linear_scale' },
-                    { type: 'yes_no', label: 'Yes/No Toggle', icon: 'toggle_on' }
-                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-              )}
-
-              {/* Advanced & Legal */}
-              {[{ type: 'credit_card', label: 'Credit Card Payment', icon: 'credit_card' },
-                { type: 'fileupload', label: 'File Upload', icon: 'upload_file' },
-                { type: 'signature', label: 'Signature Pad', icon: 'draw' },
-                { type: 'terms', label: 'Terms & Conditions', icon: 'gavel' }
-               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Advanced & Legal</h3>
-                <div className="flex flex-col gap-1">
-                  {[{ type: 'credit_card', label: 'Credit Card Payment', icon: 'credit_card' },
-                    { type: 'fileupload', label: 'File Upload', icon: 'upload_file' },
-                    { type: 'signature', label: 'Signature Pad', icon: 'draw' },
-                    { type: 'terms', label: 'Terms & Conditions', icon: 'gavel' }
-                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-              )}
-
-              {/* Layout */}
-              {[{ type: 'heading', label: 'Section Heading', icon: 'title' },
-                { type: 'divider', label: 'Divider', icon: 'horizontal_rule' },
-                { type: 'spacer', label: 'Spacer', icon: 'space_bar' }
-               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3">Layout</h3>
-                <div className="flex flex-col gap-1">
-                  {[{ type: 'heading', label: 'Section Heading', icon: 'title' },
-                    { type: 'divider', label: 'Divider', icon: 'horizontal_rule' },
-                    { type: 'spacer', label: 'Spacer', icon: 'space_bar' }
-                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-              )}
-
-              {/* Smart AI Fields */}
-              {[{ type: 'sentiment', label: 'AI Sentiment', icon: 'psychology', desc: 'Analysis text inputs' },
-                { type: 'upload', label: 'Smart Upload', icon: 'document_scanner', desc: 'Auto-extract metadata' }
-               ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).length > 0 && (
-              <div>
-                <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-3 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
-                  Smart AI Fields
-                </h3>
-                <div className="space-y-2">
-                  {[{ type: 'sentiment', label: 'AI Sentiment', icon: 'psychology', desc: 'Analysis text inputs' },
-                    { type: 'upload', label: 'Smart Upload', icon: 'document_scanner', desc: 'Auto-extract metadata' }
-                   ].filter(t => t.label.toLowerCase().includes(templateSearch.toLowerCase())).map(t => (
-                    <DraggableLibraryItem key={t.type} type={t.type} label={t.label} icon={t.icon} desc={t.desc} onClick={() => addBlock(t.type, t.label, t.icon)} />
-                  ))}
-                </div>
-              </div>
-              )}
-
-            </div>
-          </aside>
-
-          {/* Floating Expand Tab when Library is Hidden */}
-          {!isLibraryVisible && (
-            <button
-              onClick={() => setIsLibraryVisible(true)}
-              className="absolute left-0 top-4 bg-[#131313] border border-[#1a1a1a] border-l-0 rounded-r-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800 z-50 shadow-lg transition-colors group flex items-center"
-              title="Show Library Elements"
-            >
-              <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
-            </button>
-          )}
-
-          {/* Center Canvas (Light background workspace style as requested) */}
-          <div className="flex-1 light-workspace bg-[#f8f9fa] relative overflow-hidden flex flex-col">
-
-            {/* Canvas Controls */}
-            <div className="absolute top-4 left-4 z-10 flex gap-2">
-              <button
-                onClick={() => setZoom(Math.min(zoom + 10, 200))}
-                className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
-              >
-                <span className="material-symbols-outlined text-[18px]">add</span>
-              </button>
-              <button
-                onClick={() => setZoom(Math.max(zoom - 10, 50))}
-                className="w-8 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm rounded-sm"
-              >
-                <span className="material-symbols-outlined text-[18px]">remove</span>
-              </button>
-              <div className="w-px h-8 bg-gray-200 mx-1"></div>
-              <button
-                onClick={() => setZoom(100)}
-                className="px-3 h-8 bg-white border border-gray-200 text-gray-600 flex items-center justify-center hover:text-primary hover:border-primary transition-colors shadow-sm font-label-sm text-label-sm rounded-sm"
-              >
-                {zoom}%
-              </button>
-            </div>
-
-            {/* Blocks flow list */}
-            <div className="flex-1 overflow-y-auto builder-scroll p-12 flex flex-col items-center">
-              <div
-                className="w-full max-w-xl pb-32 pt-8 transition-transform duration-200 origin-top"
-                style={{ transform: `scale(${zoom / 100})` }}
-              >
-
-                {/* Canvas Header */}
-                <div className="w-full mb-8">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1 className="text-xl font-bold text-gray-900">{formTitle}</h1>
-                      <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
-                        {visibleBlocks.length} fields &middot; {formMode === 'conversational' ? 'Conversational Flow' : `Classic Layout · Page ${currentPage} of ${totalPages}`}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setFormMode(formMode === 'conversational' ? 'classic' : 'conversational')}
-                      className="text-[10px] text-gray-400 uppercase tracking-wider bg-white border border-gray-200 px-3 py-1 rounded-full hover:border-primary hover:text-primary transition-colors"
-                    >
-                      {formMode === 'conversational' ? 'Flow View' : 'Page View'}
-                    </button>
-                  </div>
-
-                  {/* Classic Mode: Page Tabs */}
-                  {formMode === 'classic' && (
-                    <div className="flex items-center gap-2 mt-4">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${currentPage === page
-                              ? 'bg-gray-900 text-white shadow-sm'
-                              : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
-                            }`}
-                        >
-                          Page {page}
-                        </button>
-                      ))}
-                      <button
-                        onClick={() => { setTotalPages(totalPages + 1); setCurrentPage(totalPages + 1); }}
-                        className="w-7 h-7 flex items-center justify-center bg-white border border-dashed border-gray-300 text-gray-400 hover:border-gray-500 hover:text-gray-600 transition-colors"
-                        title="Add Page"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">add</span>
-                      </button>
-                      {totalPages > 1 && (
-                        <button
-                          onClick={() => { if (totalPages > 1) { setTotalPages(totalPages - 1); if (currentPage > totalPages - 1) setCurrentPage(totalPages - 1); } }}
-                          className="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors ml-1"
-                          title="Remove Last Page"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">remove</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Start Node */}
-                <div className="flex justify-center mb-6">
-                  <div className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-600 font-label-sm text-label-sm uppercase tracking-widest rounded-full flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[16px]">play_arrow</span>
-                    Start Node
-                  </div>
-                </div>
-
-                {/* Connector */}
-                <div className="relative w-full h-12 flex items-center justify-center my-2">
-                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
-                  <DropZone index={0} />
-                </div>
-
-                {/* Dynamic Block Rendering */}
-                  <SortableContext items={visibleBlocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
-                    {visibleBlocks.map((block, index) => {
-                      const isActive = block.id === activeBlockId;
-                      return (
-                        <SortableBlock key={block.id} id={block.id}>
-                          {({ listeners, attributes }) => (
-                            <div className="w-full">
-                              {/* Form Block Item */}
-                              <div
-                                onClick={() => setActiveBlockId(block.id)}
-                                className={`bg-white border text-gray-900 sharp-corners shadow-sm relative group transition-all duration-200 cursor-pointer ${isActive
-                                    ? 'border-primary ring-2 ring-primary/20 shadow-[0_0_20px_rgba(208,188,255,0.15)]'
-                                    : 'border-gray-200 hover:border-primary'
-                                  }`}
-                              >
-                                {/* Drag Handle on active */}
-                                {isActive && (
-                                  <div
-                                    {...listeners}
-                                    {...attributes}
-                                    className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing bg-[#fbf9ff] border-r border-[#d0bcff]/30 text-primary z-10"
-                                  >
-                                    <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
-                                  </div>
-                                )}
-
-                                {/* AI Indicator badge */}
-                                {(block.type === 'sentiment' || block.type === 'upload' || block.aiLogic) && (
-                                  <div className="absolute -top-3 right-4 bg-[#131313] text-[#d0bcff] px-2 py-0.5 flex items-center gap-1 border border-[#d0bcff]/30 text-[9px] uppercase font-bold tracking-wider sharp-corners">
-                                    <span className="material-symbols-outlined text-[11px] animate-pulse">auto_awesome</span>
-                                    AI Logic
-                                  </div>
-                                )}
-
-                                {/* Block Header */}
-                                <div className={`px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 ${isActive ? 'ml-8' : ''}`}>
-                                  <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-gray-400 text-[18px]">{block.icon || 'description'}</span>
-                                    <span className="font-label-sm text-label-sm text-gray-700 font-bold">{block.typeName}</span>
-                                  </div>
-
-                                  {/* Actions */}
-                                  <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
-                                    {block.type !== 'welcome' && (
-                                      <>
-                                        <button
-                                          onClick={() => updateBlockValue(block.id, 'required', !block.required)}
-                                          className={`flex items-center gap-1 font-label-sm text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors ${block.required
-                                              ? 'bg-primary/10 text-primary border border-primary/20'
-                                              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                                            }`}
-                                          title="Toggle Required"
-                                        >
-                                          <span className="material-symbols-outlined text-[14px]">
-                                            {block.required ? 'star' : 'star_border'}
-                                          </span>
-                                          Required
-                                        </button>
-                                        <div className="w-px h-4 bg-gray-200"></div>
-                                      </>
-                                    )}
-                                    <button
-                                      onClick={() => duplicateBlock(block)}
-                                      className="text-gray-400 hover:text-gray-800 transition-colors"
-                                      title="Duplicate"
-                                    >
-                                      <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                                    </button>
-                                    <button
-                                      onClick={() => deleteBlock(block.id)}
-                                      className="text-gray-400 hover:text-red-500"
-                                      title="Delete"
-                                    >
-                                      <span className="material-symbols-outlined text-[16px]">delete</span>
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Block Content Inputs */}
-                                <div className={`p-6 ${isActive ? 'ml-8' : ''}`}>
-                                  {/* Question/Title Input */}
-                                  <input
-                                    type="text"
-                                    value={block.title}
-                                    onChange={(e) => updateBlockValue(block.id, 'title', e.target.value)}
-                                    placeholder="Enter question wording..."
-                                    className="w-full font-body-lg text-body-lg font-medium text-gray-900 border-none bg-transparent focus:ring-0 p-0 mb-4 focus:border-b focus:border-primary focus:outline-none"
-                                  />
-
-                                  {/* Welcome Screen Subtitle */}
-                                  {block.type === 'welcome' && (
-                                    <textarea
-                                      value={block.description}
-                                      onChange={(e) => updateBlockValue(block.id, 'description', e.target.value)}
-                                      placeholder="Subtitle description..."
-                                      className="w-full font-body-md text-body-md text-gray-500 border-none bg-transparent focus:ring-0 p-0 resize-none h-12 focus:border-b focus:border-primary focus:outline-none"
-                                    />
-                                  )}
-
-                                  {/* Block Option details */}
-                                  {block.type === 'rating' && (
-                                    <div className="flex justify-between items-center gap-2 mt-4">
-                                      {block.options?.map((opt, i) => (
-                                        <div key={i} className="flex flex-col items-center gap-1">
-                                          <div className="w-10 h-10 border border-gray-200 bg-gray-50 flex items-center justify-center font-bold text-gray-500 text-sm">
-                                            {opt.value}
-                                          </div>
-                                          <span className="text-[9px] text-gray-400">{opt.label}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* Choice/Dropdown/Checkbox Options List */}
-                                  {(block.type === 'choice' || block.type === 'dropdown' || block.type === 'checkbox') && (
-                                    <div className="space-y-2 mt-2">
-                                      {block.options?.map((opt, i) => (
-                                        <div key={i} className="flex items-center justify-between group">
-                                          <div className="flex items-center gap-2 flex-1">
-                                            <span className="material-symbols-outlined text-gray-300 text-sm">
-                                              {block.type === 'checkbox' ? 'check_box_outline_blank' : 'radio_button_unchecked'}
-                                            </span>
-                                            <input
-                                              type="text"
-                                              value={opt.label}
-                                              onChange={(e) => {
-                                                const newOpts = [...block.options];
-                                                newOpts[i].label = e.target.value;
-                                                updateBlockValue(block.id, 'options', newOpts);
-                                              }}
-                                              onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                  e.preventDefault();
-                                                  const newOpts = [...block.options];
-                                                  newOpts.splice(i + 1, 0, { value: `option-${Date.now()}`, label: `Option ${newOpts.length + 1}` });
-                                                  updateBlockValue(block.id, 'options', newOpts);
-                                                }
-                                              }}
-                                              className="bg-transparent border-none text-gray-700 text-sm p-0 focus:ring-0 focus:border-b focus:border-primary focus:outline-none w-full"
-                                            />
-                                          </div>
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              if (block.options.length > 1) {
-                                                const newOpts = block.options.filter((_, idx) => idx !== i);
-                                                updateBlockValue(block.id, 'options', newOpts);
-                                              }
-                                            }}
-                                            className={`text-gray-300 hover:text-red-500 transition-colors ${block.options.length <= 1 ? 'invisible' : 'opacity-0 group-hover:opacity-100'}`}
-                                            title="Remove Option"
-                                          >
-                                            <span className="material-symbols-outlined text-[16px]">close</span>
-                                          </button>
-                                        </div>
-                                      ))}
-                                      <button
-                                        onClick={() => {
-                                          const newOpts = [...block.options, { value: `option-${Date.now()}`, label: `Option ${block.options.length + 1}` }];
-                                          updateBlockValue(block.id, 'options', newOpts);
-                                        }}
-                                        className="text-primary text-xs font-semibold hover:underline mt-2 flex items-center gap-1"
-                                      >
-                                        <span className="material-symbols-outlined text-xs">add</span> Add Option
-                                      </button>
-                                    </div>
-                                  )}
-
-                                  {/* Matrix Rows & Columns Editor */}
-                                  {block.type === 'matrix' && (
-                                    <div className="mt-4 space-y-4">
-                                      <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Rows (One per line)</label>
-                                        <textarea
-                                          value={(block.rows || ['Quality', 'Speed']).join('\n')}
-                                          onChange={(e) => {
-                                            const newRows = e.target.value.split('\n');
-                                            updateBlockValue(block.id, 'rows', newRows);
-                                          }}
-                                          placeholder="Enter rows..."
-                                          className="w-full mt-1 font-body-sm text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-2 resize-none h-20 focus:border-primary focus:outline-none focus:ring-0"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Columns (One per line)</label>
-                                        <textarea
-                                          value={(block.columns || ['Poor', 'Avg', 'Good']).join('\n')}
-                                          onChange={(e) => {
-                                            const newCols = e.target.value.split('\n');
-                                            updateBlockValue(block.id, 'columns', newCols);
-                                          }}
-                                          placeholder="Enter columns..."
-                                          className="w-full mt-1 font-body-sm text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-2 resize-none h-20 focus:border-primary focus:outline-none focus:ring-0"
-                                        />
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Slider Min/Max Editor */}
-                                  {block.type === 'slider' && (
-                                    <div className="mt-4 space-y-4">
-                                      <div className="flex gap-4">
-                                        <div className="flex-1">
-                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Min Value</label>
-                                          <input
-                                            type="number"
-                                            value={block.min !== undefined ? block.min : 0}
-                                            onChange={(e) => updateBlockValue(block.id, 'min', parseInt(e.target.value) || 0)}
-                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
-                                          />
-                                        </div>
-                                        <div className="flex-1">
-                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Max Value</label>
-                                          <input
-                                            type="number"
-                                            value={block.max !== undefined ? block.max : 100}
-                                            onChange={(e) => updateBlockValue(block.id, 'max', parseInt(e.target.value) || 100)}
-                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
-                                          />
-                                        </div>
-                                      </div>
-                                      <div className="flex gap-4">
-                                        <div className="flex-1">
-                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Min Label</label>
-                                          <input
-                                            type="text"
-                                            value={block.minLabel || ''}
-                                            onChange={(e) => updateBlockValue(block.id, 'minLabel', e.target.value)}
-                                            placeholder="e.g. Min"
-                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
-                                          />
-                                        </div>
-                                        <div className="flex-1">
-                                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Max Label</label>
-                                          <input
-                                            type="text"
-                                            value={block.maxLabel || ''}
-                                            onChange={(e) => updateBlockValue(block.id, 'maxLabel', e.target.value)}
-                                            placeholder="e.g. Max"
-                                            className="w-full mt-1 bg-gray-50 border border-gray-200 rounded p-2 text-sm focus:border-primary focus:outline-none"
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* AI Logic Display */}
-                                  {block.aiLogic && (
-                                    <div className="mt-6 p-3 bg-gray-50 border border-gray-100 flex items-start gap-3">
-                                      <span className="material-symbols-outlined text-[16px] text-primary mt-0.5">account_tree</span>
-                                      <div>
-                                        <span className="block text-xs font-bold text-gray-700 mb-1">Logic Branching Active</span>
-                                        <span className="block text-xs text-gray-500">{block.aiLogic}</span>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* AI Sentiment Feedback Display */}
-                                  {block.type === 'sentiment' && (
-                                    <div className="mt-4 p-3 bg-[#fbf9ff] border border-primary/20 flex items-center gap-2 text-primary">
-                                      <span className="material-symbols-outlined text-[18px]">psychology</span>
-                                      <span className="text-xs font-medium">Automatic sentiment analyzer evaluates response polarity.</span>
-                                    </div>
-                                  )}
-
-                                  {/* Smart Upload Display */}
-                                  {block.type === 'upload' && (
-                                    <div className="mt-4 border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400">
-                                      <span className="material-symbols-outlined text-[32px] mb-2 text-gray-300">cloud_upload</span>
-                                      <span className="text-xs">Drag and drop file here, or click to upload</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Connector Line below item */}
-                              {index < visibleBlocks.length - 1 && (
-                                <div className="relative w-full h-12 flex items-center justify-center">
-                                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
-                                  <DropZone index={index + 1} />
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </SortableBlock>
-                      );
-                    })}
-                  </SortableContext>
-
-                {/* End node */}
-                <div className="relative w-full h-12 flex items-center justify-center my-2">
-                  <div className="absolute inset-0 flex justify-center"><div className="w-px h-full bg-gray-300"></div></div>
-                  {visibleBlocks.length > 0 && <DropZone index={visibleBlocks.length} />}
-                </div>
-                <div className="flex justify-center">
-                  <div className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-600 font-label-sm text-label-sm uppercase tracking-widest rounded-full flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[16px]">check</span>
-                    End Screen
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Side: Immersive Device Live Preview */}
-          <aside className={`bg-[#0a0a0a] border-l border-[#1a1a1a] flex flex-col items-center py-6 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] shrink-0 transition-all duration-300 ${previewDevice === 'mobile' ? 'w-[420px]' : 'w-[65%]'}`}>
-            <div className="flex items-center justify-between w-full px-6 mb-6">
-              <h3 className="font-label-md text-label-md text-on-surface">Live Preview</h3>
-              <div className="flex bg-surface-container-high rounded-lg p-1">
-                <button
-                  onClick={() => setPreviewDevice('mobile')}
-                  className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'mobile' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  <span className="material-symbols-outlined text-[16px]">smartphone</span>
-                </button>
-                <button
-                  onClick={() => setPreviewDevice('desktop')}
-                  className={`px-3 py-1 rounded font-label-sm text-label-sm flex items-center justify-center transition-colors ${previewDevice === 'desktop' ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  <span className="material-symbols-outlined text-[16px]">desktop_windows</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Preview Mockup Container */}
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center py-10">
             <div className={`relative bg-black transition-all duration-300 overflow-hidden shadow-2xl flex flex-col ${previewDevice === 'mobile'
                 ? 'w-[340px] h-[650px] rounded-[36px] border-[6px] border-[#262626]'
                 : 'w-[90%] h-[90%] rounded-xl border border-[#262626]'
@@ -2775,8 +1620,8 @@ export default function WorkspaceBuilder() {
                             <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
                           </button>
                           {isLast && (
-                            <button className="flex-1 ml-4 h-8 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black">
-                              Submit
+                            <button onClick={handleSubmit} disabled={submitting} className="flex-1 ml-4 h-8 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black">
+                              {submitting ? 'Submitting...' : 'Submit'}
                             </button>
                           )}
                         </div>
@@ -2806,10 +1651,12 @@ export default function WorkspaceBuilder() {
                       <button 
                         onClick={() => {
                           if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+                          else handleSubmit();
                         }}
+                        disabled={submitting}
                         className="flex-1 h-10 bg-gray-900 text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase rounded-sm hover:bg-black transition-colors"
                       >
-                        {currentPage < totalPages ? 'Next' : 'Submit'}
+                        {currentPage < totalPages ? 'Next' : (submitting ? 'Submitting...' : 'Submit')}
                       </button>
                     </div>
                   )}
@@ -2817,22 +1664,8 @@ export default function WorkspaceBuilder() {
                 </div>
               </div>
             </div>
-          </aside>
-
-        </div>
-
-      </main>
-
-      <DragOverlay>
-        {activeDragItem ? (
-          <div className="bg-white border-2 border-primary text-gray-900 rounded-sm p-3 flex items-center gap-2 shadow-xl opacity-90 scale-105 pointer-events-none min-w-[200px] z-50">
-            <span className="material-symbols-outlined text-primary text-[18px]">{activeDragItem.icon}</span>
-            <span className="text-xs font-bold tracking-wide">{activeDragItem.label}</span>
-          </div>
-        ) : null}
-      </DragOverlay>
-
-      </div>
-    </DndContext>
+    </div>
   );
-}
+};
+
+export default PublishedForm;

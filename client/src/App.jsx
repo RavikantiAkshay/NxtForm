@@ -5,6 +5,7 @@ import AuthPage from './pages/AuthPage';
 import MyFormsPage from './pages/MyFormsPage';
 import WorkspaceBuilder from './pages/WorkspaceBuilder';
 import ResponseDashboard from './pages/ResponseDashboard';
+import PublishedForm from './pages/PublishedForm';
 
 // Simple Route Guard
 function ProtectedRoute({ children }) {
@@ -51,6 +52,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ResponseDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/f/:id" 
+          element={
+            <ProtectedRoute>
+              <PublishedForm />
             </ProtectedRoute>
           } 
         />

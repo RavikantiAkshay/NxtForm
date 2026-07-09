@@ -184,6 +184,15 @@ export default function MyFormsPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" onClick={(e) => e.stopPropagation()}>
+                      {form.isPublished && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); window.open(`/f/${form._id}`, '_blank'); }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#777] hover:text-emerald-400 hover:bg-emerald-400/15 transition-all"
+                          title="Open Live Form"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                        </button>
+                      )}
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/${form._id}`); }}
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-[#777] hover:text-[#8b5cf6] hover:bg-[#8b5cf6]/15 transition-all"
