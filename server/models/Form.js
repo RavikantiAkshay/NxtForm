@@ -15,7 +15,13 @@ const formBlockSchema = new mongoose.Schema({
   }],
   aiLogic: { type: String },
   buttonText: { type: String },
-  page: { type: Number, default: 1 }
+  page: { type: Number, default: 1 },
+  rows: [String],
+  columns: [String],
+  min: Number,
+  max: Number,
+  minLabel: String,
+  maxLabel: String
 });
 
 const formSchema = new mongoose.Schema({
