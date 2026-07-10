@@ -160,8 +160,11 @@ export default function ResponseDashboard() {
     const sorted = [...responses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const lastDate = new Date(sorted[0].createdAt);
     const now = new Date();
-    const diffMs = now - lastDate;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Normalize to midnight to calculate calendar day differences
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const lastDateDay = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+    const diffDays = Math.round((today - lastDateDay) / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {
       return `Today, ${lastDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;

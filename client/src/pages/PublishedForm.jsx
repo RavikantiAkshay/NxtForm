@@ -212,22 +212,41 @@ const PublishedForm = () => {
   const totalPages = blocks.reduce((acc, curr) => Math.max(acc, curr.page || 1), 1);
   const activeBlock = formMode === 'conversational' ? blocks.find(b => b.id === activeBlockId) : null;
 
-  const handleSubmit = async () => {
-    try {
-      // Validate "Other" text inputs
-      for (const block of blocks) {
-        if (block.allowOther) {
-          const val = previewData[block.id];
-          const isOther = Array.isArray(val) ? val.includes('__other__') : val === '__other__';
-          if (isOther) {
-            const otherText = previewData[`${block.id}_other`];
-            if (!otherText || otherText.trim() === '') {
-              alert(`Please specify a value for "Other" in "${block.title}"`);
-              return;
-            }
+  const validateBlocks = (blocksToValidate) => {
+    for (const block of blocksToValidate) {
+      if (block.type === 'welcome') continue;
+      
+      const val = previewData[block.id];
+      
+      if (block.required) {
+        if (
+          val === undefined || 
+          val === null || 
+          (typeof val === 'string' && val.trim() === '') || 
+          (Array.isArray(val) && val.length === 0)
+        ) {
+          alert(`Please fill out the required field: "${block.title}"`);
+          return false;
+        }
+      }
+
+      if (block.allowOther && val !== undefined) {
+        const isOther = Array.isArray(val) ? val.includes('__other__') : val === '__other__';
+        if (isOther) {
+          const otherText = previewData[`${block.id}_other`];
+          if (!otherText || (typeof otherText === 'string' && otherText.trim() === '')) {
+            alert(`Please specify a value for "Other" in "${block.title}"`);
+            return false;
           }
         }
       }
+    }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateBlocks(formMode === 'classic' ? visibleBlocks : [activeBlock])) return;
+    try {
 
       setSubmitting(true);
       const answersArray = Object.entries(previewData).map(([blockId, value]) => ({ blockId, value }));
@@ -1710,7 +1729,12 @@ const PublishedForm = () => {
                           </button>
                           <button
                             disabled={isLast}
-                            onClick={() => !isLast && setActiveBlockId(blocks[currentIndex + 1].id)}
+                            onClick={() => {
+                              if (!isLast) {
+                                if (!validateBlocks([activeBlock])) return;
+                                setActiveBlockId(blocks[currentIndex + 1].id);
+                              }
+                            }}
                             className={`w-8 h-8 border border-gray-200 flex items-center justify-center rounded-sm transition-colors ${isLast ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
                           >
                             <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
@@ -1746,6 +1770,7 @@ const PublishedForm = () => {
                       </button>
                       <button 
                         onClick={() => {
+                          if (!validateBlocks(visibleBlocks)) return;
                           if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
                           else handleSubmit();
                         }}
