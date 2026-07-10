@@ -688,7 +688,7 @@ export default function WorkspaceBuilder() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/workspace')}
-              className="text-[#555] hover:text-white transition-colors flex items-center"
+              className="text-[#888] hover:text-white transition-colors flex items-center"
             >
               <span className="material-symbols-outlined mr-1 text-[18px]">arrow_back</span>
               <span className="font-label-sm text-sm">Exit</span>

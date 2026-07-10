@@ -158,7 +158,7 @@ export default function ResponseDashboard() {
               <button 
                 onClick={handleGenerateInsights}
                 disabled={isGeneratingInsights || responses.length === 0}
-                className="bg-[#1a1a1a] text-[#d0bcff] px-4 py-2 rounded text-sm border border-[#d0bcff]/30 flex items-center space-x-2 hover:bg-[#262626] transition-colors disabled:opacity-50"
+                className="bg-[#1a1a1a] text-[#d0bcff] px-4 py-2 rounded text-sm border border-[#d0bcff]/30 flex items-center space-x-2 hover:bg-[#262626] transition-colors disabled:bg-[#222] disabled:text-[#999] disabled:border-[#444] disabled:cursor-not-allowed"
               >
                 {isGeneratingInsights ? (
                   <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
@@ -263,7 +263,7 @@ export default function ResponseDashboard() {
               
               <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 {!insights ? (
-                  <div className="h-full flex flex-col items-center justify-center text-[#555] text-sm text-center">
+                  <div className="h-full flex flex-col items-center justify-center text-[#888] text-sm text-center">
                     <span className="material-symbols-outlined text-4xl mb-2">query_stats</span>
                     <p>Click "AI Insights" above to analyze the responses.</p>
                   </div>

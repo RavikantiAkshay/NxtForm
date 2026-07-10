@@ -46,23 +46,30 @@ export default function MyFormsPage() {
     fetchForms();
   }, []);
 
-  const handleDeleteForm = async (e, formId, formTitle) => {
-    e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete "${formTitle}"? This cannot be undone.`)) {
-      try {
-        const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        });
-        if (response.ok) {
-          setForms(forms.filter(f => f._id !== formId));
-        } else {
-          alert('Failed to delete form');
-        }
-      } catch (error) {
-        console.error('Error deleting form:', error);
+  const [formToDelete, setFormToDelete] = useState(null);
+
+  const confirmDelete = async () => {
+    if (!formToDelete) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/forms/${formToDelete.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (response.ok) {
+        setForms(forms.filter(f => f._id !== formToDelete.id));
+      } else {
+        alert('Failed to delete form');
       }
+    } catch (error) {
+      console.error('Error deleting form:', error);
+    } finally {
+      setFormToDelete(null);
     }
+  };
+
+  const handleDeleteForm = (e, formId, formTitle) => {
+    e.stopPropagation();
+    setFormToDelete({ id: formId, title: formTitle });
   };
 
 
@@ -95,13 +102,13 @@ export default function MyFormsPage() {
 
           {/* Search */}
           <div className="mt-8 relative max-w-md">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#555] text-[20px]">search</span>
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#888] text-[20px]">search</span>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search forms..."
-              className="w-full bg-[#111]/80 backdrop-blur-xl border border-[#333] rounded-xl pl-12 pr-4 py-3.5 text-[15px] text-[#e5e2e1] placeholder:text-[#555] focus:outline-none focus:border-[#8b5cf6]/50 focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] transition-all"
+              className="w-full bg-[#111]/80 backdrop-blur-xl border border-[#333] rounded-xl pl-12 pr-4 py-3.5 text-[15px] text-[#e5e2e1] placeholder:text-[#888] focus:outline-none focus:border-[#8b5cf6]/50 focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] transition-all"
             />
           </div>
         </header>
@@ -116,7 +123,7 @@ export default function MyFormsPage() {
             /* Empty State */
             <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto">
               <div className="w-24 h-24 bg-[#111] border border-[#222] rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
-                <span className="material-symbols-outlined text-[48px] text-[#444]">description</span>
+                <span className="material-symbols-outlined text-[48px] text-[#777]">description</span>
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">No forms found</h3>
               <p className="text-[15px] text-[#888] mb-8 leading-relaxed">
@@ -159,17 +166,17 @@ export default function MyFormsPage() {
 
                   {/* Title & Description */}
                   <h3 className="text-[17px] font-bold text-[#f5f5f5] mb-2 group-hover:text-[#c4b5fd] transition-colors line-clamp-1">{form.title}</h3>
-                  <p className="text-[13px] text-[#888] mb-6 flex items-center gap-2">
+                  <p className="text-[13px] text-[#aaa] mb-6 flex items-center gap-2">
                     <span className="material-symbols-outlined text-[14px]">view_agenda</span>
                     {form.blocks?.length || 0} fields
-                    <span className="text-[#444]">•</span>
+                    <span className="text-[#666]">•</span>
                     <span className="capitalize">{form.mode}</span>
                   </p>
 
                   {/* Footer Stats */}
                   <div className="mt-auto pt-5 border-t border-[#222] flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                      <div className="flex items-center gap-2 text-[12px] font-medium text-[#777] group-hover:text-[#aaa] transition-colors">
+                      <div className="flex items-center gap-2 text-[12px] font-medium text-[#aaa] group-hover:text-[#ccc] transition-colors">
                         <span className="material-symbols-outlined text-[16px]">bar_chart</span>
                         0 
                       </div>
@@ -304,7 +311,7 @@ export default function MyFormsPage() {
                     }
                   }}
                   disabled={!aiPrompt.trim() || isGenerating}
-                  className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] disabled:bg-[#222] disabled:text-[#999] disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
                 >
                   {isGenerating ? (
                     <><span className="material-symbols-outlined animate-spin">sync</span> Generating...</>
@@ -313,6 +320,37 @@ export default function MyFormsPage() {
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {formToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-[#111] border border-[#222] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4 text-red-500">
+                <span className="material-symbols-outlined text-[24px]">warning</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Delete Form</h2>
+              <p className="text-[15px] text-[#888] leading-relaxed">
+                Are you sure you want to delete <span className="text-white font-medium">"{formToDelete.title}"</span>? This action cannot be undone and all associated responses will be lost.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-[#0a0a0a] border-t border-[#222] flex gap-3 justify-end">
+              <button
+                onClick={() => setFormToDelete(null)}
+                className="px-5 py-2 rounded-lg font-medium text-[#888] hover:text-white hover:bg-[#222] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-5 py-2 rounded-lg font-medium bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 hover:border-red-500 transition-all"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

@@ -234,7 +234,7 @@ export default function AuthPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-[#8b5cf6] text-white py-2.5 px-4 rounded-lg font-semibold text-[14px] hover:bg-[#7c3aed] hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-[#8b5cf6] text-white py-2.5 px-4 rounded-lg font-semibold text-[14px] hover:bg-[#7c3aed] hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-200 mt-1 disabled:bg-[#222] disabled:text-[#999] disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
               {isSignUp ? 'Create Workspace' : 'Sign In'}
@@ -255,7 +255,7 @@ export default function AuthPage() {
             </p>
           </div>
 
-          <p className="text-center text-[11px] text-[#333] mt-6">
+          <p className="text-center text-[11px] text-[#666] mt-6">
             By continuing, you agree to NxtForm's Terms & Privacy Policy.
           </p>
         </div>
