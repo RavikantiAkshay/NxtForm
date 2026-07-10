@@ -13,19 +13,7 @@ export default function MyFormsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const user = JSON.parse(localStorage.getItem('nxtform_user') || '{"name":"User"}');
-  const cursorOrbRef = useRef(null);
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (cursorOrbRef.current) {
-        // Offset by half the width/height (250px) to center it on the cursor
-        cursorOrbRef.current.style.transform = `translate(${e.clientX - 250}px, ${e.clientY - 250}px)`;
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   useEffect(() => {
     const fetchForms = async () => {
@@ -80,19 +68,26 @@ export default function MyFormsPage() {
 
   return (
     <div className="bg-[#050505] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased relative">
-      {/* Background glow orbs for premium aesthetic */}
-      <div 
-        ref={cursorOrbRef} 
-        className="fixed top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-[#8b5cf6]/20 via-[#6366f1]/20 to-transparent rounded-full blur-[100px] pointer-events-none z-0 transition-transform duration-700 ease-out"
-        style={{ transform: 'translate(-250px, -250px)' }} // Initial off-screen or center
-      ></div>
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
+      {/* Premium Dot Matrix Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-[#050505]">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.15]" style={{
+          backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }}></div>
+        
+        {/* Elegant top spotlight glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(139,92,246,0.15),transparent)]"></div>
+        
+        {/* Soft fade at the bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80"></div>
+      </div>
 
       <TopNavbar />
 
       <main className="flex-1 flex flex-col overflow-hidden w-full max-w-[1440px] mx-auto z-10">
         {/* Header */}
-        <header className="shrink-0 px-10 py-8 border-b border-[#222]/50 bg-black/20 backdrop-blur-md">
+        <header className="shrink-0 px-10 py-10 bg-transparent relative z-10">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">My Forms</h1>
