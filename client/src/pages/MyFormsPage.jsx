@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavbar from '../components/TopNavbar';
+import Loader from '../components/Loader';
 
 export default function MyFormsPage() {
   const navigate = useNavigate();
@@ -109,8 +110,7 @@ export default function MyFormsPage() {
         <div className="flex-1 overflow-y-auto px-10 py-8 hide-scrollbar">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <span className="material-symbols-outlined text-[64px] text-[#8b5cf6] animate-spin mb-6 drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]">sync</span>
-              <h3 className="text-xl font-bold text-white mb-2">Loading your forms...</h3>
+              <Loader text="Loading your forms..." />
             </div>
           ) : filteredForms.length === 0 ? (
             /* Empty State */
@@ -224,8 +224,11 @@ export default function MyFormsPage() {
         </div>
       </main>
 
+      {/* AI Generation Loading Overlay */}
+      {isGenerating && <Loader fullScreen text="AI is crafting your form..." />}
+
       {/* AI Generation Modal */}
-      {isAiModalOpen && (
+      {isAiModalOpen && !isGenerating && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-[#111] border border-[#333] rounded-2xl p-8 max-w-lg w-full shadow-2xl relative">
             <button 

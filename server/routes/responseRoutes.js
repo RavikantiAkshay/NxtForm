@@ -23,6 +23,32 @@ router.post('/:formId', protect, async (req, res) => {
       return res.status(403).json({ message: 'This form is no longer accepting responses.' });
     }
 
+    // Validate Answers structure
+    if (!Array.isArray(answers)) {
+      return res.status(400).json({ message: 'Answers must be an array' });
+    }
+
+    const formBlocks = form.blocks || [];
+    const validBlockIds = new Set(formBlocks.map(b => b.id));
+
+    // Check for required fields
+    for (const block of formBlocks) {
+      if (block.required) {
+        const answer = answers.find(a => a.blockId === block.id);
+        if (!answer || answer.value === undefined || answer.value === '' || answer.value === null || (Array.isArray(answer.value) && answer.value.length === 0)) {
+          return res.status(400).json({ message: `Required field missing: ${block.title}` });
+        }
+      }
+    }
+
+    // Check that all submitted blockIds are valid (or are _other fields for valid blockIds)
+    for (const ans of answers) {
+      const baseBlockId = ans.blockId.endsWith('_other') ? ans.blockId.replace('_other', '') : ans.blockId;
+      if (!validBlockIds.has(baseBlockId)) {
+         return res.status(400).json({ message: `Invalid field submitted: ${ans.blockId}` });
+      }
+    }
+
     // 2. We use findOneAndUpdate with upsert: true. 
     // If the user already submitted, it updates their answers. If not, it creates a new record.
     const response = await Response.findOneAndUpdate(

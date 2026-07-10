@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 import Select from 'react-select';
 import countries from 'i18n-iso-countries';
@@ -254,7 +255,7 @@ const PublishedForm = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white">Loading form...</div>;
+    return <Loader fullScreen text="Loading form..." />;
   }
 
   if (!form) {

@@ -158,3 +158,14 @@ code {
   background-size: 24px 24px;
 }
 
+@keyframes scan {
+  0% { transform: translateY(-10px); }
+  50% { transform: translateY(96px); }
+  100% { transform: translateY(-10px); }
+}
+
+@keyframes slideRight {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+

@@ -77,21 +77,22 @@ router.post('/generate-form', protect, async (req, res) => {
       return res.status(400).json({ message: 'Prompt is required' });
     }
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: FORM_GENERATION_PROMPT
-        },
-        {
-          role: "user",
-          content: `Generate a form for: ${prompt}`
-        }
-      ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.2,
-      response_format: { type: "json_object" }
-    });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AI generation timed out')), 25000)
+    );
+
+    const completion = await Promise.race([
+      groq.chat.completions.create({
+        messages: [
+          { role: "system", content: FORM_GENERATION_PROMPT },
+          { role: "user", content: `Generate a form for: ${prompt}` }
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.2,
+        response_format: { type: "json_object" }
+      }),
+      timeoutPromise
+    ]);
 
     let jsonResponse = completion.choices[0].message.content;
     
@@ -126,6 +127,9 @@ router.post('/generate-form', protect, async (req, res) => {
     }
 
   } catch (error) {
+    if (error.message === 'AI generation timed out') {
+      return res.status(504).json({ message: 'Request to AI provider timed out. Please try again.' });
+    }
     console.error('Error generating form with AI:', error);
     res.status(500).json({ message: 'Server error during AI generation.' });
   }
