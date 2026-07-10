@@ -319,7 +319,7 @@ export default function WorkspaceBuilder() {
     if (location.state?.formId) {
       const fetchForm = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/forms/${location.state.formId}`);
+          const response = await fetch(`http://localhost:5000/api/forms/${location.state.formId}`, { credentials: 'include' });
           if (response.ok) {
             const data = await response.json();
             setFormId(data._id);
@@ -749,11 +749,17 @@ export default function WorkspaceBuilder() {
             </div>
             <div className="flex gap-3 items-center pl-1">
               <button
-                onClick={() => navigate(`/workspace`)}
+                onClick={() => {
+                  if (formId) {
+                    navigate(`/dashboard/${formId}`);
+                  } else {
+                    alert('Please publish the form first to view responses.');
+                  }
+                }}
                 className="px-3 py-1.5 border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all text-sm flex items-center gap-1.5 rounded"
               >
-                <span className="material-symbols-outlined text-[16px]">dashboard</span>
-                <span className="hidden xl:inline">Dashboard</span>
+                <span className="material-symbols-outlined text-[16px]">insights</span>
+                <span className="hidden xl:inline">Responses</span>
               </button>
               
               <div className="h-5 w-px bg-outline-variant mx-1"></div>

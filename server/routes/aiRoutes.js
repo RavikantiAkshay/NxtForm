@@ -135,4 +135,68 @@ router.post('/generate-form', protect, async (req, res) => {
   }
 });
 
+const INSIGHTS_PROMPT = `
+You are an expert AI data analyst.
+Your task is to analyze form responses and generate insights in a specific JSON format.
+Analyze the sentiment of the responses and extract key themes.
+
+Format the output strictly as this JSON structure:
+{
+  "averageScore": "Number or N/A",
+  "sentiment": "Overall sentiment (e.g., Positive, Neutral, Negative, Mixed)",
+  "sentimentClass": "Tailwind classes for the sentiment badge (e.g., 'bg-green-500/10 text-green-500' or 'bg-red-500/10 text-red-500')",
+  "themes": [
+    {
+      "title": "Theme title",
+      "mentions": "Number of mentions (int)",
+      "description": "Brief description of the theme based on the responses.",
+      "tagClass": "Tailwind classes for the tag (e.g., 'bg-primary/10 text-primary' or 'bg-secondary-container text-on-secondary-container')"
+    }
+  ]
+}
+`;
+
+// @desc    Generate insights from responses using AI
+// @route   POST /api/ai/insights
+// @access  Private
+router.post('/insights', protect, async (req, res) => {
+  try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const { formTitle, blocks, responses } = req.body;
+    
+    if (!responses || responses.length === 0) {
+      return res.status(400).json({ message: 'No responses to analyze' });
+    }
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AI generation timed out')), 25000)
+    );
+
+    const completion = await Promise.race([
+      groq.chat.completions.create({
+        messages: [
+          { role: "system", content: INSIGHTS_PROMPT },
+          { role: "user", content: `Form Title: ${formTitle}\n\nQuestions:\n${JSON.stringify(blocks)}\n\nResponses:\n${JSON.stringify(responses)}\n\nPlease analyze and provide insights.` }
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.1,
+        response_format: { type: "json_object" }
+      }),
+      timeoutPromise
+    ]);
+
+    const jsonResponse = completion.choices[0].message.content;
+    const parsed = JSON.parse(jsonResponse);
+    
+    res.status(200).json(parsed);
+
+  } catch (error) {
+    if (error.message === 'AI generation timed out') {
+      return res.status(504).json({ message: 'Request to AI provider timed out. Please try again.' });
+    }
+    console.error('Error generating AI insights:', error);
+    res.status(500).json({ message: 'Server error during AI insights generation.' });
+  }
+});
+
 export default router;

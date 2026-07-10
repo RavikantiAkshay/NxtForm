@@ -54,12 +54,6 @@ export default function TopNavbar() {
               >
                 My Forms
               </button>
-              <button 
-                onClick={() => navigate('/dashboard/customer-feedback')} 
-                className={`font-label-md text-label-md font-bold transition-colors ${location.pathname.includes('/dashboard') ? 'text-[#8b5cf6]' : 'text-gray-400 hover:text-white'}`}
-              >
-                Responses
-              </button>
             </>
           ) : (
             <>
