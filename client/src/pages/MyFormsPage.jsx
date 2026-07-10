@@ -306,7 +306,7 @@ export default function MyFormsPage() {
                     }
                   }}
                   disabled={!aiPrompt.trim() || isGenerating}
-                  className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] disabled:bg-[#222] disabled:text-[#999] disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] disabled:!bg-[#222] disabled:!text-[#666] disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
                 >
                   {isGenerating ? (
                     <><span className="material-symbols-outlined animate-spin">sync</span> Generating...</>

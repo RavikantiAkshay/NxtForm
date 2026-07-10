@@ -8,6 +8,7 @@ export default function ResponseDashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [form, setForm] = useState(null);
   const [responses, setResponses] = useState([]);
@@ -152,6 +153,19 @@ export default function ResponseDashboard() {
       sub._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (sub.userId?.email || 'Anonymous').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Pagination logic
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
+  const paginatedSubmissions = filteredSubmissions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   return (
     <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased">
@@ -337,14 +351,14 @@ export default function ResponseDashboard() {
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {filteredSubmissions.length === 0 ? (
+                  {paginatedSubmissions.length === 0 ? (
                     <tr>
                       <td colSpan="4" className="p-8 text-center text-[#8a8494]">
                         No submissions matching that query found.
                       </td>
                     </tr>
                   ) : (
-                    filteredSubmissions.map((sub) => (
+                    paginatedSubmissions.map((sub) => (
                       <tr key={sub._id} className="border-b border-[#1a1a1a] hover:bg-[#111] transition-colors">
                         <td className="p-4 font-mono text-[#8a8494]">#{sub._id.slice(-6).toUpperCase()}</td>
                         <td className="p-4 text-[#e5e2e1]">{new Date(sub.createdAt).toLocaleString()}</td>
@@ -364,6 +378,31 @@ export default function ResponseDashboard() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="p-4 border-t border-[#1e1e1e] flex justify-between items-center bg-[#0c0c0c]">
+                <span className="text-sm text-[#8a8494]">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredSubmissions.length)} of {filteredSubmissions.length} entries
+                </span>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded bg-[#111] border border-[#222] text-[#e5e2e1] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1a1a1a] transition-colors text-sm"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded bg-[#111] border border-[#222] text-[#e5e2e1] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1a1a1a] transition-colors text-sm"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
       </main>
@@ -405,11 +444,11 @@ export default function ResponseDashboard() {
                   }
 
                   return (
-                    <div key={block.id}>
-                      <h5 className="text-xs font-bold text-[#d0bcff] mb-1">{block.title}</h5>
-                      <p className="text-sm text-[#e5e2e1] bg-[#111] border border-[#222] p-3 rounded break-words">
-                        {String(displayVal)}{otherText}
-                      </p>
+                    <div key={block.id} className="mb-6 bg-[#111] p-4 rounded-xl border border-[#222]">
+                      <h4 className="text-sm font-bold text-white mb-2">{block.title}</h4>
+                      <div className="text-[#a19ba8] text-sm whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-custom bg-[#0c0c0c] p-3 rounded-lg border border-[#1a1a1a]">
+                        {displayVal}{otherText}
+                      </div>
                     </div>
                   );
                 })}
