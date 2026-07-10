@@ -57,8 +57,28 @@ export default function ResponseDashboard() {
       form.blocks.forEach(block => {
         const answer = sub.answers.find(a => a.blockId === block.id);
         let val = answer ? answer.value : '';
-        if (Array.isArray(val)) val = val.join('; ');
-        row.push(`"${String(val).replace(/"/g, '""')}"`);
+        
+        // Handle "Other" option
+        const isOther = Array.isArray(val) ? val.includes('__other__') : val === '__other__';
+        if (isOther) {
+          const otherAns = sub.answers.find(a => a.blockId === `${block.id}_other`);
+          if (otherAns && otherAns.value) {
+            if (Array.isArray(val)) {
+              val = val.map(v => v === '__other__' ? `Other: ${otherAns.value}` : v);
+            } else {
+              val = `Other: ${otherAns.value}`;
+            }
+          }
+        }
+
+        let stringVal = Array.isArray(val) ? val.join('; ') : String(val);
+        
+        // Prevent CSV injection
+        if (/^[=+\-@]/.test(stringVal)) {
+          stringVal = "'" + stringVal;
+        }
+        
+        row.push(`"${stringVal.replace(/"/g, '""')}"`);
       });
       return row.join(',');
     });
