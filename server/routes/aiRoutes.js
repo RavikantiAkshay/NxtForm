@@ -145,6 +145,7 @@ Format the output strictly as this JSON structure:
   "averageScore": "Number or N/A",
   "sentiment": "Overall sentiment (e.g., Positive, Neutral, Negative, Mixed)",
   "sentimentClass": "Tailwind classes for the sentiment badge (e.g., 'bg-green-500/10 text-green-500' or 'bg-red-500/10 text-red-500')",
+  "outliers": ["submission_id_1", "submission_id_2"], // Array of submission _id strings that are flagged as anomalies (e.g., weird requests, highly negative, extreme outliers). Keep it empty if none.
   "themes": [
     {
       "title": "Theme title",

@@ -9,6 +9,8 @@ export default function ResponseDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterOutliers, setFilterOutliers] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [form, setForm] = useState(null);
   const [responses, setResponses] = useState([]);
@@ -104,7 +106,7 @@ export default function ResponseDashboard() {
     setIsGeneratingInsights(true);
     try {
       const mappedResponses = responses.map(r => {
-        const resObj = {};
+        const resObj = { _id: r._id };
         r.answers.forEach(a => {
           const block = form.blocks.find(b => b.id === a.blockId);
           if (block) resObj[block.title] = a.value;
@@ -135,6 +137,85 @@ export default function ResponseDashboard() {
     }
   };
 
+  useEffect(() => {
+    if (responses.length > 0) {
+      const lastViewed = localStorage.getItem(`lastViewed_${id}`);
+      if (lastViewed) {
+        const lastViewedDate = new Date(lastViewed);
+        const newResps = responses.filter(r => new Date(r.createdAt) > lastViewedDate);
+        setUnreadCount(newResps.length);
+      } else {
+        setUnreadCount(responses.length);
+      }
+      
+      const timer = setTimeout(() => {
+        localStorage.setItem(`lastViewed_${id}`, new Date().toISOString());
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [responses, id]);
+
+  const getLastActivity = () => {
+    if (responses.length === 0) return 'Never';
+    const sorted = [...responses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const lastDate = new Date(sorted[0].createdAt);
+    const now = new Date();
+    const diffMs = now - lastDate;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return `Today, ${lastDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    } else if (diffDays === 1) {
+      return `Yesterday, ${lastDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    } else {
+      return `${diffDays} Days Ago`;
+    }
+  };
+
+  const getBottleneckQuestion = () => {
+    if (!form || !form.blocks || responses.length === 0) return { title: 'N/A', skips: 0 };
+    let mostSkipped = null;
+    let maxSkips = -1;
+
+    form.blocks.forEach(block => {
+      let skips = 0;
+      responses.forEach(sub => {
+        const ans = sub.answers.find(a => a.blockId === block.id);
+        if (!ans || !ans.value || (Array.isArray(ans.value) && ans.value.length === 0)) {
+          skips++;
+        }
+      });
+      if (skips > maxSkips) {
+        maxSkips = skips;
+        mostSkipped = block;
+      }
+    });
+    return { title: mostSkipped ? mostSkipped.title : 'N/A', skips: maxSkips };
+  };
+
+  const bottleneck = getBottleneckQuestion();
+
+  const filteredSubmissions = responses.filter(sub => {
+    const matchesSearch = sub._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.userId?.email || 'Anonymous').toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (filterOutliers && insights?.outliers) {
+      return matchesSearch && insights.outliers.includes(sub._id);
+    }
+    return matchesSearch;
+  });
+
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
+  const paginatedSubmissions = filteredSubmissions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterOutliers]);
+
   if (isLoading) {
     return <Loader fullScreen text="Loading Dashboard..." />;
   }
@@ -147,25 +228,6 @@ export default function ResponseDashboard() {
       </div>
     );
   }
-
-  const filteredSubmissions = responses.filter(
-    sub =>
-      sub._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.userId?.email || 'Anonymous').toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Pagination logic
-  const itemsPerPage = 20;
-  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
-  const paginatedSubmissions = filteredSubmissions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Reset to page 1 when search query changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
 
   return (
     <div className="bg-[#0a0a0a] text-[#e5e2e1] min-h-screen flex flex-col overflow-hidden font-sans antialiased">
@@ -204,55 +266,61 @@ export default function ResponseDashboard() {
             </div>
           </header>
 
-          {/* Stats Grid */}
+          {/* Insightful Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             
-            <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 hover:border-[#8b5cf6]/20 transition-all">
+            {/* Total Responses */}
+            <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 hover:border-[#8b5cf6]/20 transition-all group">
               <div className="text-xs text-[#8a8494] uppercase tracking-wider flex justify-between items-center">
                 Total Responses
-                <span className="material-symbols-outlined text-[#d0bcff] text-[18px]">trending_up</span>
+                <span className="material-symbols-outlined text-[#d0bcff] text-[18px] group-hover:-translate-y-0.5 transition-transform">monitoring</span>
               </div>
               <div className="text-3xl font-bold text-white">{responses.length}</div>
-              <div className="text-xs text-[#d0bcff] font-semibold">Real-time count</div>
+              <div className="text-xs text-[#d0bcff] font-semibold">Track completion targets</div>
             </div>
 
+            {/* Unread / New */}
+            <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 hover:border-[#8b5cf6]/20 transition-all group">
+              <div className="text-xs text-[#8a8494] uppercase tracking-wider flex justify-between items-center">
+                Unread / New
+                <span className="material-symbols-outlined text-[#10b981] text-[18px] group-hover:scale-110 transition-transform">mark_email_unread</span>
+              </div>
+              <div className="text-3xl font-bold text-white">
+                {unreadCount} <span className="text-lg text-[#10b981] font-medium">New</span>
+              </div>
+              <div className="text-xs text-[#8a8494]">Since your last visit</div>
+            </div>
+
+            {/* Last Activity */}
             <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 hover:border-[#8b5cf6]/20 transition-all">
               <div className="text-xs text-[#8a8494] uppercase tracking-wider flex justify-between items-center">
-                Average Completion Rate
-                <span className="material-symbols-outlined text-[#8a8494] text-[18px]">horizontal_rule</span>
+                Last Activity
+                <span className="material-symbols-outlined text-[#8a8494] text-[18px]">history</span>
               </div>
-              <div className="text-3xl font-bold text-white">100%</div>
-              <div className="text-xs text-[#8a8494]">All saved are completed</div>
+              <div className="text-lg font-bold text-white mt-2 leading-tight">
+                {getLastActivity()}
+              </div>
+              <div className="text-xs text-[#8a8494] mt-auto">Most recent submission</div>
             </div>
 
-            {/* AI Score */}
-            <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 relative overflow-hidden hover:border-[#8b5cf6]/30 transition-all">
-              <div className="absolute inset-0 bg-[#d0bcff]/[0.04] pointer-events-none"></div>
+            {/* AI Outliers / Flags */}
+            <div 
+              onClick={() => {
+                if (insights?.outliers) setFilterOutliers(!filterOutliers);
+              }}
+              className={`border p-5 rounded-lg flex flex-col justify-between h-32 transition-all relative overflow-hidden ${insights ? 'cursor-pointer hover:bg-[#1a1525]' : 'opacity-70'} ${filterOutliers ? 'bg-[#1a1525] border-[#8b5cf6] shadow-[0_0_15px_rgba(139,92,246,0.15)]' : 'bg-[#111] border-[#1e1e1e] hover:border-[#8b5cf6]/40'}`}
+            >
+              {insights && <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 to-transparent pointer-events-none"></div>}
               <div className="text-xs text-[#d0bcff] uppercase tracking-wider flex justify-between items-center relative z-10 font-bold">
-                AI Average Score
-                <span className="material-symbols-outlined text-[#d0bcff] text-[18px]">neurology</span>
+                AI Outliers / Flags
+                <span className="material-symbols-outlined text-[#d0bcff] text-[18px]">{filterOutliers ? 'filter_alt_off' : 'filter_alt'}</span>
               </div>
               <div className="text-3xl font-bold text-white relative z-10">
-                {insights ? insights.averageScore : 'N/A'}
-              </div>
-              <div className="text-xs text-[#d0bcff] relative z-10 font-semibold">Out of 10</div>
-            </div>
-
-            {/* AI Sentiment */}
-            <div className="bg-[#111] border border-[#1e1e1e] p-5 rounded-lg flex flex-col justify-between h-32 relative overflow-hidden hover:border-[#8b5cf6]/30 transition-all">
-              <div className="absolute inset-0 bg-[#d0bcff]/[0.04] pointer-events-none"></div>
-              <div className="text-xs text-[#d0bcff] uppercase tracking-wider flex justify-between items-center relative z-10 font-bold">
-                Overall Sentiment
-                <span className="material-symbols-outlined text-[#d0bcff] text-[18px]">psychology</span>
-              </div>
-              <div className="text-xl font-bold text-white relative z-10 mt-2">
                 {insights ? (
-                  <span className={`px-2 py-1 rounded text-sm ${insights.sentimentClass || 'bg-[#222] text-white'}`}>
-                    {insights.sentiment}
-                  </span>
+                  <>{insights.outliers?.length || 0} <span className="text-lg text-[#d0bcff] font-medium">Flagged</span></>
                 ) : 'N/A'}
               </div>
-              <div className="text-xs text-[#d0bcff] relative z-10 font-semibold mt-auto">Analyzed by AI</div>
+              <div className="text-xs text-[#d0bcff] relative z-10 font-semibold">{insights ? (filterOutliers ? 'Click to clear filter' : 'Click to filter table') : 'Run AI Insights to scan'}</div>
             </div>
             
           </div>
@@ -260,31 +328,42 @@ export default function ResponseDashboard() {
           {/* Bento Grid Layout: Chart and Theme Insights */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             
-            {/* Main SVG Area Chart */}
-            <div className="lg:col-span-2 bg-[#111] border border-[#1e1e1e] rounded-lg p-6 flex flex-col h-[400px]">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-white">Response Volume</h3>
-                <span className="bg-[#1a1a1a] border border-[#333] text-white text-xs rounded px-3 py-1.5">
-                  All Time
+            {/* Friction Tracker (Bottleneck Question) */}
+            <div className="lg:col-span-2 bg-[#111] border border-[#1e1e1e] rounded-lg p-6 flex flex-col justify-between h-[400px] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#f43f5e]/5 rounded-full blur-[80px] pointer-events-none"></div>
+              
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#f43f5e]">warning</span>
+                    Friction Tracker
+                  </h3>
+                  <p className="text-sm text-[#8a8494] mt-1">Identifies the biggest bottleneck in your form conversion.</p>
+                </div>
+                <span className="bg-[#221518] border border-[#3e1b23] text-[#f43f5e] text-xs rounded px-3 py-1.5 font-bold">
+                  Highest Drop-off
                 </span>
               </div>
 
-              {/* Faux Area Chart (White background with grid & SVG path) */}
-              <div className="flex-1 w-full bg-white rounded border border-[#e5e4e7] relative overflow-hidden flex items-end">
-                {/* Horizontal grid lines */}
-                <div className="absolute inset-0 flex flex-col justify-between opacity-[0.08] pointer-events-none py-8">
-                  <div className="w-full h-px bg-black"></div>
-                  <div className="w-full h-px bg-black"></div>
-                  <div className="w-full h-px bg-black"></div>
-                  <div className="w-full h-px bg-black"></div>
-                  <div className="w-full h-px bg-black"></div>
-                </div>
-
-                {/* SVG Graph path */}
-                <svg className="absolute bottom-0 w-full h-[80%] z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
-                  <path d="M0,100 L0,70 Q10,60 20,80 T40,50 T60,20 T80,40 T100,10 L100,100 Z" fill="rgba(208, 188, 255, 0.25)" stroke="none"></path>
-                  <path d="M0,70 Q10,60 20,80 T40,50 T60,20 T80,40 T100,10" fill="none" stroke="#d0bcff" strokeLinecap="round" strokeWidth="2.5"></path>
-                </svg>
+              <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10">
+                {bottleneck.skips > 0 ? (
+                  <>
+                    <div className="text-5xl mb-4">🚧</div>
+                    <h4 className="text-2xl font-bold text-white mb-2 max-w-lg leading-tight">"{bottleneck.title}"</h4>
+                    <p className="text-[#8a8494] text-lg">
+                      Most skipped / left blank (<span className="text-[#f43f5e] font-bold">{bottleneck.skips} times</span>)
+                    </p>
+                    <div className="mt-6 text-sm text-[#a19ba8] bg-[#1a1516] border border-[#3e1b23] px-4 py-3 rounded-lg max-w-md">
+                      <strong>Insight:</strong> If a quarter of the group skips this optional question, it usually means it was confusing, or they didn't have the files ready. Consider rephrasing or removing it.
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-5xl mb-4">✅</div>
+                    <h4 className="text-xl font-bold text-white mb-2">No Bottlenecks Detected</h4>
+                    <p className="text-[#8a8494]">Every question has been answered by all respondents so far.</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -433,6 +512,10 @@ export default function ResponseDashboard() {
                   let displayVal = ans ? ans.value : 'No answer provided';
                   if (Array.isArray(displayVal)) {
                     displayVal = displayVal.join(', ');
+                  } else if (typeof displayVal === 'object' && displayVal !== null) {
+                    displayVal = JSON.stringify(displayVal);
+                  } else {
+                    displayVal = String(displayVal);
                   }
                   
                   // if they selected 'Other' option
