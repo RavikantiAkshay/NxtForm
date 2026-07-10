@@ -15,7 +15,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use('/api', apiLimiter);
 
 // Connect to MongoDB
 const connectDB = async () => {

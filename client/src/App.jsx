@@ -7,12 +7,18 @@ import WorkspaceBuilder from './pages/WorkspaceBuilder';
 import ResponseDashboard from './pages/ResponseDashboard';
 import PublishedForm from './pages/PublishedForm';
 
-// Simple Route Guard
 function ProtectedRoute({ children }) {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
   if (!isAuthenticated) {
-    // If not logged in, redirect to auth page
     return <Navigate to="/auth" replace />;
+  }
+  return children;
+}
+
+function PublicRoute({ children }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  if (isAuthenticated) {
+    return <Navigate to="/workspace" replace />;
   }
   return children;
 }
@@ -26,7 +32,9 @@ function App() {
         <Route 
           path="/auth" 
           element={
-            localStorage.getItem('isAuthenticated') ? <Navigate to="/workspace" replace /> : <AuthPage />
+            <PublicRoute>
+              <AuthPage />
+            </PublicRoute>
           } 
         />
 

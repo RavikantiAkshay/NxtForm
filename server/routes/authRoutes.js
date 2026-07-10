@@ -5,7 +5,6 @@ import User from '../models/User.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
-router.use(authLimiter);
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
