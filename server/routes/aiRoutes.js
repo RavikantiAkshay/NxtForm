@@ -1,8 +1,10 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
 import { Groq } from 'groq-sdk';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
+router.use(aiLimiter);
 
 const FORM_GENERATION_PROMPT = `
 You are an expert form designer AI for the NxtForm platform.
@@ -93,28 +95,33 @@ router.post('/generate-form', protect, async (req, res) => {
 
     let jsonResponse = completion.choices[0].message.content;
     
-    // Fallback parsing just in case response_format wraps it in an object
+    // Strict validation
     try {
       const parsed = JSON.parse(jsonResponse);
+      let blocksToReturn = null;
+
       if (parsed.blocks && Array.isArray(parsed.blocks)) {
-         res.status(200).json(parsed.blocks);
-         return;
+         blocksToReturn = parsed.blocks;
+      } else if (Array.isArray(parsed)) {
+         blocksToReturn = parsed;
+      } else {
+         const firstKey = Object.keys(parsed)[0];
+         if (firstKey && Array.isArray(parsed[firstKey])) {
+             blocksToReturn = parsed[firstKey];
+         }
       }
-      if (Array.isArray(parsed)) {
-         res.status(200).json(parsed);
-         return;
-      }
-      
-      // If it's an object with some arbitrary key
-      const firstKey = Object.keys(parsed)[0];
-      if (firstKey && Array.isArray(parsed[firstKey])) {
-          res.status(200).json(parsed[firstKey]);
-          return;
+
+      if (blocksToReturn) {
+        // Validate each block
+        const isValid = blocksToReturn.every(b => typeof b === 'object' && b !== null && typeof b.id === 'string' && typeof b.type === 'string');
+        if (!isValid) {
+          return res.status(500).json({ message: 'AI generated invalid block structure.' });
+        }
+        return res.status(200).json(blocksToReturn);
       }
       
       res.status(500).json({ message: 'Failed to parse AI output structure.', output: parsed });
     } catch (e) {
-       // if it failed to parse as JSON, but we asked for json_object, that's weird.
        res.status(500).json({ message: 'Failed to parse AI output.' });
     }
 

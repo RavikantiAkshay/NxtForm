@@ -391,8 +391,8 @@ export default function WorkspaceBuilder() {
   const handlePublish = async () => {
     setIsPublishing(true);
     try {
-      const token = localStorage.getItem('nxtform_token');
-      if (!token) {
+      const isAuthenticated = localStorage.getItem('isAuthenticated');
+      if (!isAuthenticated) {
         alert('You must be logged in to publish a form.');
         setIsPublishing(false);
         return;
@@ -417,9 +417,9 @@ export default function WorkspaceBuilder() {
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           title: formTitle,
           mode: formMode,
@@ -452,13 +452,12 @@ export default function WorkspaceBuilder() {
   const handleUnpublish = async () => {
     if (!formId) return;
     try {
-      const token = localStorage.getItem('nxtform_token');
       const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           isPublished: false
         })

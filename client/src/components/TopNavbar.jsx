@@ -4,10 +4,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function TopNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem('nxtform_token');
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
 
-  const handleLogout = () => {
-    localStorage.removeItem('nxtform_token');
+  const handleLogout = async () => {
+    try {
+      await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch (e) {
+      console.error(e);
+    }
+    localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('nxtform_user');
     navigate('/');
   };
@@ -35,7 +40,7 @@ export default function TopNavbar() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          {token ? (
+          {isAuthenticated ? (
             <>
               <button 
                 onClick={() => navigate('/')} 
@@ -75,7 +80,7 @@ export default function TopNavbar() {
         </nav>
 
         <div className="flex items-center gap-4">
-          {token ? (
+          {isAuthenticated ? (
             <>
               <button
                 onClick={handleLogout}

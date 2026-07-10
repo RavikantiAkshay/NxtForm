@@ -154,13 +154,14 @@ const PublishedForm = () => {
   useEffect(() => {
     const fetchFormAndData = async () => {
       try {
-        const token = localStorage.getItem('nxtform_token');
+        const isAuthenticated = localStorage.getItem('isAuthenticated');
         const headers = { 
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         };
 
-        const formRes = await fetch(`http://localhost:5000/api/forms/${id}`);
+        const formRes = await fetch(`http://localhost:5000/api/forms/${id}`, {
+          credentials: 'include'
+        });
         if (!formRes.ok) throw new Error('Failed to fetch form');
         const formData = await formRes.json();
         setForm(formData);
@@ -172,9 +173,9 @@ const PublishedForm = () => {
             setActiveBlockId(formData.blocks[0].id);
           }
           
-          if (token) {
+          if (isAuthenticated) {
             try {
-               const myRes = await fetch(`http://localhost:5000/api/responses/${id}/my-response`, { headers });
+               const myRes = await fetch(`http://localhost:5000/api/responses/${id}/my-response`, { headers, credentials: 'include' });
                if (myRes.ok) {
                  const myData = await myRes.json();
                  if (myData && myData.answers) {
@@ -228,15 +229,14 @@ const PublishedForm = () => {
       }
 
       setSubmitting(true);
-      const token = localStorage.getItem('nxtform_token');
       const answersArray = Object.entries(previewData).map(([blockId, value]) => ({ blockId, value }));
       
       const response = await fetch(`http://localhost:5000/api/responses/${id}`, {
         method: 'POST',
         headers: { 
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ answers: answersArray })
       });
       

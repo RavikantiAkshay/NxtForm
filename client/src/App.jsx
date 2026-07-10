@@ -9,8 +9,8 @@ import PublishedForm from './pages/PublishedForm';
 
 // Simple Route Guard
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('nxtform_token');
-  if (!token) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  if (!isAuthenticated) {
     // If not logged in, redirect to auth page
     return <Navigate to="/auth" replace />;
   }
@@ -26,7 +26,7 @@ function App() {
         <Route 
           path="/auth" 
           element={
-            localStorage.getItem('nxtform_token') ? <Navigate to="/workspace" replace /> : <AuthPage />
+            localStorage.getItem('isAuthenticated') ? <Navigate to="/workspace" replace /> : <AuthPage />
           } 
         />
 

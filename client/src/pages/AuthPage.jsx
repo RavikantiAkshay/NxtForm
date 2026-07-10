@@ -29,6 +29,7 @@ export default function AuthPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -38,7 +39,7 @@ export default function AuthPage() {
         throw new Error(data.message || 'Something went wrong');
       }
 
-      localStorage.setItem('nxtform_token', data.token);
+      localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('nxtform_user', JSON.stringify({ 
         _id: data._id,
         name: data.name, 

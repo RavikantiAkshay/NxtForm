@@ -29,11 +29,8 @@ export default function MyFormsPage() {
   useEffect(() => {
     const fetchForms = async () => {
       try {
-        const token = localStorage.getItem('nxtform_token');
         const response = await fetch('http://localhost:5000/api/forms', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include'
         });
         if (response.ok) {
           const data = await response.json();
@@ -52,12 +49,9 @@ export default function MyFormsPage() {
     e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete "${formTitle}"? This cannot be undone.`)) {
       try {
-        const token = localStorage.getItem('nxtform_token');
         const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include'
         });
         if (response.ok) {
           setForms(forms.filter(f => f._id !== formId));
@@ -284,13 +278,12 @@ export default function MyFormsPage() {
                     if(!aiPrompt.trim()) return;
                     setIsGenerating(true);
                     try {
-                      const token = localStorage.getItem('nxtform_token');
                       const res = await fetch('http://localhost:5000/api/ai/generate-form', {
                         method: 'POST',
                         headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
+                          'Content-Type': 'application/json'
                         },
+                        credentials: 'include',
                         body: JSON.stringify({ prompt: aiPrompt })
                       });
                       if(res.ok) {
