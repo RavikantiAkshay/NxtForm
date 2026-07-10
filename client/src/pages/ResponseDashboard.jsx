@@ -53,7 +53,7 @@ export default function ResponseDashboard() {
     const rows = responses.map(sub => {
       const row = [
         sub._id,
-        new Date(sub.createdAt).toLocaleString(),
+        new Date(sub.updatedAt || sub.createdAt).toLocaleString(),
         sub.userId?.email || 'Anonymous'
       ];
       
@@ -142,7 +142,7 @@ export default function ResponseDashboard() {
       const lastViewed = localStorage.getItem(`lastViewed_${id}`);
       if (lastViewed) {
         const lastViewedDate = new Date(lastViewed);
-        const newResps = responses.filter(r => new Date(r.createdAt) > lastViewedDate);
+        const newResps = responses.filter(r => new Date(r.updatedAt || r.createdAt) > lastViewedDate);
         setUnreadCount(newResps.length);
       } else {
         setUnreadCount(responses.length);
@@ -157,8 +157,8 @@ export default function ResponseDashboard() {
 
   const getLastActivity = () => {
     if (responses.length === 0) return 'Never';
-    const sorted = [...responses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    const lastDate = new Date(sorted[0].createdAt);
+    const sorted = [...responses].sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+    const lastDate = new Date(sorted[0].updatedAt || sorted[0].createdAt);
     const now = new Date();
     
     // Normalize to midnight to calculate calendar day differences
@@ -443,7 +443,7 @@ export default function ResponseDashboard() {
                     paginatedSubmissions.map((sub) => (
                       <tr key={sub._id} className="border-b border-[#1a1a1a] hover:bg-[#111] transition-colors">
                         <td className="p-4 font-mono text-[#8a8494]">#{sub._id.slice(-6).toUpperCase()}</td>
-                        <td className="p-4 text-[#e5e2e1]">{new Date(sub.createdAt).toLocaleString()}</td>
+                        <td className="p-4 text-[#e5e2e1]">{new Date(sub.updatedAt || sub.createdAt).toLocaleString()}</td>
                         <td className="p-4 text-[#e5e2e1]">{sub.userId?.email || 'Anonymous'}</td>
                         <td className="p-4 text-right">
                           <button 
@@ -504,7 +504,7 @@ export default function ResponseDashboard() {
               <div className="mb-8 pr-6">
                 <span className="text-xs text-[#d0bcff] font-mono font-bold tracking-wider">#{selectedSubmission._id.slice(-6).toUpperCase()}</span>
                 <h3 className="text-xl font-bold text-white mt-1">{selectedSubmission.userId?.email || 'Anonymous'}</h3>
-                <span className="text-xs text-[#8a8494] block mt-0.5">Submitted {new Date(selectedSubmission.createdAt).toLocaleString()}</span>
+                <span className="text-xs text-[#8a8494] block mt-0.5">Submitted {new Date(selectedSubmission.updatedAt || selectedSubmission.createdAt).toLocaleString()}</span>
               </div>
 
               <div className="space-y-6">
