@@ -8,7 +8,6 @@ An open-source, full-stack web application that revolutionizes how you collect d
 
 ### Workspace Builder
 - **Drag & Drop Interface** — Build forms effortlessly with over 30+ custom block types.
-- **Two Rendering Modes** — Toggle between Classic (standard web form) and Conversational (one question at a time like Typeform).
 - **Extensive Element Library** — Short text, long text, MCQs, dropdowns, ratings (stars, emoji, NPS), sliders, OTP inputs, file uploads, and terms & conditions.
 - **Live Preview** — See exactly how your form will look on mobile or desktop in real-time.
 - **"Other" Option Handling** — Built-in support for conditional "Other" text inputs in dropdowns and MCQs.
@@ -18,10 +17,17 @@ An open-source, full-stack web application that revolutionizes how you collect d
 - **Smart Element Selection** — AI automatically selects the best specialized elements (e.g., File Upload for resumes, Dropdowns for states, Terms for agreements).
 - **Professional Rephrasing** — Automatically refines your raw prompts into highly professional, user-friendly field titles.
 
-### Form Publishing & Responses
-- **One-Click Publish** — Make your forms live instantly.
-- **Public Form Routing** — Shareable public links for your forms.
-- **Response Dashboard** — View and analyze submissions in real-time.
+### Form Publishing & Validation
+- **One-Click Publish** — Make your forms live instantly via shareable public links.
+- **Two Rendering Modes** — Toggle between Classic (standard web form) and Conversational (one question at a time like Typeform).
+- **Smart Validation** — Client-side interception prevents the submission of incomplete required fields or empty custom "Other" responses.
+
+### Response Dashboard & AI Intelligence
+- **Small-Cohort Analytics** — Track real-time "Unread" counts and "Last Activity" timestamps that intelligently auto-update as users modify their submissions.
+- **Friction Tracking** — Automatically calculate and highlight the "Bottleneck Question" causing the highest drop-off/skip rate across all submissions.
+- **AI Outlier Detection** — Instantly scan dozens of responses using LLaMA to filter and isolate anomalous or flagged submissions for immediate manual review.
+- **AI Workflow Insights** — Generate hard-hitting themes and direct workflow action items (e.g., "3 users are stuck on pricing") from raw data, bypassing generic statistical fluff.
+- **CSV Export** — Export clean data with built-in CSV-injection protections and proper merging of custom "Other" inputs.
 
 ### Platform
 - **Authentication** — Secure login and registration.
