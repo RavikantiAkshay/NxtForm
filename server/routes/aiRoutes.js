@@ -136,22 +136,21 @@ router.post('/generate-form', protect, async (req, res) => {
 });
 
 const INSIGHTS_PROMPT = `
-You are an expert AI data analyst.
-Your task is to analyze form responses and generate insights in a specific JSON format.
-Analyze the sentiment of the responses and extract key themes.
+You are an expert AI data analyst evaluating small-cohort form submissions (40-50 users).
+Your task is to bypass generic statistical fluff and identify high-value relational blind spots, direct workflow action items, and hidden anomalies that the form owner needs to address immediately.
 
 Format the output strictly as this JSON structure:
 {
-  "averageScore": "Number or N/A",
-  "sentiment": "Overall sentiment (e.g., Positive, Neutral, Negative, Mixed)",
-  "sentimentClass": "Tailwind classes for the sentiment badge (e.g., 'bg-green-500/10 text-green-500' or 'bg-red-500/10 text-red-500')",
-  "outliers": ["submission_id_1", "submission_id_2"], // Array of submission _id strings that are flagged as anomalies (e.g., weird requests, highly negative, extreme outliers). Keep it empty if none.
+  "averageScore": "String: e.g. '8.4/10' or 'N/A' if not applicable",
+  "sentiment": "String: A sharp, 2-3 word summary of the overall vibe (e.g. 'Cautiously Optimistic', 'Frustrated & Blocked', 'Highly Engaged')",
+  "sentimentClass": "Tailwind classes for the badge based on sentiment urgency (e.g., 'bg-red-500/10 text-red-500' for urgent/blocked, 'bg-green-500/10 text-green-500' for good, 'bg-amber-500/10 text-amber-500' for mixed)",
+  "outliers": ["Resp-1", "Resp-2"], // Array of _id strings mapped exactly from the input payload. Only include IDs for submissions that contain extreme anomalies, weird requests, or critical red flags requiring manual review. Keep it empty if none.
   "themes": [
     {
-      "title": "Theme title",
+      "title": "Actionable Insight or Workflow Item",
       "mentions": "Number of mentions (int)",
-      "description": "Brief description of the theme based on the responses.",
-      "tagClass": "Tailwind classes for the tag (e.g., 'bg-primary/10 text-primary' or 'bg-secondary-container text-on-secondary-container')"
+      "description": "Direct, hard-hitting description of what this means for the form owner (e.g. '3 users are stuck on the pricing step', 'Multiple requests for X feature').",
+      "tagClass": "Tailwind classes for the tag (e.g., 'bg-[#8a8494]/20 text-[#d0bcff]')"
     }
   ]
 }

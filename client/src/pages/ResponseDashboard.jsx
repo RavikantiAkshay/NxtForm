@@ -105,8 +105,12 @@ export default function ResponseDashboard() {
     
     setIsGeneratingInsights(true);
     try {
-      const mappedResponses = responses.map(r => {
-        const resObj = { _id: r._id };
+      const idMap = {};
+      const mappedResponses = responses.map((r, index) => {
+        const safeId = `Resp-${index + 1}`;
+        idMap[safeId] = r._id;
+        
+        const resObj = { _id: safeId };
         r.answers.forEach(a => {
           const block = form.blocks.find(b => b.id === a.blockId);
           if (block) resObj[block.title] = a.value;
@@ -128,6 +132,11 @@ export default function ResponseDashboard() {
       if (!res.ok) throw new Error('Failed to generate insights');
       
       const data = await res.json();
+      
+      if (data.outliers && Array.isArray(data.outliers)) {
+        data.outliers = data.outliers.map(safeId => idMap[safeId]).filter(Boolean);
+      }
+      
       setInsights(data);
     } catch (error) {
       console.error(error);
